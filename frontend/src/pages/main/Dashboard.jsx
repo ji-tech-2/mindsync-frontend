@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import "../css/Dashboard.css"; 
+import "../css/dashboard.css"; 
 
 export default function Dashboard({ isProtected }) { 
   const navigate = useNavigate();
