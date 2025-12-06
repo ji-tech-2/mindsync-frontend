@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "backend (node.js)"
+		},
+		{
+			"path": "frontend (react.js)"
+		},
+		{
+			"path": ".github"
+		}
+	]
+}
