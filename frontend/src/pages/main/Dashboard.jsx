@@ -44,7 +44,7 @@ function DashboardLoggedOut({ navigate }) {
         <h2>Pilih Aksi Berikut</h2>
         <div className="actions-grid two-columns">
           
-          <div className="action-card" onClick={() => navigate("/take-test")}>
+          <div className="action-card" onClick={() => navigate("/screening")}>
               <div className="action-icon" style={{ background: '#7953c9' }}>📝</div>
               <h3>Ambil Tes Kesehatan Mental</h3>
               <p>Mulai evaluasi kondisi mental Anda tanpa perlu akun.</p>
@@ -88,7 +88,7 @@ function DashboardLoggedIn({ user, navigate }) {
             <div className="quick-actions">
                 <h2>Mulai Aktivitas Cepat</h2>
                 <div className="actions-grid">
-                    <div className="action-card" onClick={() => navigate("/take-test")}>
+                    <div className="action-card" onClick={() => navigate("/screening")}>
                         <div className="action-icon" style={{ background: '#7953c9' }}>📝</div>
                         <h3>Ambil Tes Kesehatan Mental</h3>
                         <p>Mulai evaluasi kondisi mental Anda saat ini.</p>
