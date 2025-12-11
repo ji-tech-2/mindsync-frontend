@@ -3,6 +3,7 @@ import Login from "./pages/main/Login";
 import Dashboard from "./pages/main/Dashboard";
 import Register from "./pages/main/Register";
 import Screening from "./pages/main/Screening";
+import Result from "./pages/main/Result";
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
       <Route path="/signIn" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/screening" element={<Screening />} />
+      <Route path="/result" element={<Result />} />
     </Routes>
   );
 }
