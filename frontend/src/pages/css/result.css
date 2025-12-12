@@ -124,6 +124,9 @@ html, body, #root {
 }
 
 .score-category {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 12px;
   font-size: 1.5rem;
   font-weight: 600;
   text-transform: uppercase;
