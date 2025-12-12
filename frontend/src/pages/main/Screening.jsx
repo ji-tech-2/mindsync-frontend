@@ -13,14 +13,14 @@ export default function Screening() {
       question: "Berapa usia Anda?",
       type: "number",
       placeholder: "Masukkan usia Anda",
-      min: 13,
+      min: 16,
       max: 100
     },
     {
       key: "gender",
       question: "Apa jenis kelamin Anda?",
       type: "select",
-      options: ["Male", "Female", "Other"]
+      options: ["Male", "Female"]
     },
     {
       key: "occupation",
@@ -32,7 +32,7 @@ export default function Screening() {
       key: "work_mode",
       question: "Bagaimana mode kerja Anda?",
       type: "select",
-      options: ["Remote", "Hybrid", "On-site"]
+      options: ["Remote", "Hybrid", "On-site", "Unemployed"]
     },
     {
       key: "screen_time_hours",
