@@ -1,7 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../css/screening.css";
 
 export default function Screening() {
+
+  const navigate = useNavigate();
+
   // Data pertanyaan dengan validasi
   const questions = [
     {
@@ -160,12 +164,11 @@ export default function Screening() {
     // Pindah ke pertanyaan berikutnya atau selesai
     if (isLastQuestion) {
       console.log("Hasil Akhir:", updatedAnswers);
-      alert("Terima kasih! Data Anda telah tersimpan.");
       
-      // Reset ke awal
-      setCurrentIndex(0);
-      setAllAnswers({});
-      setCurrentAnswer("");
+      // Kirim ke Result page dengan screening data
+      navigate("/result", { 
+        state: { screeningData: updatedAnswers } 
+      });
     } else {
       setCurrentIndex(currentIndex + 1);
       setCurrentAnswer("");
