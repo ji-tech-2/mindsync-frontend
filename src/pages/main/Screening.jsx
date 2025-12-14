@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/screening.css";
+import { saveToSession } from "../utils/sessionHelper";
 
 // ============= FUNGSI TRANSFORM & KIRIM =============
 
@@ -70,33 +71,34 @@ async function sendToFlask(data, flaskURL = "http://localhost:5000/predict") {
 // ============= FUNGSI SESSION STORAGE =============
 
 // Simpan data ke session
-function saveToSession(key, data) {
-  try {
-    const sessionData = {
-      ...data,
-      timestamp: new Date().toISOString(),
-      session_id: generateSessionId()
-    };
 
-    // Simpan sebagai JSON string
-    const dataString = JSON.stringify(sessionData);
+// function saveToSession(key, data) {
+//   try {
+//     const sessionData = {
+//       ...data,
+//       timestamp: new Date().toISOString(),
+//       session_id: generateSessionId()
+//     };
 
-    // Gunakan in-memory storage (bukan sessionStorage karena tidak didukung)
-    window._appSession = window._appSession || {};
-    window._appSession[key] = dataString;
+//     // Simpan sebagai JSON string
+//     const dataString = JSON.stringify(sessionData);
 
-    console.log("✅ Data saved to session:", key);
-    return true;
-  } catch (error) {
-    console.error("❌ Error saving to session:", error);
-    return false;
-  }
-}
+//     // Gunakan in-memory storage (bukan sessionStorage karena tidak didukung)
+//     window._appSession = window._appSession || {};
+//     window._appSession[key] = dataString;
 
-// Generate unique session ID
-function generateSessionId() {
-  return 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-}
+//     console.log("✅ Data saved to session:", key);
+//     return true;
+//   } catch (error) {
+//     console.error("❌ Error saving to session:", error);
+//     return false;
+//   }
+// }
+
+// // Generate unique session ID
+// function generateSessionId() {
+//   return 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+// }
 
 // ============= COMPONENT =============
 
