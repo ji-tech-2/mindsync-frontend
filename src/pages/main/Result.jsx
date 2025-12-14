@@ -1,79 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+// Pastikan path ini sesuai dengan lokasi file helper Anda
+// Jika belum buat file helper, scroll ke bawah untuk lihat caranya
+import { getFromSession } from '../utils/sessionHelper.js'; 
 import '../css/result.css';
 
 const ResultPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [resultData, setResultData] = useState(null);
 
   useEffect(() => {
-    // Check if user is logged in (dari localStorage atau context)
-    const userToken = localStorage.getItem('userToken');
-    setIsLoggedIn(!!userToken);
+    // 1. Coba ambil data dari navigasi (state)
+    let data = location.state;
 
-    // Ambil screening data dari location state (dari screening page)
-    const screeningData = location.state?.screeningData;
+    // 2. Jika tidak ada di state (misal karena refresh), ambil dari Session Storage
+    if (!data) {
+      console.log("State kosong, mengambil dari Session Storage...");
+      data = getFromSession("screeningData");
+    }
+
+    // 3. Jika data ditemukan, proses untuk ditampilkan
+    if (data) {
+      processData(data);
+    } else {
+      // 4. Jika benar-benar tidak ada data, kembalikan ke halaman screening
+      alert("Data tidak ditemukan. Silakan lakukan screening ulang.");
+      navigate('/screening');
+    }
+  }, [location, navigate]);
+
+  const processData = (incomingData) => {
+    // incomingData strukturnya: { raw: {...}, transformed: {...}, prediction: {...} }
     
-    if (screeningData) {
-      // Simulasi call ke Flask ML endpoint
-      fetchMLPrediction(screeningData);
-    }
-  }, [location]);
+    // Ambil score dari response Flask dengan beberapa fallback key
+    const prediction = incomingData.prediction;
+    const predictionScore = prediction?.mental_wellness_index ||
+                            prediction?.mental_wellness_index_0_100 ||
+                            prediction?.score ||
+                            prediction?.result ||
+                            prediction?.prediction ||
+                            (typeof prediction === 'number' ? prediction : 0);
 
-  const fetchMLPrediction = async (screeningData) => {
-    try {
-      // TODO: Replace dengan actual Flask endpoint
-      // const response = await fetch('http://localhost:5000/api/predict', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(screeningData)
-      // });
-      // const data = await response.json();
+    // Siapkan data untuk State React
+    const formattedResult = {
+      mentalWellnessScore: parseFloat(predictionScore),
+      category: getCategoryLabel(predictionScore),
+      // Bisa dari raw (session) atau inputData (state navigate)
+      rawInput: incomingData.raw || incomingData.inputData
+    };
 
-      // Dummy data sesuai cluster (Cluster 9 - Dangerous)
-      const dummyResult = {
-        mentalWellnessScore: 2.24, // dari avg score
-        category: 'Dangerous',
-        clusterNumber: 9,
-        topNegativeFactors: [
-          {
-            factor: 'Stress Level',
-            value: 9.81,
-            impact: 'Very High',
-            description: 'Stress level ekstrem (9.8/10) adalah faktor utama penurunan kesehatan mental'
-          },
-          {
-            factor: 'Screen Time',
-            value: 10.62,
-            impact: 'High',
-            description: 'Penggunaan screen 10.6 jam/hari berkontribusi pada kelelahan dan stress'
-          },
-          {
-            factor: 'Sleep Quality',
-            value: 1.0,
-            impact: 'Very Poor',
-            description: 'Kualitas tidur sangat rendah (1/5) memperburuk kondisi mental'
-          }
-        ],
-        rawMetrics: {
-          screenTime: 10.62,
-          workScreenHours: 2.22,
-          leisureScreenHours: 8.39,
-          sleepHours: 6.17,
-          sleepQuality: 1.0,
-          stressLevel: 9.81,
-          productivity: 42.05,
-          exerciseMinutes: 82.58,
-          socialHours: 13.08
-        }
-      };
-
-      setResultData(dummyResult);
-    } catch (error) {
-      console.error('Error fetching prediction:', error);
-    }
+    setResultData(formattedResult);
   };
 
   const getScoreColor = (score) => {
@@ -90,12 +67,9 @@ const ResultPage = () => {
     return 'Healthy';
   };
 
-  const handleLoginRedirect = () => {
-     navigate('/signIn', { state: { from: '/result' } });
-  };
-
+  // Tampilkan Loading jika data belum siap
   if (!resultData) {
-    return <div className="result-loading">Loading prediction...</div>;
+    return <div className="result-loading">Memuat hasil analisis...</div>;
   }
 
   const score = resultData.mentalWellnessScore;
@@ -105,47 +79,33 @@ const ResultPage = () => {
     <div className="result-container">
       {/* Header */}
       <div className="result-header">
-        <h1>Your Mental Wellness Score</h1>
-        <p>Based on your screening responses</p>
+        <h1>Skor Kesehatan Mental Anda</h1>
+        <p>Berdasarkan jawaban screening Anda</p>
       </div>
 
       {/* Score Circle - Always Shown */}
       <div className="score-section">
-        <div className="score-circle" style={{ borderColor: scoreColor }}>
-          <div className="score-value">{score.toFixed(2)}</div>
+        <div className="score-circle" style={{ borderColor: scoreColor, color: scoreColor }}>
+          <div className="score-value">{score.toFixed(1)}</div>
           <div className="score-max">/100</div>
         </div>
         <div className="score-category" style={{ backgroundColor: scoreColor }}>
-          {getCategoryLabel(score)}
+          {resultData.category}
         </div>
       </div>
 
+ 
       {/* Footer Action */}
       <div className="result-footer">
-        <button className="btn btn-outline" onClick={() => navigate('/screening')}>
-          Take Assessment Again
+        <button className="btn btn-primary" onClick={() => navigate('/screening')}>
+          Ambil Tes Lagi
         </button>
         <button className="btn btn-outline" onClick={() => navigate('/')}>
-          Back to Home
+          Kembali ke Beranda
         </button>
       </div>
     </div>
   );
-};
-
-const getMetricUnit = (metricKey) => {
-  const units = {
-    screenTime: 'hrs/day',
-    workScreenHours: 'hrs/day',
-    leisureScreenHours: 'hrs/day',
-    sleepHours: 'hrs/night',
-    sleepQuality: '/5',
-    stressLevel: '/10',
-    productivity: '/100',
-    exerciseMinutes: 'mins/week',
-    socialHours: 'hrs/week'
-  };
-  return units[metricKey] || '';
 };
 
 export default ResultPage;
