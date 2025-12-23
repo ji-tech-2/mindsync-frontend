@@ -31,7 +31,7 @@ function transformToJSON(screeningData) {
     gender: genderMap[screeningData.gender] || screeningData.gender,
     occupation: occupationMap[screeningData.occupation] || screeningData.occupation,
     work_mode: workModeMap[screeningData.work_mode] || screeningData.work_mode,
-    screen_time_hours: parseFloat(screeningData.screen_time_hours),
+    // screen_time_hours: parseFloat(screeningData.screen_time_hours),
     work_screen_hours: parseFloat(screeningData.work_screen_hours),
     leisure_screen_hours: parseFloat(screeningData.leisure_screen_hours),
     sleep_hours: parseFloat(screeningData.sleep_hours),
@@ -132,14 +132,14 @@ export default function Screening() {
       type: "select",
       options: ["Remote", "Hybrid", "On-site", "Unemployed"]
     },
-    {
-      key: "screen_time_hours",
-      question: "Berapa total waktu screen time Anda per hari (dalam jam)?",
-      type: "number",
-      placeholder: "Contoh: 8",
-      min: 0,
-      max: 24
-    },
+    // {
+    //   key: "screen_time_hours",
+    //   question: "Berapa total waktu screen time Anda per hari (dalam jam)?",
+    //   type: "number",
+    //   placeholder: "Contoh: 8",
+    //   min: 0,
+    //   max: 24
+    // },
     {
       key: "work_screen_hours",
       question: "Berapa jam screen time Anda untuk keperluan pekerjaan?",
