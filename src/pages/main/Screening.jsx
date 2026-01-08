@@ -17,13 +17,15 @@ function transformToJSON(screeningData) {
     "Unemployed": "Unemployed",
     "Student": "Student",
     "Freelancer": "Self-employed",
+    "Retired": "Unemployed",
     "Other": "Self-employed"
   };
 
   const workModeMap = {
     "Remote": "Remote",
     "Hybrid": "Hybrid",
-    "On-site": "In-person"
+    "On-site": "In-person",
+    "Unemployed": "Unemployed"
   };
 
   return {
@@ -124,7 +126,7 @@ export default function Screening() {
       key: "occupation",
       question: "Apa status pekerjaan Anda saat ini?",
       type: "select",
-      options: ["Employed", "Unemployed", "Student", "Freelancer", "Other"]
+      options: ["Employed", "Unemployed", "Student", "Freelancer", "Retired"]
     },
     {
       key: "work_mode",
@@ -210,6 +212,25 @@ export default function Screening() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Helper function to check if a question should be skipped
+  const shouldSkipQuestion = (questionIndex, answers) => {
+    const question = questions[questionIndex];
+    
+    // Include current answer if checking current or future questions
+    const answersToCheck = {
+      ...answers,
+      ...(currentAnswer && currentQ ? { [currentQ.key]: currentAnswer } : {})
+    };
+    
+    // Skip work_mode and work_screen_hours if occupation is Unemployed or Retired
+    if ((question.key === "work_mode" || question.key === "work_screen_hours") && 
+        (answersToCheck.occupation === "Unemployed" || answersToCheck.occupation === "Retired")) {
+      return true;
+    }
+    
+    return false;
+  };
+
   const currentQ = questions[currentIndex];
   const isLastQuestion = currentIndex === questions.length - 1;
   const progress = ((currentIndex + 1) / questions.length) * 100;
@@ -239,6 +260,24 @@ export default function Screening() {
     setErrorMsg("");
   };
 
+  // Find next non-skipped question index
+  const findNextQuestionIndex = (fromIndex, answers) => {
+    let nextIndex = fromIndex + 1;
+    while (nextIndex < questions.length && shouldSkipQuestion(nextIndex, answers)) {
+      nextIndex++;
+    }
+    return nextIndex;
+  };
+
+  // Find previous non-skipped question index
+  const findPreviousQuestionIndex = (fromIndex, answers) => {
+    let prevIndex = fromIndex - 1;
+    while (prevIndex >= 0 && shouldSkipQuestion(prevIndex, answers)) {
+      prevIndex--;
+    }
+    return prevIndex;
+  };
+
   const onNext = async () => {
     const error = validateInput(currentAnswer, currentQ);
 
@@ -251,6 +290,13 @@ export default function Screening() {
       ...allAnswers,
       [currentQ.key]: currentAnswer
     };
+
+    // Auto-set work_mode and work_screen_hours if occupation is Unemployed or Retired
+    if (currentQ.key === "occupation" && (currentAnswer === "Unemployed" || currentAnswer === "Retired")) {
+      updatedAnswers.work_mode = "Unemployed";
+      updatedAnswers.work_screen_hours = "0";
+    }
+
     setAllAnswers(updatedAnswers);
 
     if (isLastQuestion) {
@@ -294,14 +340,19 @@ export default function Screening() {
       }
 
     } else {
-      setCurrentIndex(currentIndex + 1);
+      const nextIndex = findNextQuestionIndex(currentIndex, updatedAnswers);
+      setCurrentIndex(nextIndex);
       setCurrentAnswer("");
     }
   };
 
   const onBack = () => {
     setErrorMsg("");
-    const prevIndex = currentIndex - 1;
+    const prevIndex = findPreviousQuestionIndex(currentIndex, allAnswers);
+    
+    // Safety check to prevent going below 0
+    if (prevIndex < 0) return;
+    
     const prevKey = questions[prevIndex].key;
 
     setCurrentIndex(prevIndex);
@@ -314,10 +365,6 @@ export default function Screening() {
 
         <div className="progress-bar-container">
           <div className="progress-bar" style={{ width: `${progress}%` }} />
-        </div>
-
-        <div className="question-counter">
-          Pertanyaan {currentIndex + 1} dari {questions.length}
         </div>
 
         <h2>{currentQ.question}</h2>
