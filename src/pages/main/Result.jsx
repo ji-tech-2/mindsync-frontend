@@ -43,9 +43,10 @@ const ResultPage = () => {
                             (typeof prediction === 'number' ? prediction : 0);
 
     // Siapkan data untuk State React
+    // Pastikan score tidak kurang dari 0 (tidak minus)
     const formattedResult = {
-      mentalWellnessScore: parseFloat(predictionScore),
-      category: getCategoryLabel(predictionScore),
+      mentalWellnessScore: Math.max(0, parseFloat(predictionScore)),
+      category: getCategoryLabel(Math.max(0, predictionScore)),
       // Bisa dari raw (session) atau inputData (state navigate)
       rawInput: incomingData.raw || incomingData.inputData
     };
