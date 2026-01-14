@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AdviceFactor = () => {
+const AdviceFactor = ({ factorKey, factorData }) => {
   return (
     <div className="advice-factor">
       {/* Dummy content */}
