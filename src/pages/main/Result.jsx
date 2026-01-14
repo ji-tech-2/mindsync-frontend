@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 // Pastikan path ini sesuai dengan lokasi file helper Anda
 // Jika belum buat file helper, scroll ke bawah untuk lihat caranya
 import { getFromSession } from '../utils/sessionHelper.js'; 
+import Advice from '../../components/Advice';
 import '../css/result.css';
 
 const ResultPage = () => {
@@ -95,6 +96,8 @@ const ResultPage = () => {
         </div>
       </div>
 
+      {/* Advice Section */}
+      <Advice />
  
       {/* Footer Action */}
       <div className="result-footer">
