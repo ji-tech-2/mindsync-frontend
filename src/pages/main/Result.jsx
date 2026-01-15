@@ -11,6 +11,21 @@ const ResultPage = () => {
   const location = useLocation();
   const [resultData, setResultData] = useState(null);
 
+  const processData = (incomingData) => {
+    // incomingData strukturnya: { raw: {...}, transformed: {...}, prediction: {...} }
+    const prediction = incomingData.prediction;
+
+    // Siapkan data untuk State React
+    // Pastikan score tidak kurang dari 0 (tidak minus)
+    const formattedResult = {
+      mentalWellnessScore: Math.max(0, parseFloat(prediction.prediction[0])),
+      category: prediction.mental_health_category,
+      wellnessAnalysis: prediction.wellness_analysis
+    };
+
+    setResultData(formattedResult);
+  };
+
   useEffect(() => {
     // 1. Coba ambil data dari navigasi (state)
     let data = location.state;
@@ -31,41 +46,17 @@ const ResultPage = () => {
     }
   }, [location, navigate]);
 
-  const processData = (incomingData) => {
-    // incomingData strukturnya: { raw: {...}, transformed: {...}, prediction: {...} }
-    
-    // Ambil score dari response Flask dengan beberapa fallback key
-    const prediction = incomingData.prediction;
-    const predictionScore = prediction?.mental_wellness_index ||
-                            prediction?.mental_wellness_index_0_100 ||
-                            prediction?.score ||
-                            prediction?.result ||
-                            prediction?.prediction ||
-                            (typeof prediction === 'number' ? prediction : 0);
-
-    // Siapkan data untuk State React
-    // Pastikan score tidak kurang dari 0 (tidak minus)
-    const formattedResult = {
-      mentalWellnessScore: Math.max(0, parseFloat(predictionScore)),
-      category: getCategoryLabel(Math.max(0, predictionScore)),
-      // Bisa dari raw (session) atau inputData (state navigate)
-      rawInput: incomingData.raw || incomingData.inputData
-    };
-
-    setResultData(formattedResult);
+  const getScoreColor = (category) => {
+    if (category === 'dangerous') return '#FF4757';
+    if (category === 'not healthy') return '#FFA502';
+    if (category === 'average') return '#FFD93D';
+    return '#6BCB77';
   };
 
-  const getScoreColor = (score) => {
-    if (score <= 12) return '#FF4757'; // Dangerous
-    if (score <= 28.6) return '#FFA502'; // Not Healthy
-    if (score <= 61.4) return '#FFD93D'; // Average
-    return '#6BCB77'; // Healthy
-  };
-
-  const getCategoryLabel = (score) => {
-    if (score <= 12) return 'Dangerous';
-    if (score <= 28.6) return 'Not Healthy';
-    if (score <= 61.4) return 'Average';
+  const getCategoryLabel = (category) => {
+    if (category === 'dangerous') return 'Dangerous';
+    if (category === 'not healthy') return 'Not Healthy';
+    if (category === 'average') return 'Average';
     return 'Healthy';
   };
 
@@ -75,7 +66,7 @@ const ResultPage = () => {
   }
 
   const score = resultData.mentalWellnessScore;
-  const scoreColor = getScoreColor(score);
+  const scoreColor = getScoreColor(resultData.category);
 
   return (
     <div className="result-container">
@@ -92,12 +83,12 @@ const ResultPage = () => {
           <div className="score-max">/100</div>
         </div>
         <div className="score-category" style={{ backgroundColor: scoreColor }}>
-          {resultData.category}
+          {getCategoryLabel(resultData.category)}
         </div>
       </div>
 
       {/* Advice Section */}
-      <Advice />
+      <Advice resultData={resultData} />
  
       {/* Footer Action */}
       <div className="result-footer">

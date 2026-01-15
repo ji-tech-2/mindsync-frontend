@@ -1,61 +1,81 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AdviceFactor from './AdviceFactor';
 import styles from './Advice.module.css';
 
-const dummyResponse = {
-  "description": "It sounds like you're navigating a particularly challenging period, and it takes immense strength to acknowledge these struggles. Dealing with concerns around your sleep quality, the amount of physical activity you're able to incorporate, and how your sleep impacts your overall productivity can feel incredibly overwhelming. Please know that it's okay to feel this way, and reaching out for support is a courageous first step towards finding balance and well-being.",
-  "factors": {
-    "num__exercise_minutes_per_week": {
-      "advices": [
-        "Start with small, manageable increments of physical activity, such as 10-15 minute walks, and gradually increase duration or intensity as your stamina improves.",
-        "Find activities you genuinely enjoy, whether it's dancing, gardening, or a sport, to make exercise feel less like a chore and more like a rewarding part of your day.",
-        "Integrate movement into your daily routine by taking stairs instead of elevators, parking further away, or doing short 'activity snacks' throughout the day."
-      ],
-      "references": [
-        "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
-        "https://newsnetwork.mayoclinic.org/discussion/mayo-clinic-minute-boost-your-health-and-productivity-with-activity-snacks/",
-        "https://www.nimh.nih.gov/health/topics/caring-for-your-mental-health"
-      ]
-    },
-    "num__sleep_hours productivity_0_100": {
-      "advices": [
-        "Prioritize adequate sleep by aiming for 7-9 hours per night, recognizing that sufficient rest is foundational for optimal cognitive function and productivity.",
-        "Implement a 'power-down' hour before bed, avoiding screens and mentally stimulating tasks, to allow your brain to switch from 'work mode' to 'rest mode'.",
-        "Structure your workday or tasks by breaking them into smaller, manageable chunks with short breaks in between, which can enhance focus and prevent burnout, even with good sleep."
-      ],
-      "references": [
-        "https://www.sleepfoundation.org/sleep-hygiene",
-        "https://www.mayoclinichealthsystem.org/hometown-health/speaking-of-health/5-ways-to-get-better-sleep",
-        "https://newsnetwork.mayoclinic.org/discussion/mayo-clinic-minute-boost-your-health-and-productivity-with-activity-snacks/"
-      ]
-    },
-    "num__sleep_quality_1_5^2": {
-      "advices": [
-        "Establish a consistent sleep schedule, going to bed and waking up at the same time daily, even on weekends, to regulate your body's natural sleep-wake cycle.",
-        "Create a relaxing bedtime routine, such as reading a book, taking a warm bath, or listening to calming music, to signal to your body that it's time to wind down.",
-        "Optimize your sleep environment by ensuring your bedroom is dark, quiet, cool, and free from electronic devices that emit blue light."
-      ],
-      "references": [
-        "https://www.mayoclinichealthsystem.org/hometown-health/speaking-of-health/5-ways-to-get-better-sleep",
-        "https://www.sleepfoundation.org/sleep-hygiene",
-        "https://www.cdc.gov/sleep/about/index.html"
-      ]
-    }
-  }
-}
+const Advice = ({ resultData }) => {
+  const [adviceData, setAdviceData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-const Advice = () => {
+  useEffect(() => {
+    const fetchAdvice = async () => {
+      if (!resultData) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        
+        const requestData = {
+          prediction_score: [resultData.mentalWellnessScore],
+          mental_health_category: resultData.category,
+          wellness_analysis: resultData.wellnessAnalysis
+        };
+        
+        const response = await fetch('http://139.59.109.5:8000/v0-1/model-advice', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setAdviceData(data.ai_advice);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching advice:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAdvice();
+  }, [resultData]);
+
+  if (loading) {
+    return (
+      <div className={styles.adviceSection}>
+        <h2>Advice</h2>
+        <p>Loading personalized advice...</p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.adviceSection}>
       <h2>Advice</h2>
-      <p className={styles.description}>
-        {dummyResponse.description}
-      </p>
-      <div className={styles.adviceFactors}>
-        {Object.entries(dummyResponse.factors).map(([key, value]) => (
-          <AdviceFactor key={key} factorKey={key} factorData={value} />
-        ))}
-      </div>
+      {error && (
+        <p style={{ color: '#FFA502' }}>{error}</p>
+      )}
+      {adviceData && (
+        <>
+          <p>
+            {adviceData.description}
+          </p>
+          <div className={styles.adviceFactors}>
+            {Object.entries(adviceData.factors || {}).map(([key, value]) => (
+              <AdviceFactor key={key} factorKey={key} factorData={value} />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -1,25 +1,24 @@
 .adviceSection {
-  margin: 20px 0;
-  padding: 0 15px;
+  color: white;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
 .adviceSection h2 {
-  color: #ffffff;
+  color: white;
   text-align: center;
-  margin-bottom: 20px;
-  font-size: 2rem;
+  margin-bottom: 1rem;
 }
 
-.description {
-  color: #f0f0f0;
-  line-height: 1.6;
-  margin-bottom: 30px;
-  text-align: justify;
-  font-size: 1.1rem;
+.adviceSection p {
+  color: white;
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
-.factorsContainer {
+.adviceFactors {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 1.5rem;
 }
