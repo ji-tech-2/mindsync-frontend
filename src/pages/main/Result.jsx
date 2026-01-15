@@ -11,6 +11,21 @@ const ResultPage = () => {
   const location = useLocation();
   const [resultData, setResultData] = useState(null);
 
+  const processData = (incomingData) => {
+    // incomingData strukturnya: { raw: {...}, transformed: {...}, prediction: {...} }
+    const prediction = incomingData.prediction;
+
+    // Siapkan data untuk State React
+    // Pastikan score tidak kurang dari 0 (tidak minus)
+    const formattedResult = {
+      mentalWellnessScore: Math.max(0, parseFloat(prediction.prediction[0])),
+      category: prediction.mental_health_category,
+      wellnessAnalysis: prediction.wellness_analysis
+    };
+
+    setResultData(formattedResult);
+  };
+
   useEffect(() => {
     // 1. Coba ambil data dari navigasi (state)
     let data = location.state;
@@ -30,21 +45,6 @@ const ResultPage = () => {
       navigate('/screening');
     }
   }, [location, navigate]);
-
-  const processData = (incomingData) => {
-    // incomingData strukturnya: { raw: {...}, transformed: {...}, prediction: {...} }
-    const prediction = incomingData.prediction;
-
-    // Siapkan data untuk State React
-    // Pastikan score tidak kurang dari 0 (tidak minus)
-    const formattedResult = {
-      mentalWellnessScore: Math.max(0, parseFloat(prediction.prediction[0])),
-      category: prediction.mental_health_category,
-      wellnessAnalysis: prediction.wellness_analysis
-    };
-
-    setResultData(formattedResult);
-  };
 
   const getScoreColor = (category) => {
     if (category === 'dangerous') return '#FF4757';
