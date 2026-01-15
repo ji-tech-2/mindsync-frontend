@@ -88,7 +88,7 @@ const ResultPage = () => {
       </div>
 
       {/* Advice Section */}
-      <Advice />
+      <Advice resultData={resultData} />
  
       {/* Footer Action */}
       <div className="result-footer">
