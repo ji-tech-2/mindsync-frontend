@@ -1,6 +1,5 @@
 import React from 'react';
 import AdviceFactor from './AdviceFactor';
-import styles from './Advice.module.css';
 
 const dummyResponse = {
   "description": "It sounds like you're navigating a particularly challenging period, and it takes immense strength to acknowledge these struggles. Dealing with concerns around your sleep quality, the amount of physical activity you're able to incorporate, and how your sleep impacts your overall productivity can feel incredibly overwhelming. Please know that it's okay to feel this way, and reaching out for support is a courageous first step towards finding balance and well-being.",
@@ -44,14 +43,15 @@ const dummyResponse = {
   }
 }
 
+
 const Advice = () => {
   return (
-    <div className={styles.adviceSection}>
+    <div className="advice-section">
       <h2>Advice</h2>
-      <p className={styles.description}>
+      <p>
         {dummyResponse.description}
       </p>
-      <div className={styles.adviceFactors}>
+      <div className="advice-factors">
         {Object.entries(dummyResponse.factors).map(([key, value]) => (
           <AdviceFactor key={key} factorKey={key} factorData={value} />
         ))}
