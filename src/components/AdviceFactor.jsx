@@ -25,7 +25,7 @@ const AdviceFactor = ({ factorKey, factorData }) => {
         <div className={styles.content}>
           <ul className={styles.list}>
             {factorData.advices.map((item, index) => (
-              <li key={index} className={styles.listItem}>{item}</li>
+              <li key={index} className={styles.listItem} data-number={index + 1}>{item}</li>
             ))}
           </ul>
 
