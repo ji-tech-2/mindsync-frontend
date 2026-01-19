@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/screening.css";
-import { saveToSession } from "../utils/sessionHelper";
 import { API_CONFIG, API_URLS } from "../../config/api";
 
 // ============= FUNGSI TRANSFORM & KIRIM =============
@@ -317,13 +316,6 @@ export default function Screening() {
           // Check if response has prediction_id (async processing)
           if (result.data.prediction_id) {
             console.log("🆔 Received prediction_id:", result.data.prediction_id);
-            
-            // Save screening data with prediction_id
-            saveToSession("screeningData", {
-              raw: updatedAnswers,
-              transformed: transformedData,
-              predictionId: result.data.prediction_id
-            });
 
             // Navigate to Result page with prediction_id for polling
             navigate(`/result/${result.data.prediction_id}`, {
@@ -335,12 +327,6 @@ export default function Screening() {
             });
           } else {
             // Synchronous response with immediate result
-            saveToSession("screeningData", {
-              raw: updatedAnswers,
-              transformed: transformedData,
-              prediction: result.data
-            });
-
             // Navigate to Result page with immediate prediction
             navigate("/result", {
               state: {

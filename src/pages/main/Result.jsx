@@ -78,9 +78,6 @@ const ResultPage = () => {
               prediction: pollResult.data
             });
             
-            // Update session with final result
-            getFromSession("screeningData").prediction = pollResult.data;
-            
             setIsPolling(false);
           }
         } catch (error) {
