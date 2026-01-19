@@ -13,7 +13,7 @@ export default function App() {
       <Route path="/signIn" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/screening" element={<Screening />} />
-      <Route path="/result" element={<Result />} />
+      <Route path="/result/:predictionId" element={<Result />} />
     </Routes>
   );
 }

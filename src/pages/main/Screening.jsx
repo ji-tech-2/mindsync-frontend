@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/screening.css";
 import { saveToSession } from "../utils/sessionHelper";
+import { API_CONFIG, API_URLS } from "../../config/api";
 
 // ============= FUNGSI TRANSFORM & KIRIM =============
 
@@ -308,25 +309,47 @@ export default function Screening() {
         console.log("📤 Data yang dikirim ke Flask:", transformedData);
 
         // 2. Kirim ke Flask API
-        const result = await sendToFlask(transformedData, "http://139.59.109.5:8000/v0-1/model-predict");
+        const result = await sendToFlask(transformedData, API_URLS.predict);
 
         if (result.success) {
           console.log("✅ Response dari Flask:", result.data);
-          saveToSession("screeningData", {
+          
+          // Check if response has prediction_id (async processing)
+          if (result.data.prediction_id) {
+            console.log("🆔 Received prediction_id:", result.data.prediction_id);
+            
+            // Save screening data with prediction_id
+            saveToSession("screeningData", {
+              raw: updatedAnswers,
+              transformed: transformedData,
+              predictionId: result.data.prediction_id
+            });
+
+            // Navigate to Result page with prediction_id for polling
+            navigate(`/result/${result.data.prediction_id}`, {
+              state: {
+                predictionId: result.data.prediction_id,
+                inputData: updatedAnswers,
+                transformedData: transformedData
+              }
+            });
+          } else {
+            // Synchronous response with immediate result
+            saveToSession("screeningData", {
               raw: updatedAnswers,
               transformed: transformedData,
               prediction: result.data
-          });
+            });
 
-
-          // 3. Navigate ke Result page dengan response dari Flask
-          navigate("/result", {
-            state: {
-              prediction: result.data,
-              inputData: updatedAnswers,
-              transformedData: transformedData
-            }
-          });
+            // Navigate to Result page with immediate prediction
+            navigate("/result", {
+              state: {
+                prediction: result.data,
+                inputData: updatedAnswers,
+                transformedData: transformedData
+              }
+            });
+          }
         } else {
           // Gagal kirim ke Flask
           setErrorMsg("Gagal mengirim data ke server: " + result.error);
