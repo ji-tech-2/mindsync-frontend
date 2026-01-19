@@ -311,31 +311,7 @@ export default function Screening() {
         const result = await sendToFlask(transformedData, API_URLS.predict);
 
         if (result.success) {
-          console.log("✅ Response dari Flask:", result.data);
-          
-          // Check if response has prediction_id (async processing)
-          if (result.data.prediction_id) {
-            console.log("🆔 Received prediction_id:", result.data.prediction_id);
-
-            // Navigate to Result page with prediction_id for polling
-            navigate(`/result/${result.data.prediction_id}`, {
-              state: {
-                predictionId: result.data.prediction_id,
-                inputData: updatedAnswers,
-                transformedData: transformedData
-              }
-            });
-          } else {
-            // Synchronous response with immediate result
-            // Navigate to Result page with immediate prediction
-            navigate("/result", {
-              state: {
-                prediction: result.data,
-                inputData: updatedAnswers,
-                transformedData: transformedData
-              }
-            });
-          }
+          navigate(`/result/${result.data.prediction_id}`);
         } else {
           // Gagal kirim ke Flask
           setErrorMsg("Gagal mengirim data ke server: " + result.error);

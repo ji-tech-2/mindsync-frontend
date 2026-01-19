@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
-// Pastikan path ini sesuai dengan lokasi file helper Anda
-// Jika belum buat file helper, scroll ke bawah untuk lihat caranya
-import { getFromSession } from '../utils/sessionHelper.js'; 
+import { useNavigate, useParams } from 'react-router-dom';
 import { pollPredictionResult } from '../utils/pollingHelper.js';
 import { API_CONFIG } from '../../config/api.js';
 import Advice from '../../components/Advice';
@@ -10,94 +7,51 @@ import '../css/result.css';
 
 const ResultPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { predictionId } = useParams();
   const [resultData, setResultData] = useState(null);
   const [isPolling, setIsPolling] = useState(false);
   const [pollingError, setPollingError] = useState(null);
 
-  const processData = (incomingData) => {
-    // incomingData strukturnya: { raw: {...}, transformed: {...}, prediction: {...} }
-    const prediction = incomingData.prediction;
-
-    // Siapkan data untuk State React
-    // Pastikan score tidak kurang dari 0 (tidak minus)
-    const formattedResult = {
-      mentalWellnessScore: Math.max(0, parseFloat(prediction.prediction_score)),
-      category: prediction.health_level,
-      wellnessAnalysis: prediction.wellness_analysis
-    };
-
-    setResultData(formattedResult);
-  };
-
   useEffect(() => {
     const loadResult = async () => {
-      // 1. Coba ambil data dari navigasi (state)
-      let data = location.state;
-
-      // 2. Jika tidak ada di state (misal karena refresh), ambil dari Session Storage
-      if (!data) {
-        console.log("State kosong, mengambil dari Session Storage...");
-        data = getFromSession("screeningData");
-      }
-
-      // 3. Jika tidak ada data sama sekali, redirect ke screening
-      if (!data) {
+      if (!predictionId) {
         alert("Data tidak ditemukan. Silakan lakukan screening ulang.");
         navigate('/screening');
         return;
       }
 
-      // 4. Check if we need to poll for results (has predictionId)
-      // Priority: URL params > state > session storage
-      const activePredictionId = predictionId || data?.predictionId;
-      
-      if (activePredictionId) {
-        console.log("🔄 Starting polling for prediction:", activePredictionId);
-        setIsPolling(true);
-        setPollingError(null);
+      setIsPolling(true);
+      setPollingError(null);
 
-        try {
-          // Poll the result endpoint
-          const pollResult = await pollPredictionResult(
-            activePredictionId,
-            API_CONFIG.BASE_URL,
-            API_CONFIG.RESULT_ENDPOINT,
-            API_CONFIG.POLLING.MAX_ATTEMPTS,
-            API_CONFIG.POLLING.INTERVAL_MS
-          );
+      try {
+        const pollResult = await pollPredictionResult(
+          predictionId,
+          API_CONFIG.BASE_URL,
+          API_CONFIG.RESULT_ENDPOINT,
+          API_CONFIG.POLLING.MAX_ATTEMPTS,
+          API_CONFIG.POLLING.INTERVAL_MS
+        );
+        
+        if (pollResult.success) {
+          const prediction = pollResult.data;
           
-          if (pollResult.success) {
-            console.log("✅ Polling complete, result received:", pollResult.data);
-            
-            // Process and display the result
-            processData({
-              raw: data.raw || data.inputData,
-              transformed: data.transformed || data.transformedData,
-              prediction: pollResult.data
-            });
-            
-            setIsPolling(false);
-          }
-        } catch (error) {
-          console.error("❌ Polling error:", error);
-          setPollingError(error.message);
+          setResultData({
+            mentalWellnessScore: Math.max(0, parseFloat(prediction.prediction_score)),
+            category: prediction.health_level,
+            wellnessAnalysis: prediction.wellness_analysis
+          });
+          
           setIsPolling(false);
         }
-      } else if (data.prediction) {
-        // 5. Direct result (no polling needed)
-        console.log("✅ Direct result available");
-        processData(data);
-      } else {
-        // 6. Invalid data structure
-        alert("Format data tidak valid. Silakan lakukan screening ulang.");
-        navigate('/screening');
+      } catch (error) {
+        console.error("❌ Polling error:", error);
+        setPollingError(error.message);
+        setIsPolling(false);
       }
     };
 
     loadResult();
-  }, [location, navigate]);
+  }, [predictionId, navigate]);
 
   const getScoreColor = (category) => {
     if (category === 'dangerous') return '#FF4757';
