@@ -1,50 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-// Pastikan path ini sesuai dengan lokasi file helper Anda
-// Jika belum buat file helper, scroll ke bawah untuk lihat caranya
-import { getFromSession } from '../utils/sessionHelper.js'; 
+import { useNavigate, useParams } from 'react-router-dom';
+import { pollPredictionResult } from '../utils/pollingHelper.js';
+import { API_CONFIG } from '../../config/api.js';
 import Advice from '../../components/Advice';
 import '../css/result.css';
 
 const ResultPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { predictionId } = useParams();
   const [resultData, setResultData] = useState(null);
-
-  const processData = (incomingData) => {
-    // incomingData strukturnya: { raw: {...}, transformed: {...}, prediction: {...} }
-    const prediction = incomingData.prediction;
-
-    // Siapkan data untuk State React
-    // Pastikan score tidak kurang dari 0 (tidak minus)
-    const formattedResult = {
-      mentalWellnessScore: Math.max(0, parseFloat(prediction.prediction[0])),
-      category: prediction.mental_health_category,
-      wellnessAnalysis: prediction.wellness_analysis
-    };
-
-    setResultData(formattedResult);
-  };
+  const [isPolling, setIsPolling] = useState(false);
+  const [pollingError, setPollingError] = useState(null);
 
   useEffect(() => {
-    // 1. Coba ambil data dari navigasi (state)
-    let data = location.state;
+    const loadResult = async () => {
+      if (!predictionId) {
+        alert("Data tidak ditemukan. Silakan lakukan screening ulang.");
+        navigate('/screening');
+        return;
+      }
 
-    // 2. Jika tidak ada di state (misal karena refresh), ambil dari Session Storage
-    if (!data) {
-      console.log("State kosong, mengambil dari Session Storage...");
-      data = getFromSession("screeningData");
-    }
+      setIsPolling(true);
+      setPollingError(null);
 
-    // 3. Jika data ditemukan, proses untuk ditampilkan
-    if (data) {
-      processData(data);
-    } else {
-      // 4. Jika benar-benar tidak ada data, kembalikan ke halaman screening
-      alert("Data tidak ditemukan. Silakan lakukan screening ulang.");
-      navigate('/screening');
-    }
-  }, [location, navigate]);
+      try {
+        const pollResult = await pollPredictionResult(
+          predictionId,
+          API_CONFIG.BASE_URL,
+          API_CONFIG.RESULT_ENDPOINT,
+          API_CONFIG.POLLING.MAX_ATTEMPTS,
+          API_CONFIG.POLLING.INTERVAL_MS
+        );
+        
+        if (pollResult.success) {
+          const prediction = pollResult.data;
+          
+          setResultData({
+            mentalWellnessScore: Math.max(0, parseFloat(prediction.prediction_score)),
+            category: prediction.health_level,
+            wellnessAnalysis: prediction.wellness_analysis
+          });
+          
+          setIsPolling(false);
+        }
+      } catch (error) {
+        console.error("❌ Polling error:", error);
+        setPollingError(error.message);
+        setIsPolling(false);
+      }
+    };
+
+    loadResult();
+  }, [predictionId, navigate]);
 
   const getScoreColor = (category) => {
     if (category === 'dangerous') return '#FF4757';
@@ -59,6 +66,42 @@ const ResultPage = () => {
     if (category === 'average') return 'Average';
     return 'Healthy';
   };
+
+  // Tampilkan Loading jika data belum siap atau sedang polling
+  if (isPolling) {
+    return (
+      <div className="result-container">
+        <div className="result-loading">
+          <div className="loading-spinner"></div>
+          <h2>Menganalisis Data Anda...</h2>
+          <p>Mohon tunggu sebentar, kami sedang memproses hasil screening Anda</p>
+          <div className="loading-dots">
+            <span>.</span><span>.</span><span>.</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Tampilkan Error jika polling gagal
+  if (pollingError) {
+    return (
+      <div className="result-container">
+        <div className="result-error">
+          <h2>⚠️ Terjadi Kesalahan</h2>
+          <p>{pollingError}</p>
+          <div className="result-footer">
+            <button className="btn btn-primary" onClick={() => navigate('/screening')}>
+              Coba Lagi
+            </button>
+            <button className="btn btn-outline" onClick={() => navigate('/')}>
+              Kembali ke Beranda
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Tampilkan Loading jika data belum siap
   if (!resultData) {

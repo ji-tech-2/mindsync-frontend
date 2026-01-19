@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdviceFactor from './AdviceFactor';
+import { API_URLS } from '../config/api.js';
 import styles from './Advice.module.css';
 
 const Advice = ({ resultData }) => {
@@ -23,7 +24,7 @@ const Advice = ({ resultData }) => {
           wellness_analysis: resultData.wellnessAnalysis
         };
         
-        const response = await fetch('http://139.59.109.5:8000/v0-1/model-advice', {
+        const response = await fetch(API_URLS.advice, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
