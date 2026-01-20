@@ -17,19 +17,138 @@ export default function Register() {
   });
 
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false); // Tambahkan state loading
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  // Placeholder for existing usernames (will be replaced with database check)
+  const existingUsernames = ["admin", "user", "test", "demo"];
 
   function handleChange(e) {
+    const { name, value } = e.target;
     setForm({
       ...form,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: "" });
+    }
   }
+
+  // Validation functions
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    // At least 8 characters, one uppercase, one lowercase, one number
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    return passwordRegex.test(password);
+  };
+
+  const validateUsername = (username) => {
+    // Only alphanumeric and underscore, 3-20 characters
+    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+    return usernameRegex.test(username);
+  };
+
+  const validateName = (name) => {
+    // At least 2 characters, only letters and spaces
+    const nameRegex = /^[a-zA-Z\s]{2,50}$/;
+    return nameRegex.test(name);
+  };
+
+  const validateAge = (dob) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      return age - 1;
+    }
+    return age;
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Email validation
+    if (!form.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!validateEmail(form.email)) {
+      newErrors.email = "Please enter a valid email address (e.g., user@example.com)";
+    }
+
+    // Password validation
+    if (!form.password) {
+      newErrors.password = "Password is required";
+    } else if (form.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    } else if (!validatePassword(form.password)) {
+      newErrors.password = "Password must contain uppercase, lowercase, and number";
+    }
+
+    // Username validation
+    if (!form.username.trim()) {
+      newErrors.username = "Username is required";
+    } else if (!validateUsername(form.username)) {
+      newErrors.username = "Username must be 3-20 characters (letters, numbers, underscore only)";
+    } else if (existingUsernames.includes(form.username.toLowerCase())) {
+      // Placeholder check - will be replaced with database check
+      newErrors.username = "Username already taken (placeholder check)";
+    }
+
+    // Name validation
+    if (!form.name.trim()) {
+      newErrors.name = "Full name is required";
+    } else if (!validateName(form.name)) {
+      newErrors.name = "Name must be 2-50 characters (letters and spaces only)";
+    }
+
+    // Date of Birth validation
+    if (!form.dob) {
+      newErrors.dob = "Date of birth is required";
+    } else {
+      const age = validateAge(form.dob);
+      if (age < 13) {
+        newErrors.dob = "You must be at least 13 years old";
+      } else if (age > 120) {
+        newErrors.dob = "Please enter a valid date of birth";
+      }
+    }
+
+    // Gender validation
+    if (!form.gender) {
+      newErrors.gender = "Gender is required";
+    }
+
+    // Occupation validation
+    if (!form.occupation.trim()) {
+      newErrors.occupation = "Occupation is required";
+    } else if (form.occupation.length < 2) {
+      newErrors.occupation = "Occupation must be at least 2 characters";
+    } else if (form.occupation.length > 50) {
+      newErrors.occupation = "Occupation must not exceed 50 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setLoading(true); // Mulai loading
+    
+    // Validate form before submitting
+    if (!validateForm()) {
+      setMessage("Please fix the errors before submitting");
+      return;
+    }
+
+    setLoading(true);
     setMessage("Processing registration...");
+    setErrors({});
 
     try {
       const res = await fetch("http://localhost:5000/register", {
@@ -98,54 +217,88 @@ export default function Register() {
       <h2>Register</h2>
 
       <form onSubmit={handleSubmit} className="register-form">
-        <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} required />
+        <div className="form-field">
+          <input 
+            name="email" 
+            type="email" 
+            placeholder="Email" 
+            value={form.email} 
+            onChange={handleChange}
+            className={errors.email ? "input-error" : ""}
+          />
+          {errors.email && <span className="error-text">{errors.email}</span>}
+        </div>
 
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
+        <div className="form-field">
+          <input
+            name="password"
+            type="password"
+            placeholder="Password (min 8 chars, include A-Z, a-z, 0-9)"
+            value={form.password}
+            onChange={handleChange}
+            className={errors.password ? "input-error" : ""}
+          />
+          {errors.password && <span className="error-text">{errors.password}</span>}
+        </div>
 
-        <input
-          name="username"
-          placeholder="Username"
-          value={form.username}
-          onChange={handleChange}
-          required
-        />
+        <div className="form-field">
+          <input
+            name="username"
+            placeholder="Username (3-20 chars, alphanumeric)"
+            value={form.username}
+            onChange={handleChange}
+            className={errors.username ? "input-error" : ""}
+          />
+          {errors.username && <span className="error-text">{errors.username}</span>}
+        </div>
 
-        <input
-          name="name"
-          placeholder="Full Name"
-          value={form.name}
-          onChange={handleChange}
-          required
-        />
+        <div className="form-field">
+          <input
+            name="name"
+            placeholder="Full Name"
+            value={form.name}
+            onChange={handleChange}
+            className={errors.name ? "input-error" : ""}
+          />
+          {errors.name && <span className="error-text">{errors.name}</span>}
+        </div>
 
-        <input
-          name="dob"
-          type="date"
-          value={form.dob}
-          onChange={handleChange}
-          required
-        />
+        <div className="form-field">
+          <input
+            name="dob"
+            type="date"
+            value={form.dob}
+            onChange={handleChange}
+            className={errors.dob ? "input-error" : ""}
+            max={new Date().toISOString().split('T')[0]}
+          />
+          {errors.dob && <span className="error-text">{errors.dob}</span>}
+        </div>
 
-        <select name="gender" value={form.gender} onChange={handleChange} required>
-          <option value="" disabled>Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
+        <div className="form-field">
+          <select 
+            name="gender" 
+            value={form.gender} 
+            onChange={handleChange}
+            className={errors.gender ? "input-error" : ""}
+          >
+            <option value="" disabled>Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+          {errors.gender && <span className="error-text">{errors.gender}</span>}
+        </div>
 
-        <input
-          name="occupation"
-          placeholder="Occupation"
-          value={form.occupation}
-          onChange={handleChange}
-          required
-        />
+        <div className="form-field">
+          <input
+            name="occupation"
+            placeholder="Occupation"
+            value={form.occupation}
+            onChange={handleChange}
+            className={errors.occupation ? "input-error" : ""}
+          />
+          {errors.occupation && <span className="error-text">{errors.occupation}</span>}
+        </div>
 
         <button type="submit" className="register-btn" disabled={loading}>
           {loading ? "Processing..." : "Register"}

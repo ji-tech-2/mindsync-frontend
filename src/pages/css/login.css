@@ -366,3 +366,45 @@ html, body, #root, .login-wrapper {
     font-size: 1.15em;
   }
 }
+
+/* Form validation styles */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: fadeIn 0.6s ease-out both;
+}
+
+.form-field:nth-child(1) { animation-delay: 0.1s; }
+.form-field:nth-child(2) { animation-delay: 0.2s; }
+
+.error-text {
+  color: #e53e3e;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-align: left;
+  padding-left: 4px;
+  animation: slideInError 0.3s ease-out;
+}
+
+@keyframes slideInError {
+  from { 
+    opacity: 0; 
+    transform: translateY(-5px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.input-error {
+  border-color: #fc8181 !important;
+  background-color: #fff5f5 !important;
+}
+
+.input-error:focus {
+  border-color: #e53e3e !important;
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1), 0 4px 12px rgba(229, 62, 62, 0.15) !important;
+}
+

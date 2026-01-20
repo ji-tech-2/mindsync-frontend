@@ -9,13 +9,45 @@ export default function Login() {
 
   const [message, setMessage] = useState(""); // untuk tampilkan pesan
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
 
+  // Validation function
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Username validation
+    if (!username.trim()) {
+      newErrors.username = "Username is required";
+    } else if (username.length < 3) {
+      newErrors.username = "Username must be at least 3 characters";
+    } else if (username.length > 20) {
+      newErrors.username = "Username must not exceed 20 characters";
+    }
+
+    // Password validation
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Validate form before submitting
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
     setMessage("");
+    setErrors({});
 
     fetch("http://localhost:5000/signIn", {
       method: "POST",
@@ -53,21 +85,33 @@ export default function Login() {
       <h2>Login</h2>
 
       <form onSubmit={handleSubmit} className="login-form">
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
+        <div className="form-field">
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => {
+              setUsername(e.target.value);
+              if (errors.username) setErrors({ ...errors, username: "" });
+            }}
+            className={errors.username ? "input-error" : ""}
+          />
+          {errors.username && <span className="error-text">{errors.username}</span>}
+        </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <div className="form-field">
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (errors.password) setErrors({ ...errors, password: "" });
+            }}
+            className={errors.password ? "input-error" : ""}
+          />
+          {errors.password && <span className="error-text">{errors.password}</span>}
+        </div>
 
         <button type="submit" className="login-btn" disabled={loading}>
           {loading ? "Loading..." : "Login"}
