@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "../css/login.css";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [message, setMessage] = useState(""); // untuk tampilkan pesan
@@ -17,13 +17,11 @@ export default function Login() {
   const validateForm = () => {
     const newErrors = {};
 
-    // Username validation
-    if (!username.trim()) {
-      newErrors.username = "Username is required";
-    } else if (username.length < 3) {
-      newErrors.username = "Username must be at least 3 characters";
-    } else if (username.length > 20) {
-      newErrors.username = "Username must not exceed 20 characters";
+    // Email validation
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Please enter a valid email address";
     }
 
     // Password validation
@@ -52,7 +50,7 @@ export default function Login() {
     fetch("http://139.59.109.5:8000/v0-1/auth-login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ email, password }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -87,16 +85,16 @@ export default function Login() {
       <form onSubmit={handleSubmit} className="login-form">
         <div className="form-field">
           <input
-            type="text"
-            placeholder="Username"
-            value={username}
+            type="email"
+            placeholder="Email"
+            value={email}
             onChange={(e) => {
-              setUsername(e.target.value);
-              if (errors.username) setErrors({ ...errors, username: "" });
+              setEmail(e.target.value);
+              if (errors.email) setErrors({ ...errors, email: "" });
             }}
-            className={errors.username ? "input-error" : ""}
+            className={errors.email ? "input-error" : ""}
           />
-          {errors.username && <span className="error-text">{errors.username}</span>}
+          {errors.email && <span className="error-text">{errors.email}</span>}
         </div>
 
         <div className="form-field">

@@ -26,7 +26,6 @@ const renderRegister = () => {
 const validFormData = {
   email: 'test@example.com',
   password: 'Password123',
-  username: 'testuser',
   name: 'Test User',
   dob: '2000-01-01',
   gender: 'Male',
@@ -44,9 +43,8 @@ describe('Register Component', () => {
     it('should render registration form with all fields', () => {
       renderRegister();
       
-      expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/Email.*username/i)).toBeInTheDocument();
       expect(screen.getByPlaceholderText(/password/i)).toBeInTheDocument();
-      expect(screen.getByPlaceholderText(/username/i)).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Full Name')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Occupation')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /register/i })).toBeInTheDocument();
@@ -75,7 +73,7 @@ describe('Register Component', () => {
     it('should accept valid email format', async () => {
       renderRegister();
       
-      const emailInput = screen.getByPlaceholderText('Email');
+      const emailInput = screen.getByPlaceholderText(/Email/i);
       fireEvent.change(emailInput, { target: { value: 'valid@email.com' } });
       
       const submitButton = screen.getByRole('button', { name: /register/i });
@@ -93,7 +91,7 @@ describe('Register Component', () => {
     it('should show error when password is empty', async () => {
       renderRegister();
       
-      const emailInput = screen.getByPlaceholderText('Email');
+      const emailInput = screen.getByPlaceholderText(/Email/i);
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       
       const submitButton = screen.getByRole('button', { name: /register/i });
@@ -129,47 +127,6 @@ describe('Register Component', () => {
       
       await waitFor(() => {
         expect(screen.getByText(/Password must contain uppercase, lowercase, and number/i)).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Username Validation', () => {
-    it('should show error when username is empty', async () => {
-      renderRegister();
-      
-      const submitButton = screen.getByRole('button', { name: /register/i });
-      fireEvent.click(submitButton);
-      
-      await waitFor(() => {
-        expect(screen.getByText('Username is required')).toBeInTheDocument();
-      });
-    });
-
-    it('should show error when username is too short', async () => {
-      renderRegister();
-      
-      const usernameInput = screen.getByPlaceholderText(/username/i);
-      fireEvent.change(usernameInput, { target: { value: 'ab' } });
-      
-      const submitButton = screen.getByRole('button', { name: /register/i });
-      fireEvent.click(submitButton);
-      
-      await waitFor(() => {
-        expect(screen.getByText(/Username must be 3-20 characters/i)).toBeInTheDocument();
-      });
-    });
-
-    it('should show error when username has invalid characters', async () => {
-      renderRegister();
-      
-      const usernameInput = screen.getByPlaceholderText(/username/i);
-      fireEvent.change(usernameInput, { target: { value: 'user@name' } });
-      
-      const submitButton = screen.getByRole('button', { name: /register/i });
-      fireEvent.click(submitButton);
-      
-      await waitFor(() => {
-        expect(screen.getByText(/Username must be 3-20 characters/i)).toBeInTheDocument();
       });
     });
   });
@@ -289,16 +246,14 @@ describe('Register Component', () => {
 
   describe('API Integration - POST Method', () => {
     const fillValidForm = () => {
-      fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: validFormData.email } });
+      fireEvent.change(screen.getByPlaceholderText(/Email.*username/i), { target: { value: validFormData.email } });
       fireEvent.change(screen.getByPlaceholderText(/password/i), { target: { value: validFormData.password } });
-      fireEvent.change(screen.getByPlaceholderText(/username/i), { target: { value: validFormData.username } });
       fireEvent.change(screen.getByPlaceholderText('Full Name'), { target: { value: validFormData.name } });
       
-      const inputs = screen.getAllByDisplayValue('');
-      const dobField = inputs.find(input => input.type === 'date');
+      const dobField = document.querySelector('input[name="dob"]');
       fireEvent.change(dobField, { target: { value: validFormData.dob } });
       
-      const genderSelect = screen.getByDisplayValue('Select Gender');
+      const genderSelect = document.querySelector('select[name="gender"]');
       fireEvent.change(genderSelect, { target: { value: validFormData.gender } });
       
       fireEvent.change(screen.getByPlaceholderText('Occupation'), { target: { value: validFormData.occupation } });
@@ -332,7 +287,6 @@ describe('Register Component', () => {
             body: JSON.stringify({
               email: validFormData.email,
               password: validFormData.password,
-              username: validFormData.username,
               name: validFormData.name,
               dob: validFormData.dob,
               gender: validFormData.gender,
@@ -379,7 +333,7 @@ describe('Register Component', () => {
         Promise.resolve({
           ok: false,
           json: () => Promise.resolve({
-            message: 'Username already exists'
+            message: 'Email already exists'
           }),
         })
       );
@@ -391,7 +345,7 @@ describe('Register Component', () => {
       fireEvent.click(submitButton);
       
       await waitFor(() => {
-        expect(screen.getByText('Username already exists')).toBeInTheDocument();
+        expect(screen.getByText('Email already exists')).toBeInTheDocument();
       });
       
       // Should not navigate or store user
@@ -433,7 +387,6 @@ describe('Register Component', () => {
         
         expect(bodyData).toHaveProperty('email');
         expect(bodyData).toHaveProperty('password');
-        expect(bodyData).toHaveProperty('username');
         expect(bodyData).toHaveProperty('name');
         expect(bodyData).toHaveProperty('dob');
         expect(bodyData).toHaveProperty('gender');
@@ -441,7 +394,7 @@ describe('Register Component', () => {
         
         expect(bodyData.email).toBe(validFormData.email);
         expect(bodyData.password).toBe(validFormData.password);
-        expect(bodyData.username).toBe(validFormData.username);
+        expect(bodyData.name).toBe(validFormData.name);
       });
     });
   });
@@ -451,22 +404,20 @@ describe('Register Component', () => {
       global.fetch = vi.fn(() =>
         Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ id: 1, username: 'testuser' }),
+          json: () => Promise.resolve({ id: 1, email: 'test@example.com' }),
         })
       );
       
       renderRegister();
       
-      fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: validFormData.email } });
+      fireEvent.change(screen.getByPlaceholderText(/Email.*username/i), { target: { value: validFormData.email } });
       fireEvent.change(screen.getByPlaceholderText(/password/i), { target: { value: validFormData.password } });
-      fireEvent.change(screen.getByPlaceholderText(/username/i), { target: { value: validFormData.username } });
       fireEvent.change(screen.getByPlaceholderText('Full Name'), { target: { value: validFormData.name } });
       
-      const inputs = screen.getAllByDisplayValue('');
-      const dobField = inputs.find(input => input.type === 'date');
+      const dobField = document.querySelector('input[name="dob"]');
       fireEvent.change(dobField, { target: { value: validFormData.dob } });
       
-      const genderSelect = screen.getByDisplayValue('Select Gender');
+      const genderSelect = document.querySelector('select[name="gender"]');
       fireEvent.change(genderSelect, { target: { value: validFormData.gender } });
       
       fireEvent.change(screen.getByPlaceholderText('Occupation'), { target: { value: validFormData.occupation } });
@@ -491,16 +442,14 @@ describe('Register Component', () => {
       
       renderRegister();
       
-      fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: validFormData.email } });
+      fireEvent.change(screen.getByPlaceholderText(/Email.*username/i), { target: { value: validFormData.email } });
       fireEvent.change(screen.getByPlaceholderText(/password/i), { target: { value: validFormData.password } });
-      fireEvent.change(screen.getByPlaceholderText(/username/i), { target: { value: validFormData.username } });
       fireEvent.change(screen.getByPlaceholderText('Full Name'), { target: { value: validFormData.name } });
       
-      const inputs = screen.getAllByDisplayValue('');
-      const dobField = inputs.find(input => input.type === 'date');
+      const dobField = document.querySelector('input[name="dob"]');
       fireEvent.change(dobField, { target: { value: validFormData.dob } });
       
-      const genderSelect = screen.getByDisplayValue('Select Gender');
+      const genderSelect = document.querySelector('select[name="gender"]');
       fireEvent.change(genderSelect, { target: { value: validFormData.gender } });
       
       fireEvent.change(screen.getByPlaceholderText('Occupation'), { target: { value: validFormData.occupation } });

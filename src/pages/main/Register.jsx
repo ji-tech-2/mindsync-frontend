@@ -9,7 +9,6 @@ export default function Register() {
   const [form, setForm] = useState({
     email: "",
     password: "",
-    username: "",
     name: "",
     dob: "",
     gender: "",
@@ -42,12 +41,6 @@ export default function Register() {
     // At least 8 characters, one uppercase, one lowercase, one number
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     return passwordRegex.test(password);
-  };
-
-  const validateUsername = (username) => {
-    // Only alphanumeric and underscore, 3-20 characters
-    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-    return usernameRegex.test(username);
   };
 
   const validateName = (name) => {
@@ -85,13 +78,6 @@ export default function Register() {
       newErrors.password = "Password must be at least 8 characters";
     } else if (!validatePassword(form.password)) {
       newErrors.password = "Password must contain uppercase, lowercase, and number";
-    }
-
-    // Username validation
-    if (!form.username || !form.username.trim()) {
-      newErrors.username = "Username is required";
-    } else if (!validateUsername(form.username)) {
-      newErrors.username = "Username must be 3-20 characters (letters, numbers, underscore only)";
     }
 
     // Name validation
@@ -215,7 +201,7 @@ export default function Register() {
           <input 
             name="email" 
             type="email" 
-            placeholder="Email" 
+            placeholder="Email (will be used as your username)" 
             value={form.email} 
             onChange={handleChange}
             className={errors.email ? "input-error" : ""}
@@ -233,17 +219,6 @@ export default function Register() {
             className={errors.password ? "input-error" : ""}
           />
           {errors.password && <span className="error-text">{errors.password}</span>}
-        </div>
-
-        <div className="form-field">
-          <input
-            name="username"
-            placeholder="Username (3-20 chars, alphanumeric)"
-            value={form.username}
-            onChange={handleChange}
-            className={errors.username ? "input-error" : ""}
-          />
-          {errors.username && <span className="error-text">{errors.username}</span>}
         </div>
 
         <div className="form-field">

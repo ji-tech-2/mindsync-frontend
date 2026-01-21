@@ -33,7 +33,7 @@ describe('Login Component', () => {
     it('should render login form with all fields', () => {
       renderLogin();
       
-      expect(screen.getByPlaceholderText('Username')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
     });
@@ -47,50 +47,36 @@ describe('Login Component', () => {
   });
 
   describe('Form Validation', () => {
-    it('should show error when username is empty', async () => {
+    it('should show error when email is empty', async () => {
       renderLogin();
       
       const submitButton = screen.getByRole('button', { name: /login/i });
       fireEvent.click(submitButton);
       
       await waitFor(() => {
-        expect(screen.getByText('Username is required')).toBeInTheDocument();
+        expect(screen.getByText('Email is required')).toBeInTheDocument();
       });
     });
 
-    it('should show error when username is too short', async () => {
+    it('should accept valid email format', async () => {
       renderLogin();
       
-      const usernameInput = screen.getByPlaceholderText('Username');
-      fireEvent.change(usernameInput, { target: { value: 'ab' } });
+      const emailInput = screen.getByPlaceholderText('Email');
+      fireEvent.change(emailInput, { target: { value: 'valid@email.com' } });
       
       const submitButton = screen.getByRole('button', { name: /login/i });
       fireEvent.click(submitButton);
       
-      await waitFor(() => {
-        expect(screen.getByText('Username must be at least 3 characters')).toBeInTheDocument();
-      });
-    });
-
-    it('should show error when username is too long', async () => {
-      renderLogin();
-      
-      const usernameInput = screen.getByPlaceholderText('Username');
-      fireEvent.change(usernameInput, { target: { value: 'a'.repeat(21) } });
-      
-      const submitButton = screen.getByRole('button', { name: /login/i });
-      fireEvent.click(submitButton);
-      
-      await waitFor(() => {
-        expect(screen.getByText('Username must not exceed 20 characters')).toBeInTheDocument();
-      });
+      // Email error should NOT be present when email is valid
+      const emailError = screen.queryByText(/Please enter a valid email address/i);
+      expect(emailError).not.toBeInTheDocument();
     });
 
     it('should show error when password is empty', async () => {
       renderLogin();
       
-      const usernameInput = screen.getByPlaceholderText('Username');
-      fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+      const emailInput = screen.getByPlaceholderText('Email');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       
       const submitButton = screen.getByRole('button', { name: /login/i });
       fireEvent.click(submitButton);
@@ -103,10 +89,10 @@ describe('Login Component', () => {
     it('should show error when password is too short', async () => {
       renderLogin();
       
-      const usernameInput = screen.getByPlaceholderText('Username');
+      const emailInput = screen.getByPlaceholderText('Email');
       const passwordInput = screen.getByPlaceholderText('Password');
       
-      fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: '12345' } });
       
       const submitButton = screen.getByRole('button', { name: /login/i });
@@ -124,14 +110,14 @@ describe('Login Component', () => {
       fireEvent.click(submitButton);
       
       await waitFor(() => {
-        expect(screen.getByText('Username is required')).toBeInTheDocument();
+        expect(screen.getByText('Email is required')).toBeInTheDocument();
       });
       
-      const usernameInput = screen.getByPlaceholderText('Username');
-      fireEvent.change(usernameInput, { target: { value: 'test' } });
+      const emailInput = screen.getByPlaceholderText('Email');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       
       await waitFor(() => {
-        expect(screen.queryByText('Username is required')).not.toBeInTheDocument();
+        expect(screen.queryByText('Email is required')).not.toBeInTheDocument();
       });
     });
   });
@@ -140,7 +126,7 @@ describe('Login Component', () => {
     it('should make POST request to correct endpoint with credentials', async () => {
       const mockResponse = {
         success: true,
-        data: { id: 1, username: 'testuser', token: 'fake-token' }
+        data: { id: 1, email: 'test@example.com', token: 'fake-token' }
       };
       
       global.fetch = vi.fn(() =>
@@ -152,10 +138,10 @@ describe('Login Component', () => {
       
       renderLogin();
       
-      const usernameInput = screen.getByPlaceholderText('Username');
+      const emailInput = screen.getByPlaceholderText('Email');
       const passwordInput = screen.getByPlaceholderText('Password');
       
-      fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
       
       const submitButton = screen.getByRole('button', { name: /login/i });
@@ -167,7 +153,7 @@ describe('Login Component', () => {
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: 'testuser', password: 'password123' }),
+            body: JSON.stringify({ email: 'test@example.com', password: 'password123' }),
           }
         );
       });
@@ -176,7 +162,7 @@ describe('Login Component', () => {
     it('should handle successful login response', async () => {
       const mockUserData = { 
         id: 1, 
-        username: 'testuser', 
+        email: 'test@example.com', 
         token: 'fake-token' 
       };
       
@@ -192,10 +178,10 @@ describe('Login Component', () => {
       
       renderLogin();
       
-      const usernameInput = screen.getByPlaceholderText('Username');
+      const emailInput = screen.getByPlaceholderText('Email');
       const passwordInput = screen.getByPlaceholderText('Password');
       
-      fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
       
       const submitButton = screen.getByRole('button', { name: /login/i });
@@ -226,10 +212,10 @@ describe('Login Component', () => {
       
       renderLogin();
       
-      const usernameInput = screen.getByPlaceholderText('Username');
+      const emailInput = screen.getByPlaceholderText('Email');
       const passwordInput = screen.getByPlaceholderText('Password');
       
-      fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } });
       
       const submitButton = screen.getByRole('button', { name: /login/i });
@@ -251,10 +237,10 @@ describe('Login Component', () => {
       
       renderLogin();
       
-      const usernameInput = screen.getByPlaceholderText('Username');
+      const emailInput = screen.getByPlaceholderText('Email');
       const passwordInput = screen.getByPlaceholderText('Password');
       
-      fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
       
       const submitButton = screen.getByRole('button', { name: /login/i });
@@ -272,10 +258,10 @@ describe('Login Component', () => {
       
       renderLogin();
       
-      const usernameInput = screen.getByPlaceholderText('Username');
+      const emailInput = screen.getByPlaceholderText('Email');
       const passwordInput = screen.getByPlaceholderText('Password');
       
-      fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
       
       const submitButton = screen.getByRole('button', { name: /login/i });
