@@ -9,7 +9,9 @@ const ResultPage = () => {
   const navigate = useNavigate();
   const { predictionId } = useParams();
   const [resultData, setResultData] = useState(null);
+  const [adviceData, setAdviceData] = useState(null);
   const [isPolling, setIsPolling] = useState(false);
+  const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
   const [pollingError, setPollingError] = useState(null);
 
   useEffect(() => {
@@ -35,18 +37,62 @@ const ResultPage = () => {
         if (pollResult.success) {
           const prediction = pollResult.data;
           
+          // Set prediction data (always available)
           setResultData({
             mentalWellnessScore: Math.max(0, parseFloat(prediction.prediction_score)),
             category: prediction.health_level,
             wellnessAnalysis: prediction.wellness_analysis
           });
           
-          setIsPolling(false);
+          // If partial, show results but continue polling for advice
+          if (pollResult.status === "partial") {
+            console.log("📊 Showing partial results, continuing to poll for advice...");
+            setIsPolling(false);
+            setIsLoadingAdvice(true);
+            
+            // Continue polling for full result with advice
+            pollForAdvice(predictionId);
+          } 
+          // If ready, set advice data
+          else if (pollResult.status === "ready") {
+            console.log("✅ Full results with advice ready");
+            if (prediction.advice) {
+              setAdviceData(prediction.advice);
+            }
+            setIsPolling(false);
+            setIsLoadingAdvice(false);
+          }
         }
       } catch (error) {
         console.error("❌ Polling error:", error);
         setPollingError(error.message);
         setIsPolling(false);
+        setIsLoadingAdvice(false);
+      }
+    };
+
+    // Function to continue polling for advice
+    const pollForAdvice = async (predictionId) => {
+      try {
+        const pollResult = await pollPredictionResult(
+          predictionId,
+          API_CONFIG.BASE_URL,
+          API_CONFIG.RESULT_ENDPOINT,
+          API_CONFIG.POLLING.MAX_ATTEMPTS,
+          API_CONFIG.POLLING.INTERVAL_MS
+        );
+        
+        if (pollResult.success && pollResult.status === "ready") {
+          const prediction = pollResult.data;
+          if (prediction.advice) {
+            console.log("✅ Advice data received:", prediction.advice);
+            setAdviceData(prediction.advice);
+          }
+          setIsLoadingAdvice(false);
+        }
+      } catch (error) {
+        console.error("⚠️ Failed to load advice:", error);
+        setIsLoadingAdvice(false);
       }
     };
 
@@ -131,7 +177,7 @@ const ResultPage = () => {
       </div>
 
       {/* Advice Section */}
-      <Advice resultData={resultData} />
+      <Advice resultData={resultData} adviceData={adviceData} isLoading={isLoadingAdvice} />
  
       {/* Footer Action */}
       <div className="result-footer">

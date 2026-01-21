@@ -38,15 +38,29 @@ export async function pollPredictionResult(
 
       const data = await response.json();
 
-      // Status: ready - prediction complete
+      // Status: ready - prediction complete with advice
       if (data.status === "ready") {
-        console.log("✅ Prediction ready:", data);
+        console.log("✅ Prediction ready with advice:", data);
         return {
           success: true,
+          status: "ready",
           data: data.result,
           metadata: {
             created_at: data.created_at,
             completed_at: data.completed_at
+          }
+        };
+      }
+
+      // Status: partial - prediction ready but advice still processing
+      if (data.status === "partial") {
+        console.log("⚡ Partial result ready (without advice):", data);
+        return {
+          success: true,
+          status: "partial",
+          data: data.result,
+          metadata: {
+            created_at: data.created_at
           }
         };
       }
