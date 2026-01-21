@@ -20,9 +20,6 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // Placeholder for existing usernames (will be replaced with database check)
-  const existingUsernames = ["admin", "user", "test", "demo"];
-
   function handleChange(e) {
     const { name, value } = e.target;
     setForm({
@@ -95,9 +92,6 @@ export default function Register() {
       newErrors.username = "Username is required";
     } else if (!validateUsername(form.username)) {
       newErrors.username = "Username must be 3-20 characters (letters, numbers, underscore only)";
-    } else if (existingUsernames.includes(form.username.toLowerCase())) {
-      // Placeholder check - will be replaced with database check
-      newErrors.username = "Username already taken (placeholder check)";
     }
 
     // Name validation
@@ -151,7 +145,7 @@ export default function Register() {
     setErrors({});
 
     try {
-      const res = await fetch("http://localhost:5000/register", {
+      const res = await fetch("http://139.59.109.5:8000/v0-1/auth-register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

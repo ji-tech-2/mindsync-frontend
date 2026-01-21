@@ -49,7 +49,7 @@ export default function Login() {
     setMessage("");
     setErrors({});
 
-    fetch("http://localhost:5000/signIn", {
+    fetch("http://139.59.109.5:8000/v0-1/auth-login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
