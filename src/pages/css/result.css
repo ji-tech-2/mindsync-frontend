@@ -900,6 +900,145 @@ html, body, #root {
   }
 }
 
+/* ==================== MULTI-STAGE LOADING ==================== */
+
+.loading-progress {
+  display: flex;
+  gap: 40px;
+  margin-top: 30px;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+}
+
+.progress-step.active {
+  opacity: 1;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.progress-step.completed {
+  opacity: 1;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.progress-step .step-number {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.progress-step.active .step-number {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: white;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+}
+
+.progress-step.completed .step-number {
+  background: #6BCB77;
+  border-color: #6BCB77;
+}
+
+.progress-step .step-label {
+  font-size: 0.9rem;
+  color: white;
+  font-weight: 500;
+}
+
+/* Small spinner for advice loading */
+.loading-spinner.small {
+  width: 40px;
+  height: 40px;
+  border-width: 4px;
+  margin-bottom: 0;
+  margin-right: 15px;
+}
+
+/* Advice Loading Section */
+.advice-loading-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 40px 30px;
+  margin: 0 auto 40px;
+  max-width: 800px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  animation: slideUp 0.6s ease-out;
+}
+
+.advice-loading-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.advice-loading-section h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #667eea;
+  margin: 0;
+}
+
+.advice-loading-section p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.advice-loading-section .loading-progress {
+  margin-top: 25px;
+}
+
+.advice-loading-section .progress-step .step-number {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.advice-loading-section .progress-step.active .step-number {
+  background: rgba(102, 126, 234, 0.2);
+  border-color: #667eea;
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+.advice-loading-section .progress-step.completed .step-number {
+  background: #6BCB77;
+  border-color: #6BCB77;
+  color: white;
+}
+
+.advice-loading-section .progress-step .step-label {
+  color: #667eea;
+}
+
 /* ==================== ERROR STATE ==================== */
 
 .result-error {
