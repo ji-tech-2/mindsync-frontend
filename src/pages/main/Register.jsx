@@ -72,7 +72,7 @@ export default function Register() {
     const newErrors = {};
 
     // Email validation
-    if (!form.email.trim()) {
+    if (!form.email || !form.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!validateEmail(form.email)) {
       newErrors.email = "Please enter a valid email address (e.g., user@example.com)";
@@ -88,14 +88,14 @@ export default function Register() {
     }
 
     // Username validation
-    if (!form.username.trim()) {
+    if (!form.username || !form.username.trim()) {
       newErrors.username = "Username is required";
     } else if (!validateUsername(form.username)) {
       newErrors.username = "Username must be 3-20 characters (letters, numbers, underscore only)";
     }
 
     // Name validation
-    if (!form.name.trim()) {
+    if (!form.name || !form.name.trim()) {
       newErrors.name = "Full name is required";
     } else if (!validateName(form.name)) {
       newErrors.name = "Name must be 2-50 characters (letters and spaces only)";
@@ -119,7 +119,7 @@ export default function Register() {
     }
 
     // Occupation validation
-    if (!form.occupation.trim()) {
+    if (!form.occupation || !form.occupation.trim()) {
       newErrors.occupation = "Occupation is required";
     } else if (form.occupation.length < 2) {
       newErrors.occupation = "Occupation must be at least 2 characters";

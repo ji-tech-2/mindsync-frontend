@@ -1,0 +1,525 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import Register from './Register';
+
+// Mock useNavigate
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
+// Helper to render component with router
+const renderRegister = () => {
+  return render(
+    <BrowserRouter>
+      <Register />
+    </BrowserRouter>
+  );
+};
+
+// Valid form data
+const validFormData = {
+  email: 'test@example.com',
+  password: 'Password123',
+  username: 'testuser',
+  name: 'Test User',
+  dob: '2000-01-01',
+  gender: 'Male',
+  occupation: 'Engineer',
+};
+
+describe('Register Component', () => {
+  beforeEach(() => {
+    mockNavigate.mockClear();
+    localStorage.clear();
+    global.fetch = vi.fn();
+  });
+
+  describe('Form Rendering', () => {
+    it('should render registration form with all fields', () => {
+      renderRegister();
+      
+      expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/password/i)).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/username/i)).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Full Name')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Occupation')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /register/i })).toBeInTheDocument();
+    });
+
+    it('should render login link', () => {
+      renderRegister();
+      
+      expect(screen.getByText('Sudah punya akun?')).toBeInTheDocument();
+      expect(screen.getByText('Masuk di sini.')).toBeInTheDocument();
+    });
+  });
+
+  describe('Email Validation', () => {
+    it('should show error when email is empty', async () => {
+      renderRegister();
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Email is required')).toBeInTheDocument();
+      });
+    });
+
+    it('should accept valid email format', async () => {
+      renderRegister();
+      
+      const emailInput = screen.getByPlaceholderText('Email');
+      fireEvent.change(emailInput, { target: { value: 'valid@email.com' } });
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        // Email error should NOT be present when email is valid
+        const emailError = screen.queryByText(/Please enter a valid email address/i);
+        expect(emailError).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Password Validation', () => {
+    it('should show error when password is empty', async () => {
+      renderRegister();
+      
+      const emailInput = screen.getByPlaceholderText('Email');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Password is required')).toBeInTheDocument();
+      });
+    });
+
+    it('should show error when password is too short', async () => {
+      renderRegister();
+      
+      const passwordInput = screen.getByPlaceholderText(/password/i);
+      fireEvent.change(passwordInput, { target: { value: 'Pass1' } });
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Password must be at least 8 characters')).toBeInTheDocument();
+      });
+    });
+
+    it('should show error when password lacks required characters', async () => {
+      renderRegister();
+      
+      const passwordInput = screen.getByPlaceholderText(/password/i);
+      fireEvent.change(passwordInput, { target: { value: 'password123' } }); // no uppercase
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText(/Password must contain uppercase, lowercase, and number/i)).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Username Validation', () => {
+    it('should show error when username is empty', async () => {
+      renderRegister();
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Username is required')).toBeInTheDocument();
+      });
+    });
+
+    it('should show error when username is too short', async () => {
+      renderRegister();
+      
+      const usernameInput = screen.getByPlaceholderText(/username/i);
+      fireEvent.change(usernameInput, { target: { value: 'ab' } });
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText(/Username must be 3-20 characters/i)).toBeInTheDocument();
+      });
+    });
+
+    it('should show error when username has invalid characters', async () => {
+      renderRegister();
+      
+      const usernameInput = screen.getByPlaceholderText(/username/i);
+      fireEvent.change(usernameInput, { target: { value: 'user@name' } });
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText(/Username must be 3-20 characters/i)).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Name Validation', () => {
+    it('should show error when name is empty', async () => {
+      renderRegister();
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Full name is required')).toBeInTheDocument();
+      });
+    });
+
+    it('should show error when name is too short', async () => {
+      renderRegister();
+      
+      const nameInput = screen.getByPlaceholderText('Full Name');
+      fireEvent.change(nameInput, { target: { value: 'A' } });
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText(/Name must be 2-50 characters/i)).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Date of Birth Validation', () => {
+    it('should show error when dob is empty', async () => {
+      renderRegister();
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Date of birth is required')).toBeInTheDocument();
+      });
+    });
+
+    it('should show error when user is too young', async () => {
+      renderRegister();
+      
+      const today = new Date();
+      const recentDate = new Date(today.getFullYear() - 10, today.getMonth(), today.getDate());
+      
+      // Use document.querySelector to get the date input directly
+      const dobField = document.querySelector('input[name="dob"]');
+      
+      fireEvent.change(dobField, { target: { value: recentDate.toISOString().split('T')[0] } });
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('You must be at least 13 years old')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Gender Validation', () => {
+    it('should show error when gender is not selected', async () => {
+      renderRegister();
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Gender is required')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Occupation Validation', () => {
+    it('should show error when occupation is empty', async () => {
+      renderRegister();
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Occupation is required')).toBeInTheDocument();
+      });
+    });
+
+    it('should show error when occupation is too short', async () => {
+      renderRegister();
+      
+      const occupationInput = screen.getByPlaceholderText('Occupation');
+      fireEvent.change(occupationInput, { target: { value: 'A' } });
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Occupation must be at least 2 characters')).toBeInTheDocument();
+      });
+    });
+
+    it('should show error when occupation is too long', async () => {
+      renderRegister();
+      
+      const occupationInput = screen.getByPlaceholderText('Occupation');
+      fireEvent.change(occupationInput, { target: { value: 'A'.repeat(51) } });
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Occupation must not exceed 50 characters')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('API Integration - POST Method', () => {
+    const fillValidForm = () => {
+      fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: validFormData.email } });
+      fireEvent.change(screen.getByPlaceholderText(/password/i), { target: { value: validFormData.password } });
+      fireEvent.change(screen.getByPlaceholderText(/username/i), { target: { value: validFormData.username } });
+      fireEvent.change(screen.getByPlaceholderText('Full Name'), { target: { value: validFormData.name } });
+      
+      const inputs = screen.getAllByDisplayValue('');
+      const dobField = inputs.find(input => input.type === 'date');
+      fireEvent.change(dobField, { target: { value: validFormData.dob } });
+      
+      const genderSelect = screen.getByDisplayValue('Select Gender');
+      fireEvent.change(genderSelect, { target: { value: validFormData.gender } });
+      
+      fireEvent.change(screen.getByPlaceholderText('Occupation'), { target: { value: validFormData.occupation } });
+    };
+
+    it('should make POST request to correct endpoint with form data', async () => {
+      const mockResponse = {
+        success: true,
+        data: { id: 1, username: 'testuser' }
+      };
+      
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockResponse),
+        })
+      );
+      
+      renderRegister();
+      fillValidForm();
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith(
+          'http://139.59.109.5:8000/v0-1/auth-register',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: validFormData.email,
+              password: validFormData.password,
+              username: validFormData.username,
+              name: validFormData.name,
+              dob: validFormData.dob,
+              gender: validFormData.gender,
+              occupation: validFormData.occupation,
+            }),
+          }
+        );
+      });
+    });
+
+    it('should handle successful registration', async () => {
+      const mockResponse = {
+        id: 1,
+        username: 'testuser',
+        email: 'test@example.com',
+        token: 'fake-token'
+      };
+      
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockResponse),
+        })
+      );
+      
+      renderRegister();
+      fillValidForm();
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('✅ Registrasi Berhasil!')).toBeInTheDocument();
+        expect(screen.getByText(/Registration successful! Welcome aboard./i)).toBeInTheDocument();
+      });
+      
+      // Verify localStorage
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      expect(storedUser).toEqual(mockResponse);
+    });
+
+    it('should handle registration failure', async () => {
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: false,
+          json: () => Promise.resolve({
+            message: 'Username already exists'
+          }),
+        })
+      );
+      
+      renderRegister();
+      fillValidForm();
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Username already exists')).toBeInTheDocument();
+      });
+      
+      // Should not navigate or store user
+      expect(mockNavigate).not.toHaveBeenCalled();
+      expect(localStorage.getItem('user')).toBeNull();
+    });
+
+    it('should handle network error', async () => {
+      global.fetch = vi.fn(() => Promise.reject(new Error('Network error')));
+      
+      renderRegister();
+      fillValidForm();
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText(/Error connecting to server/i)).toBeInTheDocument();
+      });
+    });
+
+    it('should send correct JSON format with all fields', async () => {
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ id: 1 }),
+        })
+      );
+      
+      renderRegister();
+      fillValidForm();
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        const callArgs = global.fetch.mock.calls[0];
+        const bodyData = JSON.parse(callArgs[1].body);
+        
+        expect(bodyData).toHaveProperty('email');
+        expect(bodyData).toHaveProperty('password');
+        expect(bodyData).toHaveProperty('username');
+        expect(bodyData).toHaveProperty('name');
+        expect(bodyData).toHaveProperty('dob');
+        expect(bodyData).toHaveProperty('gender');
+        expect(bodyData).toHaveProperty('occupation');
+        
+        expect(bodyData.email).toBe(validFormData.email);
+        expect(bodyData.password).toBe(validFormData.password);
+        expect(bodyData.username).toBe(validFormData.username);
+      });
+    });
+  });
+
+  describe('Success Screen', () => {
+    it('should navigate to dashboard when clicking continue button', async () => {
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ id: 1, username: 'testuser' }),
+        })
+      );
+      
+      renderRegister();
+      
+      fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: validFormData.email } });
+      fireEvent.change(screen.getByPlaceholderText(/password/i), { target: { value: validFormData.password } });
+      fireEvent.change(screen.getByPlaceholderText(/username/i), { target: { value: validFormData.username } });
+      fireEvent.change(screen.getByPlaceholderText('Full Name'), { target: { value: validFormData.name } });
+      
+      const inputs = screen.getAllByDisplayValue('');
+      const dobField = inputs.find(input => input.type === 'date');
+      fireEvent.change(dobField, { target: { value: validFormData.dob } });
+      
+      const genderSelect = screen.getByDisplayValue('Select Gender');
+      fireEvent.change(genderSelect, { target: { value: validFormData.gender } });
+      
+      fireEvent.change(screen.getByPlaceholderText('Occupation'), { target: { value: validFormData.occupation } });
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText('✅ Registrasi Berhasil!')).toBeInTheDocument();
+      });
+      
+      const continueButton = screen.getByText('Lanjut ke Dashboard');
+      fireEvent.click(continueButton);
+      
+      expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
+    });
+  });
+
+  describe('Loading State', () => {
+    it('should show loading state during submission', async () => {
+      global.fetch = vi.fn(() => new Promise(resolve => setTimeout(resolve, 100)));
+      
+      renderRegister();
+      
+      fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: validFormData.email } });
+      fireEvent.change(screen.getByPlaceholderText(/password/i), { target: { value: validFormData.password } });
+      fireEvent.change(screen.getByPlaceholderText(/username/i), { target: { value: validFormData.username } });
+      fireEvent.change(screen.getByPlaceholderText('Full Name'), { target: { value: validFormData.name } });
+      
+      const inputs = screen.getAllByDisplayValue('');
+      const dobField = inputs.find(input => input.type === 'date');
+      fireEvent.change(dobField, { target: { value: validFormData.dob } });
+      
+      const genderSelect = screen.getByDisplayValue('Select Gender');
+      fireEvent.change(genderSelect, { target: { value: validFormData.gender } });
+      
+      fireEvent.change(screen.getByPlaceholderText('Occupation'), { target: { value: validFormData.occupation } });
+      
+      const submitButton = screen.getByRole('button', { name: /register/i });
+      fireEvent.click(submitButton);
+      
+      expect(screen.getByRole('button', { name: /processing/i })).toBeDisabled();
+    });
+  });
+
+  describe('Navigation', () => {
+    it('should navigate to login page when clicking login link', () => {
+      renderRegister();
+      
+      const loginButton = screen.getByText('Masuk di sini.');
+      fireEvent.click(loginButton);
+      
+      expect(mockNavigate).toHaveBeenCalledWith('/signIn');
+    });
+  });
+});
