@@ -50,35 +50,12 @@ export async function pollPredictionResult(
 
       const data = await response.json();
 
-      // Status: partial - Fast numeric model ready, advisory model still processing
-      if (data.status === "partial" && !partialResultDelivered) {
-        console.log("⚡ Stage 1 complete: Numeric model ready (partial result)");
-        partialResultDelivered = true;
-        
-        // Deliver partial result via callback
-        if (onPartialResult && typeof onPartialResult === 'function') {
-          onPartialResult({
-            stage: 1,
-            data: data.result,
-            metadata: {
-              created_at: data.created_at,
-              numeric_completed_at: data.numeric_completed_at || new Date().toISOString()
-            }
-          });
-        }
-        
-        // Continue polling for complete result
-        console.log("⏳ Stage 2 pending: Waiting for advisory model...");
-        await new Promise(resolve => setTimeout(resolve, interval));
-        return poll();
-      }
-
-      // Status: ready - Both models complete (numeric + advisory)
+      // Status: ready - prediction complete with advice
       if (data.status === "ready") {
-        console.log("✅ Stage 2 complete: Full prediction ready (numeric + advisory)");
+        console.log("✅ Prediction ready with advice:", data);
         return {
           success: true,
-          stage: 2,
+          status: "ready",
           data: data.result,
           metadata: {
             created_at: data.created_at,
@@ -88,7 +65,20 @@ export async function pollPredictionResult(
         };
       }
 
-      // Status: processing - Initial processing (no results yet)
+      // Status: partial - prediction ready but advice still processing
+      if (data.status === "partial") {
+        console.log("⚡ Partial result ready (without advice):", data);
+        return {
+          success: true,
+          status: "partial",
+          data: data.result,
+          metadata: {
+            created_at: data.created_at
+          }
+        };
+      }
+
+      // Status: processing - continue polling
       if (data.status === "processing") {
         console.log("⏳ Processing: Models not ready yet...");
         

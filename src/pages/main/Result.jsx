@@ -9,7 +9,9 @@ const ResultPage = () => {
   const navigate = useNavigate();
   const { predictionId } = useParams();
   const [resultData, setResultData] = useState(null);
+  const [adviceData, setAdviceData] = useState(null);
   const [isPolling, setIsPolling] = useState(false);
+  const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
   const [pollingError, setPollingError] = useState(null);
   const [loadingStage, setLoadingStage] = useState(1); // 1: processing, 2: numeric ready, 3: complete
   const [hasPartialResult, setHasPartialResult] = useState(false);
@@ -58,7 +60,7 @@ const ResultPage = () => {
           
           const prediction = pollResult.data;
           
-          // Update with complete results (numeric + advisory)
+          // Set prediction data (always available)
           setResultData({
             mentalWellnessScore: Math.max(0, parseFloat(prediction.prediction_score)),
             category: prediction.health_level,
@@ -66,14 +68,81 @@ const ResultPage = () => {
             isPartial: false
           });
           
-          setIsPolling(false);
+          // If partial, show results but continue polling for advice
+          if (pollResult.status === "partial") {
+            console.log("📊 Showing partial results, continuing to poll for advice...");
+            setIsPolling(false);
+            setIsLoadingAdvice(true);
+            
+            // Continue polling for full result with advice
+            pollForAdvice(predictionId);
+          } 
+          // If ready, set advice data
+          else if (pollResult.status === "ready") {
+            console.log("✅ Full results with advice ready");
+            if (prediction.advice) {
+              setAdviceData(prediction.advice);
+            }
+            setIsPolling(false);
+            setIsLoadingAdvice(false);
+          }
         }
       } catch (error) {
         console.error("❌ Polling error:", error);
         setPollingError(error.message);
         setIsPolling(false);
-        setLoadingStage(1);
+        setIsLoadingAdvice(false);
       }
+    };
+
+    // Function to continue polling for advice
+    const pollForAdvice = async (predictionId) => {
+      let adviceAttempts = 0;
+      const maxAdviceAttempts = API_CONFIG.POLLING.MAX_ATTEMPTS;
+      const pollInterval = API_CONFIG.POLLING.INTERVAL_MS;
+
+      const pollUntilReady = async () => {
+        adviceAttempts++;
+        console.log(`🔄 Polling for advice attempt ${adviceAttempts}/${maxAdviceAttempts}`);
+
+        try {
+          const pollResult = await pollPredictionResult(
+            predictionId,
+            API_CONFIG.BASE_URL,
+            API_CONFIG.RESULT_ENDPOINT,
+            1, // Only 1 attempt per call, we handle retries here
+            pollInterval
+          );
+          
+          if (pollResult.success && pollResult.status === "ready") {
+            const prediction = pollResult.data;
+            if (prediction.advice) {
+              console.log("✅ Advice data received:", prediction.advice);
+              setAdviceData(prediction.advice);
+            }
+            setIsLoadingAdvice(false);
+            return;
+          }
+
+          // Still partial or processing, continue polling
+          if (pollResult.status === "partial" || pollResult.status === "processing") {
+            if (adviceAttempts >= maxAdviceAttempts) {
+              console.warn("⚠️ Timeout waiting for advice");
+              setIsLoadingAdvice(false);
+              return;
+            }
+            
+            // Wait and poll again
+            await new Promise(resolve => setTimeout(resolve, pollInterval));
+            return pollUntilReady();
+          }
+        } catch (error) {
+          console.error("⚠️ Failed to load advice:", error);
+          setIsLoadingAdvice(false);
+        }
+      };
+
+      pollUntilReady();
     };
 
     loadResult();
@@ -164,27 +233,7 @@ const ResultPage = () => {
       </div>
 
       {/* Advice Section */}
-      {resultData.isPartial ? (
-        <div className="advice-loading-section">
-          <div className="advice-loading-header">
-            <div className="loading-spinner small"></div>
-            <h3>Sedang Menganalisis Rekomendasi...</h3>
-          </div>
-          <p>AI kami sedang menyiapkan saran kesehatan mental yang dipersonalisasi untuk Anda</p>
-          <div className="loading-progress">
-            <div className="progress-step completed">
-              <span className="step-number">✓</span>
-              <span className="step-label">Skor Mental Selesai</span>
-            </div>
-            <div className="progress-step active">
-              <span className="step-number">2</span>
-              <span className="step-label">Menghasilkan Rekomendasi</span>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <Advice resultData={resultData} />
-      )}
+      <Advice resultData={resultData} adviceData={adviceData} isLoading={isLoadingAdvice} />
  
       {/* Footer Action */}
       <div className="result-footer">
