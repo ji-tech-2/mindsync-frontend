@@ -13,6 +13,8 @@ const ResultPage = () => {
   const [isPolling, setIsPolling] = useState(false);
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
   const [pollingError, setPollingError] = useState(null);
+  const [loadingStage, setLoadingStage] = useState(1); // 1: processing, 2: numeric ready, 3: complete
+  const [hasPartialResult, setHasPartialResult] = useState(false);
 
   useEffect(() => {
     const loadResult = async () => {
@@ -24,24 +26,46 @@ const ResultPage = () => {
 
       setIsPolling(true);
       setPollingError(null);
+      setLoadingStage(1);
 
       try {
+        // Callback for partial results (Stage 1: Numeric model ready)
+        const handlePartialResult = (partialData) => {
+          console.log("📊 Partial result received:", partialData);
+          setLoadingStage(2);
+          setHasPartialResult(true);
+          
+          // Display numeric results immediately
+          setResultData({
+            mentalWellnessScore: Math.max(0, parseFloat(partialData.data.prediction_score)),
+            category: partialData.data.health_level,
+            wellnessAnalysis: null, // Advisory model still processing
+            isPartial: true
+          });
+        };
+
+        // Start polling with partial result callback
         const pollResult = await pollPredictionResult(
           predictionId,
           API_CONFIG.BASE_URL,
           API_CONFIG.RESULT_ENDPOINT,
           API_CONFIG.POLLING.MAX_ATTEMPTS,
-          API_CONFIG.POLLING.INTERVAL_MS
+          API_CONFIG.POLLING.INTERVAL_MS,
+          handlePartialResult
         );
         
         if (pollResult.success) {
+          console.log("✅ Complete result received:", pollResult);
+          setLoadingStage(3);
+          
           const prediction = pollResult.data;
           
           // Set prediction data (always available)
           setResultData({
             mentalWellnessScore: Math.max(0, parseFloat(prediction.prediction_score)),
             category: prediction.health_level,
-            wellnessAnalysis: prediction.wellness_analysis
+            wellnessAnalysis: prediction.wellness_analysis,
+            isPartial: false
           });
           
           // If partial, show results but continue polling for advice
@@ -139,15 +163,22 @@ const ResultPage = () => {
   };
 
   // Tampilkan Loading jika data belum siap atau sedang polling
-  if (isPolling) {
+  if (isPolling && loadingStage === 1) {
     return (
       <div className="result-container">
         <div className="result-loading">
           <div className="loading-spinner"></div>
           <h2>Menganalisis Data Anda...</h2>
           <p>Mohon tunggu sebentar, kami sedang memproses hasil screening Anda</p>
-          <div className="loading-dots">
-            <span>.</span><span>.</span><span>.</span>
+          <div className="loading-progress">
+            <div className="progress-step active">
+              <span className="step-number">1</span>
+              <span className="step-label">Menghitung Skor Mental</span>
+            </div>
+            <div className="progress-step">
+              <span className="step-number">2</span>
+              <span className="step-label">Menganalisis Hasil</span>
+            </div>
           </div>
         </div>
       </div>

@@ -1,25 +1,37 @@
 /**
- * Poll prediction result endpoint until ready, error, or timeout
+ * Multi-stage polling system for two models:
+ * 1. Fast Numeric Model (Flask) - Returns score & category quickly
+ * 2. Slow Advisory Model (Gemini API) - Returns wellness analysis asynchronously
  * 
  * Kong Gateway Routes:
  * - POST /v0-1/model-predict → Flask /predict ✅
  * - GET  /v0-1/model-result/{id} → Flask /result/{id} ✅
  * 
+ * Response Stages:
+ * - Stage 1 (partial): { status: "partial", result: { prediction_score, health_level } }
+ * - Stage 2 (ready): { status: "ready", result: { prediction_score, health_level, wellness_analysis } }
+ */
+
+/**
+ * Poll with callback support for partial results
  * @param {string} predictionId - The prediction ID to poll
- * @param {string} baseURL - Base URL for the API (uses Vite proxy in dev)
- * @param {string} resultPath - Result endpoint path (default: /v0-1/model-result)
- * @param {number} maxAttempts - Maximum number of polling attempts (default: 120)
- * @param {number} interval - Interval between polls in ms (default: 1000)
- * @returns {Promise} Resolves with result data or rejects with error
+ * @param {string} baseURL - Base URL for the API
+ * @param {string} resultPath - Result endpoint path
+ * @param {number} maxAttempts - Maximum polling attempts
+ * @param {number} interval - Interval between polls in ms
+ * @param {Function} onPartialResult - Callback for partial results (optional)
+ * @returns {Promise} Resolves with complete result or rejects with error
  */
 export async function pollPredictionResult(
   predictionId,
   baseURL = "http://139.59.109.5:8000",
   resultPath = "/v0-1/result",
   maxAttempts = 60,
-  interval = 2000
+  interval = 2000,
+  onPartialResult = null
 ) {
   let attempts = 0;
+  let partialResultDelivered = false;
 
   const poll = async () => {
     attempts++;
@@ -47,7 +59,8 @@ export async function pollPredictionResult(
           data: data.result,
           metadata: {
             created_at: data.created_at,
-            completed_at: data.completed_at
+            numeric_completed_at: data.numeric_completed_at,
+            advisory_completed_at: data.completed_at || data.advisory_completed_at
           }
         };
       }
@@ -67,15 +80,14 @@ export async function pollPredictionResult(
 
       // Status: processing - continue polling
       if (data.status === "processing") {
-        console.log("⏳ Still processing...");
+        console.log("⏳ Processing: Models not ready yet...");
         
         if (attempts >= maxAttempts) {
           throw new Error("Timeout: Prediction took too long to process");
         }
 
-        // Wait and poll again
         await new Promise(resolve => setTimeout(resolve, interval));
-        return poll(); // Recursive call
+        return poll();
       }
 
       // Status: error - prediction failed
