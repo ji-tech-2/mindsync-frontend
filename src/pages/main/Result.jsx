@@ -73,27 +73,52 @@ const ResultPage = () => {
 
     // Function to continue polling for advice
     const pollForAdvice = async (predictionId) => {
-      try {
-        const pollResult = await pollPredictionResult(
-          predictionId,
-          API_CONFIG.BASE_URL,
-          API_CONFIG.RESULT_ENDPOINT,
-          API_CONFIG.POLLING.MAX_ATTEMPTS,
-          API_CONFIG.POLLING.INTERVAL_MS
-        );
-        
-        if (pollResult.success && pollResult.status === "ready") {
-          const prediction = pollResult.data;
-          if (prediction.advice) {
-            console.log("✅ Advice data received:", prediction.advice);
-            setAdviceData(prediction.advice);
+      let adviceAttempts = 0;
+      const maxAdviceAttempts = API_CONFIG.POLLING.MAX_ATTEMPTS;
+      const pollInterval = API_CONFIG.POLLING.INTERVAL_MS;
+
+      const pollUntilReady = async () => {
+        adviceAttempts++;
+        console.log(`🔄 Polling for advice attempt ${adviceAttempts}/${maxAdviceAttempts}`);
+
+        try {
+          const pollResult = await pollPredictionResult(
+            predictionId,
+            API_CONFIG.BASE_URL,
+            API_CONFIG.RESULT_ENDPOINT,
+            1, // Only 1 attempt per call, we handle retries here
+            pollInterval
+          );
+          
+          if (pollResult.success && pollResult.status === "ready") {
+            const prediction = pollResult.data;
+            if (prediction.advice) {
+              console.log("✅ Advice data received:", prediction.advice);
+              setAdviceData(prediction.advice);
+            }
+            setIsLoadingAdvice(false);
+            return;
           }
+
+          // Still partial or processing, continue polling
+          if (pollResult.status === "partial" || pollResult.status === "processing") {
+            if (adviceAttempts >= maxAdviceAttempts) {
+              console.warn("⚠️ Timeout waiting for advice");
+              setIsLoadingAdvice(false);
+              return;
+            }
+            
+            // Wait and poll again
+            await new Promise(resolve => setTimeout(resolve, pollInterval));
+            return pollUntilReady();
+          }
+        } catch (error) {
+          console.error("⚠️ Failed to load advice:", error);
           setIsLoadingAdvice(false);
         }
-      } catch (error) {
-        console.error("⚠️ Failed to load advice:", error);
-        setIsLoadingAdvice(false);
-      }
+      };
+
+      pollUntilReady();
     };
 
     loadResult();
