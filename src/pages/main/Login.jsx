@@ -1,6 +1,8 @@
 // login
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import apiClient, { API_CONFIG } from "../../config/api";
 import "../css/login.css";
 
 export default function Login() {
@@ -12,6 +14,11 @@ export default function Login() {
   const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+
+  // Get the page they were trying to visit, or default to dashboard
+  const from = location.state?.from?.pathname || "/dashboard";
 
   // Validation function
   const validateForm = () => {
@@ -35,7 +42,7 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validate form before submitting
@@ -47,30 +54,33 @@ export default function Login() {
     setMessage("");
     setErrors({});
 
-    fetch("http://139.59.109.5:8000/v0-1/auth-login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setLoading(false);
-
-        if (data.success) {
-          setMessage("Login berhasil!");
-
-          localStorage.setItem("user", JSON.stringify(data.data));
-
-          navigate("/dashboard");
-        } else {
-          setMessage(data.message || "Login gagal");
-        }
-      })
-      .catch((err) => {
-        setLoading(false);
-        setMessage("Terjadi kesalahan server");
-        console.error(err);
+    // Backend response: { success: true, token: "jwt_token", type: "Bearer", user: { email, name, userId } }
+    try {
+      const response = await apiClient.post(API_CONFIG.AUTH_LOGIN, {
+        email,
+        password,
       });
+
+      const data = response.data;
+      setLoading(false);
+
+      if (data.success && data.token) {
+        setMessage("Login berhasil!");
+
+        // Use AuthContext login to update global auth state
+        login(data.token, data.user);
+        
+        // Redirect to the page they were trying to visit, or dashboard
+        navigate(from, { replace: true });
+      } else {
+        setMessage(data.message || "Login gagal");
+      }
+    } catch (err) {
+      setLoading(false);
+      const errorMessage = err.response?.data?.message || "Terjadi kesalahan server";
+      setMessage(errorMessage);
+      console.error("Login error:", err);
+    }
   };
 
   // Fungsi untuk mengarahkan ke halaman register

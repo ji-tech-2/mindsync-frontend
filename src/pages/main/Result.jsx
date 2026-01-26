@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { pollPredictionResult } from '../utils/pollingHelper.js';
+import { pollPredictionResult } from '../helpers/pollingHelper.js';
 import { API_CONFIG } from '../../config/api.js';
 import Advice from '../../components/Advice';
 import '../css/result.css';

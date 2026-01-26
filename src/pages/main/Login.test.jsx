@@ -2,6 +2,24 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Login from './Login';
+import apiClient from '../../config/api';
+import { AuthProvider } from '../../contexts/AuthContext';
+
+// Mock axios apiClient
+vi.mock('../../config/api', async () => {
+  const actual = await vi.importActual('../../config/api');
+  return {
+    ...actual,
+    default: {
+      post: vi.fn(),
+      get: vi.fn(),
+      interceptors: {
+        request: { use: vi.fn() },
+        response: { use: vi.fn() },
+      },
+    },
+  };
+});
 
 // Mock useNavigate
 const mockNavigate = vi.fn();
@@ -13,11 +31,13 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Helper to render component with router
+// Helper to render component with router and auth context
 const renderLogin = () => {
   return render(
     <BrowserRouter>
-      <Login />
+      <AuthProvider>
+        <Login />
+      </AuthProvider>
     </BrowserRouter>
   );
 };
@@ -25,8 +45,7 @@ const renderLogin = () => {
 describe('Login Component', () => {
   beforeEach(() => {
     mockNavigate.mockClear();
-    localStorage.clear();
-    global.fetch = vi.fn();
+    vi.clearAllMocks();
   });
 
   describe('Form Rendering', () => {
@@ -126,15 +145,16 @@ describe('Login Component', () => {
     it('should make POST request to correct endpoint with credentials', async () => {
       const mockResponse = {
         success: true,
-        data: { id: 1, email: 'test@example.com', token: 'fake-token' }
+        token: 'fake-jwt-token',
+        type: 'Bearer',
+        user: { 
+          email: 'test@example.com',
+          name: 'Test User',
+          userId: 1
+        }
       };
       
-      global.fetch = vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve(mockResponse),
-        })
-      );
+      apiClient.post.mockResolvedValue({ data: mockResponse });
       
       renderLogin();
       
@@ -148,33 +168,26 @@ describe('Login Component', () => {
       fireEvent.click(submitButton);
       
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
-          'http://139.59.109.5:8000/v0-1/auth-login',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: 'test@example.com', password: 'password123' }),
-          }
+        expect(apiClient.post).toHaveBeenCalledWith(
+          '/v0-1/auth-login',
+          { email: 'test@example.com', password: 'password123' }
         );
       });
     });
 
     it('should handle successful login response', async () => {
-      const mockUserData = { 
-        id: 1, 
-        email: 'test@example.com', 
-        token: 'fake-token' 
+      const mockResponse = {
+        success: true,
+        token: 'fake-jwt-token',
+        type: 'Bearer',
+        user: { 
+          email: 'test@example.com',
+          name: 'Test User',
+          userId: 1
+        }
       };
       
-      global.fetch = vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({
-            success: true,
-            data: mockUserData
-          }),
-        })
-      );
+      apiClient.post.mockResolvedValue({ data: mockResponse });
       
       renderLogin();
       
@@ -191,24 +204,17 @@ describe('Login Component', () => {
         expect(screen.getByText('Login berhasil!')).toBeInTheDocument();
       });
       
-      // Verify localStorage
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      expect(storedUser).toEqual(mockUserData);
-      
       // Verify navigation
-      expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
+      expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true });
     });
 
     it('should handle login failure response', async () => {
-      global.fetch = vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({
-            success: false,
-            message: 'Invalid credentials'
-          }),
-        })
-      );
+      apiClient.post.mockResolvedValue({
+        data: {
+          success: false,
+          message: 'Invalid credentials'
+        }
+      });
       
       renderLogin();
       
@@ -227,13 +233,10 @@ describe('Login Component', () => {
       
       // Verify no navigation
       expect(mockNavigate).not.toHaveBeenCalled();
-      
-      // Verify no localStorage
-      expect(localStorage.getItem('user')).toBeNull();
     });
 
     it('should handle network error', async () => {
-      global.fetch = vi.fn(() => Promise.reject(new Error('Network error')));
+      apiClient.post.mockRejectedValue(new Error('Network error'));
       
       renderLogin();
       
@@ -254,7 +257,7 @@ describe('Login Component', () => {
 
   describe('Loading State', () => {
     it('should show loading state during submission', async () => {
-      global.fetch = vi.fn(() => new Promise(resolve => setTimeout(resolve, 100)));
+      apiClient.post.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
       
       renderLogin();
       

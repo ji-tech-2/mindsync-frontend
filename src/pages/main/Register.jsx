@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import apiClient, { API_CONFIG } from "../../config/api";
 import "../css/register.css";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [isRegistered, setIsRegistered] = useState(false);
 
   const [form, setForm] = useState({
@@ -130,34 +133,33 @@ export default function Register() {
     setMessage("Processing registration...");
     setErrors({});
 
+    // Backend response: { success: true, message: "...", data: { email, name } }
+    // Note: Backend doesn't return token on register, user needs to login after
     try {
-      const res = await fetch("http://139.59.109.5:8000/v0-1/auth-register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const response = await apiClient.post(API_CONFIG.AUTH_REGISTER, form);
+      const result = response.data;
+      setLoading(false);
 
-      const result = await res.json();
-      setLoading(false); // Hentikan loading setelah respons
-
-      if (res.ok) {
+      if (result.success) {
         setMessage("Registration successful! Welcome aboard.");
-        // Note: Sebaiknya simpan token/data user yang relevan, bukan objek result penuh jika tidak diperlukan.
-        localStorage.setItem("user", JSON.stringify(result)); 
         setIsRegistered(true);
+        // Note: User will need to login after successful registration
+        // Or you can auto-login here by calling the login endpoint
       } else {
         setMessage(result.message || "Registration failed. Please check your form data.");
         setIsRegistered(false);
       }
     } catch (err) {
-      setLoading(false); // Hentikan loading jika ada error
-      setMessage("Error connecting to server. Please ensure your backend is running.");
+      setLoading(false);
+      const errorMessage = err.response?.data?.message || "Error connecting to server. Please ensure your backend is running.";
+      setMessage(errorMessage);
       setIsRegistered(false);
+      console.error("Registration error:", err);
     }
   }
 
   const handleContinue = () => {
-    navigate("/dashboard");
+    navigate("/signIn"); // Redirect to login after successful registration
   };
 
   // Fungsi baru untuk navigasi ke Login
@@ -174,12 +176,12 @@ export default function Register() {
         <p className="register-message success-message-box">{message}</p>
 
         <p>
-          Akun Anda telah berhasil dibuat. Silakan lanjutkan ke dashboard untuk memulai perjalanan
+          Akun Anda telah berhasil dibuat. Silakan login untuk memulai perjalanan
           kesehatan mental Anda.
         </p>
 
         <button type="button" className="register-btn" onClick={handleContinue}>
-          Lanjut ke Dashboard
+          Login Sekarang
         </button>
       </div>
     );

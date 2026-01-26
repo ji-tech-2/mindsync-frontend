@@ -1,5 +1,5 @@
 /**
- * API Configuration
+ * API Configuration & Axios Instance
  * 
  * IMPORTANT SETUP NOTES:
  * ====================
@@ -7,21 +7,27 @@
  * Current Kong Gateway Routes (http://139.59.109.5:8000):
  * ✅ POST /v0-1/model-predict → Flask /predict (WORKING)
  * ✅ GET  /v0-1/model-result/{id} → Flask /result/{id} (CONFIGURED)
+ * ✅ POST /v0-1/auth-login → Authentication endpoint
+ * ✅ POST /v0-1/auth-register → Registration endpoint
  * 
- * The Flask backend has these endpoints:
- * - POST /predict → Returns prediction_id
- * - GET  /result/<prediction_id> → Returns prediction result
- * 
- * Kong needs to expose:
- * - POST /v0-1/model-predict → /predict
- * - GET  /v0-1/result/{id} → /result/{id}  <-- ADD THIS
+ * Security Implementation:
+ * - JWT token stored in memory (not localStorage)
+ * - Token automatically attached to requests via Axios interceptors
+ * - HttpOnly cookies support (when backend implements it)
  */
+
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 export const API_CONFIG = {
   // Base URL for the API
   // In development: uses Vite proxy (/api) to bypass CORS
   // In production: uses direct URL
   BASE_URL: import.meta.env.DEV ? "/api" : "http://139.59.109.5:8000",
+  
+  // Authentication endpoints
+  AUTH_LOGIN: "/v0-1/auth-login",
+  AUTH_REGISTER: "/v0-1/auth-register",
   
   // Prediction endpoint (working)
   PREDICT_ENDPOINT: "/v0-1/model-predict",
@@ -40,6 +46,113 @@ export const API_CONFIG = {
     TIMEOUT_MS: 120000    // 2 minutes total timeout
   }
 };
+
+// ====================================
+// TOKEN MANAGEMENT (In-Memory Storage)
+// ====================================
+// TODO: PLACEHOLDER - Waiting for backend to implement JWT token generation
+// Backend should return: { success: true, token: "jwt_token_here", user: {...} }
+let authToken = null;
+let userData = null;
+
+export const TokenManager = {
+  // Set token after successful login/register
+  setToken(token) {
+    authToken = token;
+    // TODO: PLACEHOLDER - Once backend supports HttpOnly cookies, remove this
+    // For now, we'll also store in a secure cookie as fallback
+    Cookies.set('auth_token', token, { 
+      secure: true,  // Only sent over HTTPS
+      sameSite: 'strict' // CSRF protection
+    });
+  },
+
+  // Get current token
+  getToken() {
+    // TODO: PLACEHOLDER - Check memory first, then cookie fallback
+    return authToken || Cookies.get('auth_token');
+  },
+
+  // Clear token on logout
+  clearToken() {
+    authToken = null;
+    userData = null;
+    Cookies.remove('auth_token');
+  },
+
+  // Store user data (non-sensitive info only)
+  setUserData(user) {
+    // Only store non-sensitive user data (no passwords!)
+    userData = {
+      email: user.email,
+      name: user.name,
+      userId: user.userId, // From backend response
+      // Add other non-sensitive fields as needed
+    };
+  },
+
+  getUserData() {
+    return userData;
+  },
+
+  isAuthenticated() {
+    return !!this.getToken();
+  }
+};
+
+// ====================================
+// AXIOS INSTANCE (Centralized API Client)
+// ====================================
+const apiClient = axios.create({
+  baseURL: API_CONFIG.BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true, // Enable cookies for HttpOnly cookie support
+});
+
+// Request Interceptor: Attach JWT token to all requests
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = TokenManager.getToken();
+    
+    // Attach JWT token to Authorization header
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response Interceptor: Handle token refresh and errors
+apiClient.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    // Handle 401 Unauthorized - token expired or invalid
+    if (error.response?.status === 401) {
+      // Don't redirect if already on login/register page
+      const publicPaths = ['/signIn', '/register', '/'];
+      const currentPath = window.location.pathname;
+      
+      if (!publicPaths.includes(currentPath)) {
+        TokenManager.clearToken();
+        // Trigger auth state update
+        window.dispatchEvent(new CustomEvent('auth:logout'));
+        window.location.href = '/signIn';
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
+export default apiClient;
 
 // Helper function to get full endpoint URLs
 export function getApiUrl(endpoint) {

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
 import Result from './Result';
-import * as pollingHelper from '../utils/pollingHelper';
+import * as pollingHelper from '../helpers/pollingHelper';
 
 // Mock the API config
 vi.mock('../../config/api.js', () => ({
@@ -17,7 +17,7 @@ vi.mock('../../config/api.js', () => ({
 }));
 
 // Mock the pollingHelper module
-vi.mock('../utils/pollingHelper', () => ({
+vi.mock('../helpers/pollingHelper', () => ({
   pollPredictionResult: vi.fn(),
 }));
 
