@@ -25,22 +25,10 @@ export default function App() {
             </ProtectedRoute>
           } 
         />
-        <Route 
-          path="/screening" 
-          element={
-            <ProtectedRoute>
-              <Screening />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/result/:predictionId" 
-          element={
-            <ProtectedRoute>
-              <Result />
-            </ProtectedRoute>
-          } 
-        />
+
+        {/* Semi-public routes - accessible to all, but full features require auth */}
+        <Route path="/screening" element={<Screening />} />
+        <Route path="/result/:predictionId" element={<Result />} />
       </Routes>
     </AuthProvider>
   );
