@@ -84,10 +84,8 @@ mindsync-frontend/
 ├── vite.config.js                  # Vite configuration
 ├── vitest.config.js                # Vitest testing configuration
 ├── Dockerfile                      # Docker containerization
-├── README.md                       # This file
-├── AUTHENTICATION.md               # Auth implementation details
-├── JWT_AUTHENTICATION_GUIDE.md     # Complete JWT guide 
-└── AUTH_QUICK_REFERENCE.md         # Quick auth reference 
+└── README.md                       # This file
+
 
 
 ```

@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
 import apiClient, { API_CONFIG } from "../../config/api";
 import "../css/register.css";
 
 export default function Register() {
   const navigate = useNavigate();
-  const { login } = useAuth();
   const [isRegistered, setIsRegistered] = useState(false);
 
   const [form, setForm] = useState({

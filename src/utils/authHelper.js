@@ -29,15 +29,14 @@ export function getCurrentUser() {
 /**
  * Logout user by clearing token and user data
  * Dispatches event to notify AuthContext and other listeners
+ * Note: Navigation is handled by AuthContext listening to 'auth:logout'
+ * For React components, prefer using useAuth().logout() directly
  */
 export function logout() {
   TokenManager.clearToken();
   
-  // Dispatch logout event for AuthContext and other components
+  // Dispatch logout event - AuthContext handles state update and navigation
   window.dispatchEvent(new CustomEvent('auth:logout'));
-  
-  // Redirect to login
-  window.location.href = '/signIn';
 }
 
 /**
@@ -49,13 +48,14 @@ export function getAuthToken() {
 }
 
 /**
- * Protected route guard (legacy - prefer using ProtectedRoute component)
- * Use this to check authentication before rendering protected components
+ * Protected route guard
+ * @deprecated Prefer using ProtectedRoute component for route protection
  * @returns {boolean} True if authenticated, false otherwise
  */
 export function requireAuth() {
   if (!isAuthenticated()) {
-    window.location.href = '/signIn';
+    // Dispatch event - let React components handle navigation
+    window.dispatchEvent(new CustomEvent('auth:unauthorized'));
     return false;
   }
   return true;

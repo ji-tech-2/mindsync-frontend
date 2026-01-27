@@ -59,25 +59,20 @@ export const TokenManager = {
   // Set token after successful login/register
   setToken(token) {
     authToken = token;
-    // TODO: PLACEHOLDER - Once backend supports HttpOnly cookies, remove this
-    // For now, we'll also store in a secure cookie as fallback
-    Cookies.set('auth_token', token, { 
-      secure: true,  // Only sent over HTTPS
-      sameSite: 'strict' // CSRF protection
-    });
+    // Memory-only storage - token is cleared on page refresh
+    // TODO: Once backend supports HttpOnly cookies, they will handle persistence
   },
 
   // Get current token
   getToken() {
-    // TODO: PLACEHOLDER - Check memory first, then cookie fallback
-    return authToken || Cookies.get('auth_token');
+    // Memory-only - no cookie fallback
+    return authToken;
   },
 
   // Clear token on logout
   clearToken() {
     authToken = null;
     userData = null;
-    Cookies.remove('auth_token');
   },
 
   // Store user data (non-sensitive info only)
@@ -142,9 +137,9 @@ apiClient.interceptors.response.use(
       
       if (!publicPaths.includes(currentPath)) {
         TokenManager.clearToken();
-        // Trigger auth state update
+        // Dispatch events for React components to handle
         window.dispatchEvent(new CustomEvent('auth:logout'));
-        window.location.href = '/signIn';
+        window.dispatchEvent(new CustomEvent('auth:unauthorized'));
       }
     }
     

@@ -6,6 +6,7 @@
  */
 
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TokenManager } from '../config/api';
 
 // Create the context
@@ -25,6 +26,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Initialize auth state on mount
   useEffect(() => {
@@ -46,16 +48,27 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  // Listen for logout events from API interceptor
+  // Listen for logout events from API interceptor or authHelper
   useEffect(() => {
     const handleLogout = () => {
       setUser(null);
       setIsAuthenticated(false);
+      navigate('/signIn', { replace: true });
     };
 
     window.addEventListener('auth:logout', handleLogout);
     return () => window.removeEventListener('auth:logout', handleLogout);
-  }, []);
+  }, [navigate]);
+
+  // Listen for unauthorized events (401) and redirect via React Router
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      navigate('/signIn', { replace: true });
+    };
+
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
+  }, [navigate]);
 
   // Login function - to be called after successful API login
   const login = useCallback((token, userData) => {
