@@ -145,7 +145,8 @@ describe('pollPredictionResult', () => {
         data: mockReadyResponse.result,
         metadata: {
           created_at: mockReadyResponse.created_at,
-          completed_at: mockReadyResponse.completed_at,
+          numeric_completed_at: undefined,
+          advisory_completed_at: mockReadyResponse.completed_at,
         },
       });
     });
@@ -419,7 +420,8 @@ describe('pollPredictionResult', () => {
 
       expect(result.metadata).toEqual({
         created_at: '2026-01-21T10:00:00Z',
-        completed_at: '2026-01-21T10:05:00Z',
+        numeric_completed_at: undefined,
+        advisory_completed_at: '2026-01-21T10:05:00Z',
       });
     });
   });

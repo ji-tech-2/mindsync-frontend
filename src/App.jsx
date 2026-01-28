@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/main/Login";
 import Dashboard from "./pages/main/Dashboard";
 import Register from "./pages/main/Register";
@@ -7,13 +9,27 @@ import Result from "./pages/main/Result";
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Dashboard isProtected={false} />} />      
-      <Route path="/dashboard" element={<Dashboard isProtected={true} />} />
-      <Route path="/signIn" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/screening" element={<Screening />} />
-      <Route path="/result/:predictionId" element={<Result />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<Dashboard isProtected={false} />} />      
+        <Route path="/signIn" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        
+        {/* Protected routes - require authentication */}
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute>
+              <Dashboard isProtected={true} />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Semi-public routes - accessible to all, but full features require auth */}
+        <Route path="/screening" element={<Screening />} />
+        <Route path="/result/:predictionId" element={<Result />} />
+      </Routes>
+    </AuthProvider>
   );
 }

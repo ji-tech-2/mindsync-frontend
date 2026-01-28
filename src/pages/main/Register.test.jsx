@@ -2,6 +2,24 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Register from './Register';
+import apiClient from '../../config/api';
+import { AuthProvider } from '../../contexts/AuthContext';
+
+// Mock axios apiClient
+vi.mock('../../config/api', async () => {
+  const actual = await vi.importActual('../../config/api');
+  return {
+    ...actual,
+    default: {
+      post: vi.fn(),
+      get: vi.fn(),
+      interceptors: {
+        request: { use: vi.fn() },
+        response: { use: vi.fn() },
+      },
+    },
+  };
+});
 
 // Mock useNavigate
 const mockNavigate = vi.fn();
@@ -13,11 +31,13 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Helper to render component with router
+// Helper to render component with router and auth context
 const renderRegister = () => {
   return render(
     <BrowserRouter>
-      <Register />
+      <AuthProvider>
+        <Register />
+      </AuthProvider>
     </BrowserRouter>
   );
 };
@@ -35,8 +55,7 @@ const validFormData = {
 describe('Register Component', () => {
   beforeEach(() => {
     mockNavigate.mockClear();
-    localStorage.clear();
-    global.fetch = vi.fn();
+    vi.clearAllMocks();
   });
 
   describe('Form Rendering', () => {
@@ -265,12 +284,7 @@ describe('Register Component', () => {
         data: { id: 1, username: 'testuser' }
       };
       
-      global.fetch = vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve(mockResponse),
-        })
-      );
+      apiClient.post.mockResolvedValue({ data: mockResponse });
       
       renderRegister();
       fillValidForm();
@@ -279,19 +293,15 @@ describe('Register Component', () => {
       fireEvent.click(submitButton);
       
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
-          'http://139.59.109.5:8000/v0-1/auth-register',
+        expect(apiClient.post).toHaveBeenCalledWith(
+          '/v0-1/auth-register',
           {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: validFormData.email,
-              password: validFormData.password,
-              name: validFormData.name,
-              dob: validFormData.dob,
-              gender: validFormData.gender,
-              occupation: validFormData.occupation,
-            }),
+            email: validFormData.email,
+            password: validFormData.password,
+            name: validFormData.name,
+            dob: validFormData.dob,
+            gender: validFormData.gender,
+            occupation: validFormData.occupation,
           }
         );
       });
@@ -299,18 +309,15 @@ describe('Register Component', () => {
 
     it('should handle successful registration', async () => {
       const mockResponse = {
-        id: 1,
-        username: 'testuser',
-        email: 'test@example.com',
-        token: 'fake-token'
+        success: true,
+        data: {
+          id: 1,
+          username: 'testuser',
+          email: 'test@example.com',
+        }
       };
       
-      global.fetch = vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve(mockResponse),
-        })
-      );
+      apiClient.post.mockResolvedValue({ data: mockResponse });
       
       renderRegister();
       fillValidForm();
@@ -322,21 +329,15 @@ describe('Register Component', () => {
         expect(screen.getByText('✅ Registrasi Berhasil!')).toBeInTheDocument();
         expect(screen.getByText(/Registration successful! Welcome aboard./i)).toBeInTheDocument();
       });
-      
-      // Verify localStorage
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      expect(storedUser).toEqual(mockResponse);
     });
 
     it('should handle registration failure', async () => {
-      global.fetch = vi.fn(() =>
-        Promise.resolve({
-          ok: false,
-          json: () => Promise.resolve({
-            message: 'Email already exists'
-          }),
-        })
-      );
+      apiClient.post.mockResolvedValue({
+        data: {
+          success: false,
+          message: 'Email already exists'
+        }
+      });
       
       renderRegister();
       fillValidForm();
@@ -348,13 +349,12 @@ describe('Register Component', () => {
         expect(screen.getByText('Email already exists')).toBeInTheDocument();
       });
       
-      // Should not navigate or store user
+      // Should not navigate
       expect(mockNavigate).not.toHaveBeenCalled();
-      expect(localStorage.getItem('user')).toBeNull();
     });
 
     it('should handle network error', async () => {
-      global.fetch = vi.fn(() => Promise.reject(new Error('Network error')));
+      apiClient.post.mockRejectedValue(new Error('Network error'));
       
       renderRegister();
       fillValidForm();
@@ -368,12 +368,7 @@ describe('Register Component', () => {
     });
 
     it('should send correct JSON format with all fields', async () => {
-      global.fetch = vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ id: 1 }),
-        })
-      );
+      apiClient.post.mockResolvedValue({ data: { success: true, data: { id: 1 } } });
       
       renderRegister();
       fillValidForm();
@@ -382,8 +377,8 @@ describe('Register Component', () => {
       fireEvent.click(submitButton);
       
       await waitFor(() => {
-        const callArgs = global.fetch.mock.calls[0];
-        const bodyData = JSON.parse(callArgs[1].body);
+        const callArgs = apiClient.post.mock.calls[0];
+        const bodyData = callArgs[1]; // Second argument is the data object
         
         expect(bodyData).toHaveProperty('email');
         expect(bodyData).toHaveProperty('password');
@@ -400,13 +395,10 @@ describe('Register Component', () => {
   });
 
   describe('Success Screen', () => {
-    it('should navigate to dashboard when clicking continue button', async () => {
-      global.fetch = vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ id: 1, email: 'test@example.com' }),
-        })
-      );
+    it('should navigate to login when clicking continue button', async () => {
+      apiClient.post.mockResolvedValue({
+        data: { success: true, message: 'Registration successful', data: { email: 'test@example.com', name: 'Test User' } }
+      });
       
       renderRegister();
       
@@ -429,16 +421,16 @@ describe('Register Component', () => {
         expect(screen.getByText('✅ Registrasi Berhasil!')).toBeInTheDocument();
       });
       
-      const continueButton = screen.getByText('Lanjut ke Dashboard');
+      const continueButton = screen.getByText('Login Sekarang');
       fireEvent.click(continueButton);
       
-      expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
+      expect(mockNavigate).toHaveBeenCalledWith('/signIn');
     });
   });
 
   describe('Loading State', () => {
     it('should show loading state during submission', async () => {
-      global.fetch = vi.fn(() => new Promise(resolve => setTimeout(resolve, 100)));
+      apiClient.post.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
       
       renderRegister();
       

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { pollPredictionResult } from '../utils/pollingHelper.js';
+import { useAuth } from '../../contexts/AuthContext';
+import { pollPredictionResult } from '../helpers/pollingHelper.js';
 import { API_CONFIG } from '../../config/api.js';
 import Advice from '../../components/Advice';
 import '../css/result.css';
@@ -8,6 +9,7 @@ import '../css/result.css';
 const ResultPage = () => {
   const navigate = useNavigate();
   const { predictionId } = useParams();
+  const { isAuthenticated } = useAuth();
   const [resultData, setResultData] = useState(null);
   const [adviceData, setAdviceData] = useState(null);
   const [isPolling, setIsPolling] = useState(false);
@@ -232,8 +234,23 @@ const ResultPage = () => {
         </div>
       </div>
 
-      {/* Advice Section */}
-      <Advice resultData={resultData} adviceData={adviceData} isLoading={isLoadingAdvice} />
+      {/* Advice Section - Only for authenticated users */}
+      {isAuthenticated ? (
+        <Advice resultData={resultData} adviceData={adviceData} isLoading={isLoadingAdvice} />
+      ) : (
+        <div className="advice-locked">
+          <h3>🔒 Saran Personal Terkunci</h3>
+          <p>Masuk atau daftar untuk melihat saran kesehatan mental yang dipersonalisasi berdasarkan hasil Anda.</p>
+          <div className="auth-buttons">
+            <button className="btn btn-primary" onClick={() => navigate('/signIn')}>
+              Masuk
+            </button>
+            <button className="btn btn-outline" onClick={() => navigate('/register')}>
+              Daftar
+            </button>
+          </div>
+        </div>
+      )}
  
       {/* Footer Action */}
       <div className="result-footer">

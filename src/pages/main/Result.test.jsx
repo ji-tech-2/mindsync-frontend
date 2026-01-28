@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
 import Result from './Result';
-import * as pollingHelper from '../utils/pollingHelper';
+import * as pollingHelper from '../helpers/pollingHelper';
 
 // Mock the API config
 vi.mock('../../config/api.js', () => ({
@@ -17,8 +17,18 @@ vi.mock('../../config/api.js', () => ({
 }));
 
 // Mock the pollingHelper module
-vi.mock('../utils/pollingHelper', () => ({
+vi.mock('../helpers/pollingHelper', () => ({
   pollPredictionResult: vi.fn(),
+}));
+
+// Mock the AuthContext with configurable auth state
+let mockIsAuthenticated = true;
+vi.mock('../../contexts/AuthContext', () => ({
+  useAuth: () => ({
+    isAuthenticated: mockIsAuthenticated,
+    user: mockIsAuthenticated ? { email: 'test@example.com' } : null,
+    isLoading: false,
+  }),
 }));
 
 // Mock the Advice component
@@ -421,6 +431,311 @@ describe('Result Component - Partial Polling', () => {
       await waitFor(() => {
         expect(screen.getByText('0.0')).toBeInTheDocument();
       });
+    });
+  });
+});
+
+// ============================================
+// GUEST VS AUTHENTICATED USER TESTS
+// ============================================
+
+describe('Result Component - Guest User (Not Authenticated)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockNavigate.mockClear();
+    // Set as guest (not authenticated)
+    mockIsAuthenticated = false;
+  });
+
+  afterEach(() => {
+    // Reset to authenticated for other tests
+    mockIsAuthenticated = true;
+  });
+
+  it('should show score for guest users', async () => {
+    const mockResult = {
+      success: true,
+      status: 'ready',
+      data: {
+        prediction_score: 65.0,
+        health_level: 'average',
+        wellness_analysis: 'Your mental wellness is average',
+        advice: { description: 'Some advice', factors: {} },
+      },
+      metadata: {
+        created_at: '2026-01-21T10:00:00Z',
+        completed_at: '2026-01-21T10:01:00Z',
+      },
+    };
+
+    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
+
+    renderResult('guest-test-123');
+
+    // Should show score
+    await waitFor(() => {
+      expect(screen.getByText('65.0')).toBeInTheDocument();
+    });
+
+    // Should show category
+    expect(screen.getByText('Average')).toBeInTheDocument();
+  });
+
+  it('should show locked advice section for guest users', async () => {
+    const mockResult = {
+      success: true,
+      status: 'ready',
+      data: {
+        prediction_score: 70.0,
+        health_level: 'average',
+        wellness_analysis: 'Test analysis',
+        advice: { description: 'Advice that guest should not see', factors: {} },
+      },
+      metadata: {
+        created_at: '2026-01-21T10:00:00Z',
+        completed_at: '2026-01-21T10:01:00Z',
+      },
+    };
+
+    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
+
+    renderResult('guest-test-456');
+
+    await waitFor(() => {
+      expect(screen.getByText('70.0')).toBeInTheDocument();
+    });
+
+    // Should NOT show the Advice component
+    expect(screen.queryByTestId('advice-component')).not.toBeInTheDocument();
+
+    // Should show locked advice message
+    expect(screen.getByText(/Saran Personal Terkunci/i)).toBeInTheDocument();
+  });
+
+  it('should show login and register buttons for guest users', async () => {
+    const mockResult = {
+      success: true,
+      status: 'ready',
+      data: {
+        prediction_score: 55.0,
+        health_level: 'not healthy',
+        wellness_analysis: 'Test',
+        advice: { description: 'Advice', factors: {} },
+      },
+      metadata: {
+        created_at: '2026-01-21T10:00:00Z',
+        completed_at: '2026-01-21T10:01:00Z',
+      },
+    };
+
+    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
+
+    renderResult('guest-test-789');
+
+    await waitFor(() => {
+      expect(screen.getByText('55.0')).toBeInTheDocument();
+    });
+
+    // Should show login and register buttons
+    expect(screen.getByRole('button', { name: /Masuk/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Daftar/i })).toBeInTheDocument();
+  });
+
+  it('should navigate to signIn when login button clicked', async () => {
+    const mockResult = {
+      success: true,
+      status: 'ready',
+      data: {
+        prediction_score: 60.0,
+        health_level: 'average',
+        wellness_analysis: 'Test',
+        advice: { description: 'Advice', factors: {} },
+      },
+      metadata: {
+        created_at: '2026-01-21T10:00:00Z',
+        completed_at: '2026-01-21T10:01:00Z',
+      },
+    };
+
+    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
+
+    renderResult('guest-test-nav');
+
+    await waitFor(() => {
+      expect(screen.getByText('60.0')).toBeInTheDocument();
+    });
+
+    const loginButton = screen.getByRole('button', { name: /Masuk/i });
+    loginButton.click();
+
+    expect(mockNavigate).toHaveBeenCalledWith('/signIn');
+  });
+
+  it('should navigate to register when register button clicked', async () => {
+    const mockResult = {
+      success: true,
+      status: 'ready',
+      data: {
+        prediction_score: 60.0,
+        health_level: 'average',
+        wellness_analysis: 'Test',
+        advice: { description: 'Advice', factors: {} },
+      },
+      metadata: {
+        created_at: '2026-01-21T10:00:00Z',
+        completed_at: '2026-01-21T10:01:00Z',
+      },
+    };
+
+    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
+
+    renderResult('guest-test-register');
+
+    await waitFor(() => {
+      expect(screen.getByText('60.0')).toBeInTheDocument();
+    });
+
+    const registerButton = screen.getByRole('button', { name: /Daftar/i });
+    registerButton.click();
+
+    expect(mockNavigate).toHaveBeenCalledWith('/register');
+  });
+});
+
+describe('Result Component - Authenticated User', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockNavigate.mockClear();
+    // Set as authenticated
+    mockIsAuthenticated = true;
+  });
+
+  it('should show score for authenticated users', async () => {
+    const mockResult = {
+      success: true,
+      status: 'ready',
+      data: {
+        prediction_score: 85.0,
+        health_level: 'healthy',
+        wellness_analysis: 'Excellent mental health',
+        advice: { description: 'Keep it up', factors: {} },
+      },
+      metadata: {
+        created_at: '2026-01-21T10:00:00Z',
+        completed_at: '2026-01-21T10:01:00Z',
+      },
+    };
+
+    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
+
+    renderResult('auth-test-123');
+
+    await waitFor(() => {
+      expect(screen.getByText('85.0')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Healthy')).toBeInTheDocument();
+  });
+
+  it('should show full advice component for authenticated users', async () => {
+    const mockResult = {
+      success: true,
+      status: 'ready',
+      data: {
+        prediction_score: 75.0,
+        health_level: 'average',
+        wellness_analysis: 'Good mental health',
+        advice: { 
+          description: 'Personalized advice here',
+          factors: {
+            sleep: { recommendation: 'Improve sleep' },
+            exercise: { recommendation: 'Exercise more' },
+          },
+        },
+      },
+      metadata: {
+        created_at: '2026-01-21T10:00:00Z',
+        completed_at: '2026-01-21T10:01:00Z',
+      },
+    };
+
+    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
+
+    renderResult('auth-test-456');
+
+    await waitFor(() => {
+      expect(screen.getByText('75.0')).toBeInTheDocument();
+    });
+
+    // Should show the Advice component
+    expect(screen.getByTestId('advice-component')).toBeInTheDocument();
+    
+    // Should have advice data
+    await waitFor(() => {
+      expect(screen.getByTestId('advice-data')).toHaveTextContent('has-advice');
+    });
+  });
+
+  it('should NOT show locked advice section for authenticated users', async () => {
+    const mockResult = {
+      success: true,
+      status: 'ready',
+      data: {
+        prediction_score: 80.0,
+        health_level: 'healthy',
+        wellness_analysis: 'Test',
+        advice: { description: 'Advice', factors: {} },
+      },
+      metadata: {
+        created_at: '2026-01-21T10:00:00Z',
+        completed_at: '2026-01-21T10:01:00Z',
+      },
+    };
+
+    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
+
+    renderResult('auth-test-789');
+
+    await waitFor(() => {
+      expect(screen.getByText('80.0')).toBeInTheDocument();
+    });
+
+    // Should NOT show locked message
+    expect(screen.queryByText(/Saran Personal Terkunci/i)).not.toBeInTheDocument();
+    
+    // Should NOT show login/register buttons in advice section
+    const adviceLocked = screen.queryByText(/Masuk atau daftar/i);
+    expect(adviceLocked).not.toBeInTheDocument();
+  });
+
+  it('should show advice loading state for authenticated users', async () => {
+    const mockPartialResult = {
+      success: true,
+      status: 'partial',
+      data: {
+        prediction_score: 72.0,
+        health_level: 'average',
+        wellness_analysis: 'Analysis in progress',
+      },
+      metadata: {
+        created_at: '2026-01-21T10:00:00Z',
+      },
+    };
+
+    pollingHelper.pollPredictionResult
+      .mockResolvedValueOnce(mockPartialResult)
+      .mockResolvedValueOnce({ success: true, status: 'processing', data: null });
+
+    renderResult('auth-partial-test');
+
+    await waitFor(() => {
+      expect(screen.getByText('72.0')).toBeInTheDocument();
+    });
+
+    // Should show advice component in loading state
+    expect(screen.getByTestId('advice-component')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('advice-loading')).toHaveTextContent('true');
     });
   });
 });
