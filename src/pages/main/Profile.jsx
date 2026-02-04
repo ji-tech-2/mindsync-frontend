@@ -8,7 +8,17 @@ import FormInput from "../../components/FormInput";
 import FormSelect from "../../components/FormSelect";
 import OTPInput from "../../components/OTPInput";
 import apiClient from "../../config/api";
-import { genderOptions, occupationOptions } from "../../utils/fieldMappings";
+import { 
+  genderOptions, 
+  occupationOptions, 
+  workModeOptions,
+  toApiGender,
+  toApiOccupation,
+  toApiWorkMode,
+  fromApiGender,
+  fromApiOccupation,
+  fromApiWorkMode
+} from "../../utils/fieldMappings";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -17,6 +27,7 @@ export default function Profile() {
     email: "",
     gender: "",
     occupation: "",
+    workRmt: "",
     dob: ""
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +47,14 @@ export default function Profile() {
       try {
         const response = await apiClient.get("/v0-1/auth-profile");
         if (response.data.success) {
-          setUser(response.data.data);
+          // Transform API values to display values
+          const apiData = response.data.data;
+          setUser({
+            ...apiData,
+            gender: fromApiGender(apiData.gender),
+            occupation: fromApiOccupation(apiData.occupation),
+            workRmt: fromApiWorkMode(apiData.workRmt)
+          });
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -89,21 +107,30 @@ export default function Profile() {
           }, 1500);
         }
       } else {
-        // Update profile (name, gender, occupation)
+        // Update profile (name, gender, occupation, workRmt)
         const updateData = {};
         
         if (activeModal === "name") {
           updateData.name = formData.value;
         } else if (activeModal === "gender") {
-          updateData.gender = formData.value;
+          updateData.gender = toApiGender(formData.value);
         } else if (activeModal === "occupation") {
-          updateData.occupation = formData.value;
+          updateData.occupation = toApiOccupation(formData.value);
+        } else if (activeModal === "workRmt") {
+          updateData.workRmt = toApiWorkMode(formData.value);
         }
 
         const response = await apiClient.put("/v0-1/auth-profile", updateData);
 
         if (response.data.success) {
-          setUser(response.data.data);
+          // Transform API response to display values
+          const apiData = response.data.data;
+          setUser({
+            ...apiData,
+            gender: fromApiGender(apiData.gender),
+            occupation: fromApiOccupation(apiData.occupation),
+            workRmt: fromApiWorkMode(apiData.workRmt)
+          });
           setMessage({ type: "success", text: response.data.message });
           setTimeout(() => {
             closeModal();
@@ -192,6 +219,12 @@ export default function Profile() {
             />
 
             <ProfileFieldRow
+              label="Work Mode"
+              value={user.workRmt}
+              onEdit={() => openModal("workRmt")}
+            />
+
+            <ProfileFieldRow
               label="Password"
               value="••••••••"
               onEdit={() => openModal("password")}
@@ -256,6 +289,25 @@ export default function Profile() {
           value={formData.value}
           onChange={handleInputChange}
           options={occupationOptions}
+          required
+        />
+      </EditModal>
+
+      {/* Modal for Work Mode */}
+      <EditModal
+        isOpen={activeModal === "workRmt"}
+        onClose={closeModal}
+        title="Edit Work Mode"
+        onSubmit={handleSubmit}
+        loading={loading}
+        message={message}
+      >
+        <FormSelect
+          label="Work Mode"
+          name="value"
+          value={formData.value}
+          onChange={handleInputChange}
+          options={workModeOptions}
           required
         />
       </EditModal>

@@ -1,58 +1,88 @@
 /**
- * Field mappings for gender, occupation, and work mode
- * Used for both display and API transformation
+ * Field Mappings - Single Source of Truth
+ * Define UI display values -> API values mapping once
+ * Everything else is auto-generated
  */
 
-export const genderMap = {
-  Male: "Male",
-  Female: "Female",
-  Other: "Non-binary/Other",
-};
-
-export const occupationMap = {
-  Employed: "Employed",
-  Unemployed: "Unemployed",
-  Student: "Student",
-  Freelancer: "Self-employed",
-  Retired: "Unemployed",
-  Other: "Self-employed",
-};
-
-export const workModeMap = {
-  Remote: "Remote",
-  Hybrid: "Hybrid",
-  "On-site": "In-person",
-  Unemployed: "Unemployed",
-};
-
-// Generate options arrays from map keys
-export const genderOptions = Object.keys(genderMap)
-  .filter(key => key !== "Other") // Filter out "Other" for profile page (only Male/Female)
-  .map(key => ({ value: key, label: key }));
-
-export const occupationOptions = Object.keys(occupationMap).map(key => ({
-  value: key,
-  label: key,
-}));
-
-export const workModeOptions = Object.keys(workModeMap).map(key => ({
-  value: key,
-  label: key,
-}));
-
-// Reverse mapping for display (from API values to display values)
-export const reverseGenderMap = Object.entries(genderMap).reduce(
-  (acc, [key, value]) => {
-    acc[value] = key;
-    return acc;
+// ============================================
+// SINGLE SOURCE OF TRUTH - Display -> API
+// ============================================
+const MAPPINGS = {
+  gender: {
+    Male: "Male",
+    Female: "Female",
   },
-  {},
-);
-
-export const reverseOccupationMap = Object.entries(occupationMap).reduce(
-  (acc, [key, value]) => {
-    acc[value] = key;
-    return acc;
+  occupation: {
+    Employed: "Employed",
+    Unemployed: "Unemployed",
+    Student: "Student",
+    Freelancer: "Self-employed",
+    Retired: "Unemployed",
+    Other: "Self-employed",
   },
-  {},
-);
+  workMode: {
+    Remote: "Remote",
+    Hybrid: "Hybrid",
+    "On-site": "In-person",
+    Unemployed: "Unemployed",
+  },
+};
+
+// ============================================
+// AUTO-GENERATED: Reverse Mappings
+// ============================================
+function createReverseMap(forwardMap) {
+  const reverse = {};
+  for (const [displayVal, apiVal] of Object.entries(forwardMap)) {
+    // Handle many-to-one mappings (use first occurrence)
+    if (!reverse[apiVal]) {
+      reverse[apiVal] = displayVal;
+    }
+  }
+  return reverse;
+}
+
+const REVERSE_MAPPINGS = {
+  gender: createReverseMap(MAPPINGS.gender),
+  occupation: createReverseMap(MAPPINGS.occupation),
+  workMode: createReverseMap(MAPPINGS.workMode),
+};
+
+// ============================================
+// AUTO-GENERATED: Dropdown Options
+// ============================================
+function createOptions(fieldName) {
+  const mapping = MAPPINGS[fieldName];
+  return Object.keys(mapping).map((key) => ({ value: key, label: key }));
+}
+
+export const genderOptions = createOptions("gender");
+export const occupationOptions = createOptions("occupation");
+export const workModeOptions = createOptions("workMode");
+
+// ============================================
+// PUBLIC API: Transformation Functions
+// ============================================
+export function toApiGender(displayValue) {
+  return MAPPINGS.gender[displayValue] || displayValue;
+}
+
+export function toApiOccupation(displayValue) {
+  return MAPPINGS.occupation[displayValue] || displayValue;
+}
+
+export function toApiWorkMode(displayValue) {
+  return MAPPINGS.workMode[displayValue] || displayValue;
+}
+
+export function fromApiGender(apiValue) {
+  return REVERSE_MAPPINGS.gender[apiValue] || apiValue;
+}
+
+export function fromApiOccupation(apiValue) {
+  return REVERSE_MAPPINGS.occupation[apiValue] || apiValue;
+}
+
+export function fromApiWorkMode(apiValue) {
+  return REVERSE_MAPPINGS.workMode[apiValue] || apiValue;
+}
