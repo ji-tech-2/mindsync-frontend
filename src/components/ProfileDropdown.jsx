@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import ProfileAvatar from './ProfileAvatar';
 import LogoutButton from './LogoutButton';
 import styles from './ProfileDropdown.module.css';
 
@@ -36,8 +37,6 @@ function ProfileDropdown() {
 
   if (!user) return null;
 
-  const initial = (user.name || '').trim().charAt(0).toUpperCase();
-
   return (
     <div className={styles.profileDropdown} ref={dropdownRef}>
       <button 
@@ -45,9 +44,7 @@ function ProfileDropdown() {
         onClick={toggleDropdown}
         aria-label="Profile menu"
       >
-        <div className="avatar-circle">
-          {initial}
-        </div>
+        <ProfileAvatar name={user.name} size="small" isHoverable={true} />
       </button>
 
       {isOpen && (
@@ -57,9 +54,7 @@ function ProfileDropdown() {
           </div>
 
           <div className={styles.dropdownBody}>
-            <div className={styles.avatarLarge}>
-              {initial}
-            </div>
+            <ProfileAvatar name={user.name} size="medium" isHoverable={false} />
             <div className={styles.greeting}>Hello, {user.name}!</div>
           </div>
 

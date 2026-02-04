@@ -212,7 +212,7 @@ export default function Profile() {
       ) : (
         <div className="profile-content">
           <div className="profile-card">
-            <ProfileAvatar name={user.name} />
+            <ProfileAvatar name={user.name} size="large" />
 
           <div className="profile-fields">
             <ProfileFieldRow
