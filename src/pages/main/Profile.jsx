@@ -8,6 +8,7 @@ import FormInput from "../../components/FormInput";
 import FormSelect from "../../components/FormSelect";
 import OTPInput from "../../components/OTPInput";
 import apiClient from "../../config/api";
+import { genderOptions, occupationOptions } from "../../utils/fieldMappings";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -235,10 +236,7 @@ export default function Profile() {
           name="value"
           value={formData.value}
           onChange={handleInputChange}
-          options={[
-            { value: "Male", label: "Male" },
-            { value: "Female", label: "Female" }
-          ]}
+          options={genderOptions}
           required
         />
       </EditModal>
@@ -252,13 +250,12 @@ export default function Profile() {
         loading={loading}
         message={message}
       >
-        <FormInput
-          label="New Occupation"
-          type="text"
+        <FormSelect
+          label="Occupation"
           name="value"
           value={formData.value}
           onChange={handleInputChange}
-          placeholder="Enter new occupation"
+          options={occupationOptions}
           required
         />
       </EditModal>

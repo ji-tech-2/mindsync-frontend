@@ -2,31 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/screening.css";
 import { API_CONFIG, API_URLS } from "../../config/api";
+import { genderMap, occupationMap, workModeMap } from "../../utils/fieldMappings";
 
 // ============= FUNGSI TRANSFORM & KIRIM =============
 
 function transformToJSON(screeningData) {
-  const genderMap = {
-    "Male": "Male",
-    "Female": "Female",
-    "Other": "Non-binary/Other"
-  };
-
-  const occupationMap = {
-    "Employed": "Employed",
-    "Unemployed": "Unemployed",
-    "Student": "Student",
-    "Freelancer": "Self-employed",
-    "Retired": "Unemployed",
-    "Other": "Self-employed"
-  };
-
-  const workModeMap = {
-    "Remote": "Remote",
-    "Hybrid": "Hybrid",
-    "On-site": "In-person",
-    "Unemployed": "Unemployed"
-  };
 
   return {
     age: parseInt(screeningData.age),
