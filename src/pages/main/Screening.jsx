@@ -2,37 +2,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/screening.css";
 import { API_CONFIG, API_URLS } from "../../config/api";
+import { toApiGender, toApiOccupation, toApiWorkMode } from "../../utils/fieldMappings";
 
 // ============= FUNGSI TRANSFORM & KIRIM =============
 
 function transformToJSON(screeningData) {
-  const genderMap = {
-    "Male": "Male",
-    "Female": "Female",
-    "Other": "Non-binary/Other"
-  };
-
-  const occupationMap = {
-    "Employed": "Employed",
-    "Unemployed": "Unemployed",
-    "Student": "Student",
-    "Freelancer": "Self-employed",
-    "Retired": "Unemployed",
-    "Other": "Self-employed"
-  };
-
-  const workModeMap = {
-    "Remote": "Remote",
-    "Hybrid": "Hybrid",
-    "On-site": "In-person",
-    "Unemployed": "Unemployed"
-  };
 
   return {
     age: parseInt(screeningData.age),
-    gender: genderMap[screeningData.gender] || screeningData.gender,
-    occupation: occupationMap[screeningData.occupation] || screeningData.occupation,
-    work_mode: workModeMap[screeningData.work_mode] || screeningData.work_mode,
+    gender: toApiGender(screeningData.gender),
+    occupation: toApiOccupation(screeningData.occupation),
+    work_mode: toApiWorkMode(screeningData.work_mode),
     // screen_time_hours: parseFloat(screeningData.screen_time_hours),
     work_screen_hours: parseFloat(screeningData.work_screen_hours),
     leisure_screen_hours: parseFloat(screeningData.leisure_screen_hours),

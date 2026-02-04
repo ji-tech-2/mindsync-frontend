@@ -6,6 +6,7 @@ import Dashboard from "./pages/main/Dashboard";
 import Register from "./pages/main/Register";
 import Screening from "./pages/main/Screening";
 import Result from "./pages/main/Result";
+import Profile from "./pages/main/Profile";
 
 export default function App() {
   return (
@@ -22,6 +23,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Dashboard isProtected={true} />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           } 
         />
