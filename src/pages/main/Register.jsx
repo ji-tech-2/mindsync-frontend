@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient, { API_CONFIG } from "../../config/api";
+import { validatePassword } from "../../utils/passwordValidation";
 import "../css/register.css";
 
 export default function Register() {
@@ -36,12 +37,6 @@ export default function Register() {
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
-  };
-
-  const validatePassword = (password) => {
-    // At least 8 characters, one uppercase, one lowercase, one number
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-    return passwordRegex.test(password);
   };
 
   const validateName = (name) => {

@@ -8,6 +8,7 @@ import FormInput from "../../components/FormInput";
 import FormSelect from "../../components/FormSelect";
 import OTPInput from "../../components/OTPInput";
 import apiClient from "../../config/api";
+import { getPasswordError } from "../../utils/passwordValidation";
 import { 
   genderOptions, 
   occupationOptions, 
@@ -38,6 +39,7 @@ export default function Profile() {
     password: "",
     otp: ""
   });
+  const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
 
@@ -73,17 +75,24 @@ export default function Profile() {
   const openModal = (field) => {
     setActiveModal(field);
     setFormData({ value: "", password: "", otp: "" });
+    setPasswordError("");
     setMessage({ type: "", text: "" });
   };
 
   const closeModal = () => {
     setActiveModal(null);
     setFormData({ value: "", password: "", otp: "" });
+    setPasswordError("");
     setMessage({ type: "", text: "" });
   };
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    
+    // Clear password error when user types in password field
+    if (e.target.name === "value" && activeModal === "password") {
+      setPasswordError("");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -93,6 +102,14 @@ export default function Profile() {
 
     try {
       if (activeModal === "password") {
+        // Validate password before submitting
+        const error = getPasswordError(formData.value);
+        if (error) {
+          setPasswordError(error);
+          setLoading(false);
+          return;
+        }
+        
         // Change password with OTP
         const response = await apiClient.post("/v0-1/auth-profile/change-password", {
           email: user.email,
@@ -330,6 +347,11 @@ export default function Profile() {
           placeholder="Enter new password"
           required
         />
+        {passwordError && (
+          <div style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "-0.5rem", marginBottom: "0.5rem" }}>
+            {passwordError}
+          </div>
+        )}
         <OTPInput
           otpValue={formData.otp}
           onOtpChange={handleInputChange}
