@@ -23,7 +23,7 @@ function Navbar() {
           <Link to="/screening" className={styles.navLink}>Screening</Link>
           {user && (
             <div className={styles.profileSection}>
-              <ProfileAvatar />
+              <ProfileAvatar name={user.name} />
             </div>
           )}
         </div>

@@ -22,7 +22,7 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
       {!isFooterOnlyPage && <Navbar />}
       
       <main style={{ flex: 1 }}>
