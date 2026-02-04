@@ -1,13 +1,17 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import "../css/dashboard.css"; 
+import { useEffect, useState } from "react";
+import "../css/dashboard.css";
+import WeeklyChart from "../../components/WeeklyChart"; 
 
 export default function Dashboard({ isProtected }) { 
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));  
+  
   useEffect(() => {
     if (isProtected && !user) {
       navigate("/signIn"); 
+    } else if (!isProtected && user) {
+      navigate("/dashboard");
     }
   }, [isProtected, user, navigate]);
 
@@ -19,8 +23,7 @@ export default function Dashboard({ isProtected }) {
       return <DashboardLoggedIn user={user} navigate={navigate} />;
   }
   
-  if (user) {
-      navigate("/dashboard");
+  if (!isProtected && user) {
       return null;
   }
   
@@ -65,6 +68,43 @@ function DashboardLoggedOut({ navigate }) {
 
 // Tampilan Pengguna SUDAH LOGIN (Penuh)
 function DashboardLoggedIn({ user, navigate }) {
+    // Generate 7 hari terakhir dari hari ini
+    const generateLast7Days = () => {
+        const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const result = [];
+        
+        for (let i = 0; i < 7; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            
+            result.unshift({
+                day: days[date.getDay()],
+                date: `${date.getDate()} ${months[date.getMonth()]}`,
+                value: Math.floor(Math.random() * 100) // Random 0-100 (dummy data)
+            });
+        }
+        
+        return result;
+    };
+
+    // Mock data untuk testing - Nanti diganti dengan data dari API
+    const [weeklyData, setWeeklyData] = useState(generateLast7Days());
+
+    // TODO: Fetch data dari API
+    // useEffect(() => {
+    //   const fetchWeeklyData = async () => {
+    //     try {
+    //       const response = await fetch(`${API_CONFIG.BASE_URL}/user-mental-health/${user.id}`);
+    //       const data = await response.json();
+    //       setWeeklyData(data);
+    //     } catch (error) {
+    //       console.error('Error fetching weekly data:', error);
+    //     }
+    //   };
+    //   fetchWeeklyData();
+    // }, [user.id]);
+
     return (
         <div className="dashboard-container">
             
@@ -84,6 +124,16 @@ function DashboardLoggedIn({ user, navigate }) {
                     Logout
                 </button>
             </header>
+
+            {/* Weekly Mental Health Chart Section */}
+            <div className="chart-section">
+                <WeeklyChart 
+                    data={weeklyData}
+                    title="📊 Nilai Mental Health 7 Hari Terakhir"
+                    dataKey="value"
+                    navigate={navigate}
+                />
+            </div>
 
             <div className="quick-actions">
                 <h2>Mulai Aktivitas Cepat</h2>
