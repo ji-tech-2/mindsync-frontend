@@ -89,6 +89,7 @@ export default function Login() {
   };
 
   return (
+    <div className="login-wrapper">
     <div className="login-container">
       <h2>Login</h2>
 
@@ -138,6 +139,7 @@ export default function Login() {
           Daftar di sini.
         </button>
       </div>
+    </div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
 * {
   margin: 0;
@@ -6,8 +6,8 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
-  font-family: 'Poppins', sans-serif;
+.register-wrapper {
+  font-family: "Poppins", sans-serif;
   margin: 0;
   display: flex;
   justify-content: center;
@@ -19,60 +19,88 @@ html, body, #root {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   background-size: 200% 200%;
   animation: gradientShift 15s ease infinite;
-  
 }
 
 @keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
-body::before {
-  content: '';
+.register-wrapper::before {
+  content: "";
   position: fixed;
   width: 100%;
   height: 100%;
   background-image:
-    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    radial-gradient(
+      circle at 20% 30%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      rgba(255, 255, 255, 0.08) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.05) 0%,
+      transparent 50%
+    );
   animation: float 20s ease-in-out infinite;
   pointer-events: none;
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 .register-container {
- max-width: 380px; /* Naikkan dari 250px ke 380px untuk tampilan yang lebih baik di desktop menengah */
- width: 90%; /* Gunakan persentase yang lebih besar untuk layar yang lebih kecil */
- padding: 30px 28px; /* Tambahkan padding yang lebih baik secara default */
- border-radius: 15px; /* Sedikit lebih membulat */
- position: relative;
- z-index: 1;
- background: rgba(255, 255, 255, 0.95);
- backdrop-filter: blur(20px);
- -webkit-backdrop-filter: blur(20px);
- box-shadow:
- 0 8px 32px rgba(0, 0, 0, 0.1),
- 0 2px 8px rgba(0, 0, 0, 0.05),
- inset 0 1px 0 rgba(255, 255, 255, 0.8);
- border: 1px solid rgba(255, 255, 255, 0.3);
- animation: slideUp 0.6s ease-out;
- color: #2d3748;
- text-align: center;
+  max-width: 380px; /* Naikkan dari 250px ke 380px untuk tampilan yang lebih baik di desktop menengah */
+  width: 90%; /* Gunakan persentase yang lebih besar untuk layar yang lebih kecil */
+  padding: 30px 28px; /* Tambahkan padding yang lebih baik secara default */
+  border-radius: 15px; /* Sedikit lebih membulat */
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: slideUp 0.6s ease-out;
+  color: #2d3748;
+  text-align: center;
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .register-container::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 50%;
@@ -96,7 +124,7 @@ body::before {
 }
 
 .register-container h2::after {
-  content: 'Join us and start your wellness journey';
+  content: "Join us and start your wellness journey";
   display: block;
   font-size: 0.38em;
   font-weight: 400;
@@ -110,8 +138,14 @@ body::before {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .register-form {
@@ -137,13 +171,27 @@ body::before {
   animation: fadeIn 0.6s ease-out both;
 }
 
-.register-form input:nth-child(1) { animation-delay: 0.1s; }
-.register-form input:nth-child(2) { animation-delay: 0.15s; }
-.register-form input:nth-child(3) { animation-delay: 0.2s; }
-.register-form input:nth-child(4) { animation-delay: 0.25s; }
-.register-form input:nth-child(5) { animation-delay: 0.3s; }
-.register-form select:nth-child(6) { animation-delay: 0.35s; }
-.register-form input:nth-child(7) { animation-delay: 0.4s; }
+.register-form input:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.register-form input:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.register-form input:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.register-form input:nth-child(4) {
+  animation-delay: 0.25s;
+}
+.register-form input:nth-child(5) {
+  animation-delay: 0.3s;
+}
+.register-form select:nth-child(6) {
+  animation-delay: 0.35s;
+}
+.register-form input:nth-child(7) {
+  animation-delay: 0.4s;
+}
 
 .register-form input:focus,
 .register-form select:focus {
@@ -166,7 +214,7 @@ body::before {
   padding: 11px 24px;
   font-size: 0.9em;
   font-weight: 600;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
@@ -182,13 +230,18 @@ body::before {
 }
 
 .register-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -237,8 +290,14 @@ body::before {
 }
 
 @keyframes messageSlide {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .register-message-wrapper.success {
@@ -314,7 +373,7 @@ body::before {
   margin: 0;
   text-decoration: none;
   transition: color 0.2s ease;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 1em;
 }
 
@@ -340,7 +399,9 @@ body::before {
 }
 
 @media (max-width: 480px) {
-  html, body, #root {
+  html,
+  body,
+  #root {
     padding: 15px 0;
   }
 
@@ -435,13 +496,27 @@ body::before {
   text-align: left;
 }
 
-.form-field:nth-child(1) { animation-delay: 0.1s; }
-.form-field:nth-child(2) { animation-delay: 0.2s; }
-.form-field:nth-child(3) { animation-delay: 0.3s; }
-.form-field:nth-child(4) { animation-delay: 0.4s; }
-.form-field:nth-child(5) { animation-delay: 0.5s; }
-.form-field:nth-child(6) { animation-delay: 0.6s; }
-.form-field:nth-child(7) { animation-delay: 0.7s; }
+.form-field:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.form-field:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.form-field:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.form-field:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.form-field:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.form-field:nth-child(6) {
+  animation-delay: 0.6s;
+}
+.form-field:nth-child(7) {
+  animation-delay: 0.7s;
+}
 
 .error-text {
   color: #e53e3e;
@@ -452,13 +527,13 @@ body::before {
 }
 
 @keyframes slideInError {
-  from { 
-    opacity: 0; 
-    transform: translateY(-5px); 
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -469,5 +544,7 @@ body::before {
 
 .input-error:focus {
   border-color: #e53e3e !important;
-  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1), 0 4px 12px rgba(229, 62, 62, 0.15) !important;
+  box-shadow:
+    0 0 0 3px rgba(229, 62, 62, 0.1),
+    0 4px 12px rgba(229, 62, 62, 0.15) !important;
 }
