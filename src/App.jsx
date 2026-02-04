@@ -30,7 +30,7 @@ export default function App() {
           path="/profile" 
           element={
             <ProtectedRoute>
-              <Profile isProtected={true} />
+              <Profile />
             </ProtectedRoute>
           } 
         />
