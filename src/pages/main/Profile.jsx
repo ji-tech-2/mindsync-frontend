@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/profile.css";
 import ProfileAvatar from "../../components/ProfileAvatar";
@@ -7,15 +7,18 @@ import EditModal from "../../components/EditModal";
 import FormInput from "../../components/FormInput";
 import FormSelect from "../../components/FormSelect";
 import OTPInput from "../../components/OTPInput";
+import apiClient from "../../config/api";
 
 export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    gender: "Male",
-    occupation: "Software Engineer"
+    name: "",
+    email: "",
+    gender: "",
+    occupation: "",
+    dob: ""
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   const [activeModal, setActiveModal] = useState(null);
   const [formData, setFormData] = useState({
@@ -25,6 +28,28 @@ export default function Profile() {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+
+  // Fetch user profile on component mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await apiClient.get("/v0-1/auth-profile");
+        if (response.data.success) {
+          setUser(response.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        setMessage({ 
+          type: "error", 
+          text: error.response?.data?.message || "Failed to load profile" 
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const openModal = (field) => {
     setActiveModal(field);
@@ -47,41 +72,75 @@ export default function Profile() {
     setLoading(true);
     setMessage({ type: "", text: "" });
 
-    // Dummy API call simulation
-    setTimeout(() => {
-      // Simulate success
-      if (activeModal === "name") {
-        setUser({ ...user, name: formData.value });
-        setMessage({ type: "success", text: "Name updated successfully!" });
-      } else if (activeModal === "gender") {
-        setUser({ ...user, gender: formData.value });
-        setMessage({ type: "success", text: "Gender updated successfully!" });
-      } else if (activeModal === "occupation") {
-        setUser({ ...user, occupation: formData.value });
-        setMessage({ type: "success", text: "Occupation updated successfully!" });
-      } else if (activeModal === "email") {
-        setUser({ ...user, email: formData.value });
-        setMessage({ type: "success", text: "Email updated successfully!" });
-      } else if (activeModal === "password") {
-        setMessage({ type: "success", text: "Password updated successfully!" });
-      }
+    try {
+      if (activeModal === "password") {
+        // Change password with OTP
+        const response = await apiClient.post("/v0-1/auth-profile/change-password", {
+          email: user.email,
+          otp: formData.otp,
+          newPassword: formData.value
+        });
 
+        if (response.data.success) {
+          setMessage({ type: "success", text: response.data.message });
+          setTimeout(() => {
+            closeModal();
+          }, 1500);
+        }
+      } else {
+        // Update profile (name, gender, occupation)
+        const updateData = {};
+        
+        if (activeModal === "name") {
+          updateData.name = formData.value;
+        } else if (activeModal === "gender") {
+          updateData.gender = formData.value;
+        } else if (activeModal === "occupation") {
+          updateData.occupation = formData.value;
+        }
+
+        const response = await apiClient.put("/v0-1/auth-profile", updateData);
+
+        if (response.data.success) {
+          setUser(response.data.data);
+          setMessage({ type: "success", text: response.data.message });
+          setTimeout(() => {
+            closeModal();
+          }, 1500);
+        }
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setMessage({ 
+        type: "error", 
+        text: error.response?.data?.message || "Failed to update profile" 
+      });
+    } finally {
       setLoading(false);
-      
-      // Close modal after 1.5 seconds
-      setTimeout(() => {
-        closeModal();
-      }, 1500);
-    }, 1000);
+    }
   };
 
-  const sendOTP = () => {
+  const sendOTP = async () => {
     setLoading(true);
-    // Dummy OTP send
-    setTimeout(() => {
-      setMessage({ type: "info", text: "OTP sent to your email!" });
+    setMessage({ type: "", text: "" });
+
+    try {
+      const response = await apiClient.post("/v0-1/auth-profile/request-otp", {
+        email: user.email
+      });
+
+      if (response.data.success) {
+        setMessage({ type: "info", text: response.data.message });
+      }
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      setMessage({ 
+        type: "error", 
+        text: error.response?.data?.message || "Failed to send OTP" 
+      });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -94,9 +153,16 @@ export default function Profile() {
         <p>Manage your personal information</p>
       </div>
 
-      <div className="profile-content">
-        <div className="profile-card">
-          <ProfileAvatar name={user.name} />
+      {isLoading ? (
+        <div className="profile-content">
+          <div className="profile-card">
+            <p style={{ textAlign: "center", padding: "2rem" }}>Loading profile...</p>
+          </div>
+        </div>
+      ) : (
+        <div className="profile-content">
+          <div className="profile-card">
+            <ProfileAvatar name={user.name} />
 
           <div className="profile-fields">
             <ProfileFieldRow
@@ -133,6 +199,7 @@ export default function Profile() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Modal for Name */}
       <EditModal
