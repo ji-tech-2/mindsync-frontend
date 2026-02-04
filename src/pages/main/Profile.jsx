@@ -7,7 +7,7 @@ import EditModal from "../../components/EditModal";
 import FormInput from "../../components/FormInput";
 import FormSelect from "../../components/FormSelect";
 import OTPInput from "../../components/OTPInput";
-import apiClient from "../../config/api";
+import apiClient, { TokenManager } from "../../config/api";
 import { getPasswordError } from "../../utils/passwordValidation";
 import { 
   genderOptions, 
@@ -142,12 +142,17 @@ export default function Profile() {
         if (response.data.success) {
           // Transform API response to display values
           const apiData = response.data.data;
-          setUser({
+          const updatedUser = {
             ...apiData,
             gender: fromApiGender(apiData.gender),
             occupation: fromApiOccupation(apiData.occupation),
             workRmt: fromApiWorkMode(apiData.workRmt)
-          });
+          };
+          setUser(updatedUser);
+          
+          // Update stored user data in localStorage
+          TokenManager.setUserData(apiData);
+          
           setMessage({ type: "success", text: response.data.message });
           setTimeout(() => {
             closeModal();

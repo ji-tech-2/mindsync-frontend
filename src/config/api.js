@@ -52,31 +52,51 @@ export const API_CONFIG = {
 };
 
 // ====================================
-// TOKEN MANAGEMENT (In-Memory Storage)
+// TOKEN MANAGEMENT (TEMPORARY: localStorage)
 // ====================================
-// TODO: PLACEHOLDER - Waiting for backend to implement JWT token generation
+// TEMPORARY: Using localStorage for persistence across page reloads
+// TODO: Switch to HttpOnly cookies for production security
 // Backend should return: { success: true, token: "jwt_token_here", user: {...} }
 let authToken = null;
 let userData = null;
+
+const TOKEN_KEY = "auth_token";
+const USER_DATA_KEY = "user_data";
 
 export const TokenManager = {
   // Set token after successful login/register
   setToken(token) {
     authToken = token;
-    // Memory-only storage - token is cleared on page refresh
-    // TODO: Once backend supports HttpOnly cookies, they will handle persistence
+    // TEMPORARY: Store in localStorage for persistence
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token);
+    }
   },
 
   // Get current token
   getToken() {
-    // Memory-only - no cookie fallback
-    return authToken;
+    // Return in-memory token if available
+    if (authToken) {
+      return authToken;
+    }
+
+    // TEMPORARY: Fallback to localStorage
+    const storedToken = localStorage.getItem(TOKEN_KEY);
+    if (storedToken) {
+      authToken = storedToken;
+      return storedToken;
+    }
+
+    return null;
   },
 
   // Clear token on logout
   clearToken() {
     authToken = null;
     userData = null;
+    // TEMPORARY: Clear from localStorage
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_DATA_KEY);
   },
 
   // Store user data (non-sensitive info only)
@@ -88,10 +108,30 @@ export const TokenManager = {
       userId: user.userId, // From backend response
       // Add other non-sensitive fields as needed
     };
+
+    // TEMPORARY: Store in localStorage for persistence
+    localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
   },
 
   getUserData() {
-    return userData;
+    // Return in-memory data if available
+    if (userData) {
+      return userData;
+    }
+
+    // TEMPORARY: Fallback to localStorage
+    const storedData = localStorage.getItem(USER_DATA_KEY);
+    if (storedData) {
+      try {
+        userData = JSON.parse(storedData);
+        return userData;
+      } catch (e) {
+        console.error("Failed to parse user data:", e);
+        return null;
+      }
+    }
+
+    return null;
   },
 
   isAuthenticated() {
