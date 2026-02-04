@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/main/Login";
+import Home from "./pages/main/Home";
 import Dashboard from "./pages/main/Dashboard";
 import Register from "./pages/main/Register";
 import Screening from "./pages/main/Screening";
@@ -13,7 +14,7 @@ export default function App() {
     <AuthProvider>
       <Routes>
         {/* Public routes */}
-        <Route path="/" element={<Dashboard isProtected={false} />} />      
+        <Route path="/" element={<Home />} />      
         <Route path="/signIn" element={<Login />} />
         <Route path="/register" element={<Register />} />
         
@@ -22,7 +23,7 @@ export default function App() {
           path="/dashboard" 
           element={
             <ProtectedRoute>
-              <Dashboard isProtected={true} />
+              <Dashboard />
             </ProtectedRoute>
           } 
         />
