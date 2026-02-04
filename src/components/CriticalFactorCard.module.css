@@ -1,0 +1,55 @@
+/* Container utama card */
+.cardContainer {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  border: 1px solid #eaeaea;
+  height: 305px;
+}
+
+.title {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  color: #d9534f; 
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.factorList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.factorItem {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f9f9f9;
+}
+
+.factorItem:last-child {
+  border-bottom: none; 
+}
+
+.factorName {
+  font-weight: 500;
+  color: #333;
+}
+
+.factorImpact {
+  color: #ff4d4f; 
+  font-weight: 700;
+  font-size: 0.95rem;
+  background-color: #fff1f0; 
+  padding: 4px 12px;
+  border-radius: 20px; 
+  border: 1px solid #ffa39e;
+}
