@@ -17,7 +17,6 @@
  */
 
 import axios from "axios";
-import Cookies from "js-cookie";
 
 export const API_CONFIG = {
   // Base URL for the API
