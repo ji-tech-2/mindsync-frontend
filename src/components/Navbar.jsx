@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import ProfileAvatar from './ProfileAvatar';
+import ProfileDropdown from './ProfileDropdown';
 import styles from './Navbar.module.css';
 
 function Navbar() {
@@ -23,7 +23,7 @@ function Navbar() {
           <Link to="/screening" className={styles.navLink}>Screening</Link>
           {user && (
             <div className={styles.profileSection}>
-              <ProfileAvatar name={user.name} />
+              <ProfileDropdown />
             </div>
           )}
         </div>
