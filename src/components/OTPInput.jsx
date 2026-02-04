@@ -7,11 +7,12 @@ export default function OTPInput({
 }) {
   return (
     <div className="form-group">
-      <label>OTP Code</label>
+      <label htmlFor="otp">OTP Code</label>
       <div className="otp-input-group">
         <input
           type="text"
           name="otp"
+          id="otp"
           value={otpValue}
           onChange={onOtpChange}
           placeholder="Enter OTP"
