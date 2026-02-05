@@ -1,55 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styles from './CriticalFactorCard.module.css'; 
 
-const CriticalFactorCard = () => {
-  const [factors, setFactors] = useState([]);
-  const [loading, setLoading] = useState(true);
+const CriticalFactorCard = ({ data, loading }) => {
+  if (loading) {
+    return <div className={styles.cardContainer}>Menganalisis...</div>;
+  }
 
-  const userData = JSON.parse(localStorage.getItem("user"));
-  const userId = userData?.id;
-
-  useEffect(() => {
-    if (userId) {
-      // Mengambil data faktor kritis mingguan dari Flask
-      fetch(`http://localhost:5000/weekly-critical-factors?user_id=${userId}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.status === "success" && data.top_critical_factors) {
-            // Kita ambil top 3 faktor dari backend
-            setFactors(data.top_critical_factors);
-          }
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error("Error fetching weekly factors:", err);
-          setLoading(false);
-        });
-    }
-  }, [userId]);
-
-  if (loading) return <div className={styles.cardContainer}>Menganalisis data mingguan...</div>;
-  
-  // Jika belum ada data tes sama sekali dalam seminggu
-  if (factors.length === 0) return null;
+  if (!data) {
+    return (
+      <div className={`${styles.cardContainer} ${styles.emptyCard}`}>
+        <p>Data belum tersedia</p>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.cardContainer}>
-      <h3 className={styles.title}>Faktor Kritis Minggu Ini</h3>
-      <p className={styles.subtitle}>Faktor yang paling sering muncul dalam tes kamu:</p>
-      
-      <ul className={styles.factorList}>
-        {factors.map((f, index) => (
-          <li key={index} className={styles.factorItem}>
-            <span className={styles.factorName}>{f.factor_name}</span>
-            {/* Kita tampilkan berapa kali faktor ini muncul sebagai masalah */}
-            <span className={styles.factorImpact}>
-              {f.count}x Terdeteksi
-            </span>
-          </li>
-        ))}
-      </ul>
+      <h3 className={styles.factorName}>{data.factor_name}</h3>
+      <p className={styles.description}>{data.description}</p>
     </div>
   );
 };
 
 export default CriticalFactorCard;
+
+// import React from 'react';
+// import styles from './CriticalFactorCard.module.css'; 
+
+// // Komponen sekarang menerima prop 'data'
+// const CriticalFactorCard = ({ data }) => {
+//   if (!data) return <div className={styles.cardContainer}>No Data</div>;
+
+//   return (
+//     <div className={styles.cardContainer}>
+//       <h3 className={styles.title}>{data.factor_name}</h3>
+//       <div className={styles.factorValue}>
+//         <span className={styles.countNumber}>{data.count}</span>
+//         <span className={styles.countText}> Kali Terdeteksi</span>
+//       </div>
+//       <p className={styles.footerNote}>Analisis Mingguan</p>
+//     </div>
+//   );
+// };
+
+// export default CriticalFactorCard;

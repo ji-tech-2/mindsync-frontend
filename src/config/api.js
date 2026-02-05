@@ -22,8 +22,8 @@ export const API_CONFIG = {
   // Base URL for the API
   // In development: uses Vite proxy (/api) to bypass CORS
   // In production: uses direct URL
-  BASE_URL: import.meta.env.DEV ? "/api" : "http://139.59.109.5:8000",
-
+  BASE_URL: import.meta.env.DEV ? "/api" : "http://139.59.109.5:8000",  
+  
   // Authentication endpoints
   AUTH_LOGIN: "/v0-1/auth-login",
   AUTH_REGISTER: "/v0-1/auth-register",
