@@ -1,7 +1,7 @@
 // login
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import apiClient, { API_CONFIG } from "../../config/api";
 import "../css/login.css";
 
@@ -89,6 +89,7 @@ export default function Login() {
   };
 
   return (
+    <div className="login-wrapper">
     <div className="login-container">
       <h2>Login</h2>
 
@@ -138,6 +139,7 @@ export default function Login() {
           Daftar di sini.
         </button>
       </div>
+    </div>
     </div>
   );
 }

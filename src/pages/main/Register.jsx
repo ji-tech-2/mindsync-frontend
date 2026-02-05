@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient, { API_CONFIG } from "../../config/api";
+import { validatePassword } from "../../utils/passwordValidation";
 import "../css/register.css";
 
 export default function Register() {
@@ -36,12 +37,6 @@ export default function Register() {
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
-  };
-
-  const validatePassword = (password) => {
-    // At least 8 characters, one uppercase, one lowercase, one number
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-    return passwordRegex.test(password);
   };
 
   const validateName = (name) => {
@@ -168,6 +163,7 @@ export default function Register() {
   // RENDER HALAMAN SUKSES
   if (isRegistered) {
     return (
+      <div className="register-wrapper">
       <div className="register-container success-screen">
         <h2>✅ Registrasi Berhasil!</h2>
 
@@ -182,6 +178,7 @@ export default function Register() {
           Login Sekarang
         </button>
       </div>
+      </div>
     );
   }
 
@@ -193,6 +190,7 @@ export default function Register() {
 
   // RENDER FORM REGISTER
   return (
+    <div className="register-wrapper">
     <div className="register-container">
       <h2>Register</h2>
 
@@ -287,6 +285,7 @@ export default function Register() {
           Masuk di sini.
         </button>
       </div>
+    </div>
     </div>
   );
 }
