@@ -1,32 +1,27 @@
 /**
  * AuthContext - Global Authentication State Management
  * 
- * Provides authentication state and methods to the entire application.
- * Wraps the app to provide user data, loading states, and auth actions.
+ * Enterprise-grade authentication state management with graceful logout.
+ * - Manages user state and authentication status
+ * - Provides login/logout methods
+ * - Prevents redirect flash during logout
  */
 
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TokenManager } from '../config/api';
 
 // Create the context
 const AuthContext = createContext(null);
 
-// Custom hook to use auth context
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
 // AuthProvider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  
   const navigate = useNavigate();
+  const logoutTimeoutRef = useRef(null);
 
   // Initialize auth state on mount
   useEffect(() => {
@@ -41,10 +36,8 @@ export const AuthProvider = ({ children }) => {
           userId: userData.userId || userData.id || userData.user_id || `temp_${Date.now()}`
         };
         setUser(normalizedUser);
-        setIsAuthenticated(true);
       } else {
         setUser(null);
-        setIsAuthenticated(false);
       }
       
       setIsLoading(false);
@@ -53,29 +46,16 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  // Listen for logout events from API interceptor or authHelper
+  // Cleanup timeout on unmount
   useEffect(() => {
-    const handleLogout = () => {
-      setUser(null);
-      setIsAuthenticated(false);
-      navigate('/signIn', { replace: true });
+    return () => {
+      if (logoutTimeoutRef.current) {
+        clearTimeout(logoutTimeoutRef.current);
+      }
     };
+  }, []);
 
-    window.addEventListener('auth:logout', handleLogout);
-    return () => window.removeEventListener('auth:logout', handleLogout);
-  }, [navigate]);
-
-  // Listen for unauthorized events (401) and redirect via React Router
-  useEffect(() => {
-    const handleUnauthorized = () => {
-      navigate('/signIn', { replace: true });
-    };
-
-    window.addEventListener('auth:unauthorized', handleUnauthorized);
-    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
-  }, [navigate]);
-
-  // Login function - to be called after successful API login
+  // Login function
   const login = useCallback((token, userData) => {
     // Ensure user has an ID field for consistency
     const normalizedUser = {
@@ -87,18 +67,34 @@ export const AuthProvider = ({ children }) => {
     TokenManager.setToken(token);
     TokenManager.setUserData(normalizedUser);
     setUser(normalizedUser);
-    setIsAuthenticated(true);
   }, []);
 
-  // Logout function
+  // Simple logout function - just clears state (for programmatic use)
   const logout = useCallback(() => {
     TokenManager.clearToken();
     setUser(null);
-    setIsAuthenticated(false);
-    
-    // Dispatch logout event for other components
-    window.dispatchEvent(new CustomEvent('auth:logout'));
   }, []);
+
+  // Graceful logout - prevents redirect flash
+  // Sets isLoggingOut flag briefly to prevent ProtectedRoute redirect during transition
+  const logoutWithTransition = useCallback(() => {
+    // Set flag to prevent ProtectedRoute from redirecting to /signIn
+    setIsLoggingOut(true);
+
+    // Navigate to home page first
+    navigate('/', { replace: true });
+
+    // Small delay before clearing auth state to allow navigation to begin
+    // This prevents the current page from seeing the cleared auth state
+    logoutTimeoutRef.current = setTimeout(() => {
+      // Clear auth state
+      TokenManager.clearToken();
+      setUser(null);
+
+      // Clear the flag after auth is cleared
+      setIsLoggingOut(false);
+    }, 50);
+  }, [navigate]);
 
   // Update user data
   const updateUser = useCallback((userData) => {
@@ -106,19 +102,14 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   }, []);
 
-  // Check if user is authenticated
-  const checkAuth = useCallback(() => {
-    return TokenManager.isAuthenticated();
-  }, []);
-
   const value = {
     user,
-    isAuthenticated,
     isLoading,
+    isLoggingOut,
     login,
     logout,
+    logoutWithTransition,
     updateUser,
-    checkAuth,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
