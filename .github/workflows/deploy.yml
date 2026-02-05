@@ -13,10 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Frontend Image
-        run: docker build -t mindsync-frontend:latest .
-
-      - name: Run Tests in Container
-        run: docker run --rm mindsync-frontend:latest npm test
+        run: docker build --target test -t mindsync-frontend-test .
 
   deploy:
     runs-on: ubuntu-latest
