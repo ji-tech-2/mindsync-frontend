@@ -35,22 +35,14 @@ export default function App() {
           <Route path="/logout" element={<LogoutHandler />} />
           
           {/* Protected routes - require authentication */}
-          <Route 
-            path="/dashboard" 
+          <Route  
             element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
+              <ProtectedRoute />
             } 
-          />
-          <Route 
-            path="/profile" 
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } 
-          />
+          >
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
 
           {/* Semi-public routes - accessible to all, but full features require auth */}
           <Route path="/screening" element={<Screening />} />
