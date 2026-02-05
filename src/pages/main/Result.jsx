@@ -9,7 +9,7 @@ import '../css/result.css';
 const ResultPage = () => {
   const navigate = useNavigate();
   const { predictionId } = useParams();
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [resultData, setResultData] = useState(null);
   const [adviceData, setAdviceData] = useState(null);
   const [isPolling, setIsPolling] = useState(false);
@@ -235,7 +235,7 @@ const ResultPage = () => {
       </div>
 
       {/* Advice Section - Only for authenticated users */}
-      {isAuthenticated ? (
+      {user ? (
         <Advice resultData={resultData} adviceData={adviceData} isLoading={isLoadingAdvice} />
       ) : (
         <div className="advice-locked">

@@ -17,7 +17,6 @@ const AuthContext = createContext(null);
 // AuthProvider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   
@@ -32,10 +31,8 @@ export const AuthProvider = ({ children }) => {
 
       if (token && userData) {
         setUser(userData);
-        setIsAuthenticated(true);
       } else {
         setUser(null);
-        setIsAuthenticated(false);
       }
       
       setIsLoading(false);
@@ -58,14 +55,12 @@ export const AuthProvider = ({ children }) => {
     TokenManager.setToken(token);
     TokenManager.setUserData(userData);
     setUser(userData);
-    setIsAuthenticated(true);
   }, []);
 
   // Simple logout function - just clears state (for programmatic use)
   const logout = useCallback(() => {
     TokenManager.clearToken();
     setUser(null);
-    setIsAuthenticated(false);
   }, []);
 
   // Graceful logout - prevents redirect flash
@@ -83,7 +78,6 @@ export const AuthProvider = ({ children }) => {
       // Clear auth state
       TokenManager.clearToken();
       setUser(null);
-      setIsAuthenticated(false);
 
       // Clear the flag after auth is cleared
       setIsLoggingOut(false);
@@ -98,7 +92,6 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
-    isAuthenticated,
     isLoading,
     isLoggingOut,
     login,
