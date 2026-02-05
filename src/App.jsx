@@ -43,6 +43,7 @@ function AppContent() {
             >
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/history" element={<History />} />
             </Route>
 
             {/* Semi-public routes - accessible to all, but full features require auth */}

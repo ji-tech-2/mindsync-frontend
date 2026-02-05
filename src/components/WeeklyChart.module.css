@@ -1,14 +1,48 @@
 .weekly-chart-container {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 30px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(248, 243, 235, 0.95));
+  border-radius: 20px;
+  padding: 35px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 
+    0 10px 35px rgba(0, 0, 0, 0.1),
+    0 4px 15px rgba(90, 124, 89, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative gradient accent */
+.weekly-chart-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(90, 124, 89, 0.05) 0%,
+    transparent 70%
+  );
+  animation: chartGlow 8s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes chartGlow {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(20px, 20px); }
+  100% { transform: translate(0, 0); }
 }
 
 .weekly-chart-container:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 40px rgba(125, 168, 123, 0.2);
+  transform: translateY(-8px) translateZ(20px);
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.15),
+    0 10px 30px rgba(90, 124, 89, 0.15),
+    inset 0 2px 2px rgba(255, 255, 255, 0.95);
 }
 
 .chart-header {
@@ -30,17 +64,30 @@
 }
 
 .chart-badge {
-  background: linear-gradient(135deg, #7da87b 0%, #91a885 100%);
+  background: linear-gradient(135deg, #5a7c59 0%, #6b9b6a 50%, #7db87c 100%);
   color: white;
-  padding: 6px 16px;
-  border-radius: 20px;
+  padding: 8px 18px;
+  border-radius: 25px;
   font-size: 0.85rem;
   font-weight: 500;
-  box-shadow: 0 4px 12px rgba(125, 168, 123, 0.3);
+  box-shadow: 
+    0 6px 20px rgba(90, 124, 89, 0.4),
+    0 3px 10px rgba(0, 0, 0, 0.15),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.2),
+    inset 0 1px 6px rgba(255, 255, 255, 0.3);
+  transition: all 0.4s ease;
+  transform: translateZ(10px);
+}
+
+.chart-badge:hover {
+  transform: translateZ(20px) scale(1.05);
+  box-shadow: 
+    0 8px 25px rgba(90, 124, 89, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .history-button {
-  background: linear-gradient(135deg, #7da87b 0%, #91a885 100%);
+  background: linear-gradient(135deg, #5a7c59 0%, #6b9b6a 100%);
   color: white;
   padding: 8px 20px;
   border: none;
@@ -49,13 +96,13 @@
   font-weight: 600;
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(125, 168, 123, 0.3);
+  box-shadow: 0 4px 12px rgba(90, 124, 89, 0.3);
   transition: all 0.3s ease;
 }
 
 .history-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(125, 168, 123, 0.4);
+  box-shadow: 0 6px 20px rgba(90, 124, 89, 0.4);
 }
 
 .history-button:active {
@@ -124,7 +171,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   margin-right: 4px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5a7c59 0%, #6b9b6a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -143,9 +190,9 @@
   justify-content: center;
   align-items: center;
   min-height: 300px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(90, 124, 89, 0.05) 0%, rgba(107, 155, 106, 0.05) 100%);
   border-radius: 16px;
-  border: 2px dashed rgba(102, 126, 234, 0.3);
+  border: 2px dashed rgba(90, 124, 89, 0.3);
   padding: 40px;
 }
 

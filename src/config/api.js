@@ -45,7 +45,7 @@ export const API_CONFIG = {
   
   // Screening history endpoint
   // TODO: Configure Kong Gateway route: GET /v0-1/model-screening-history → Flask /screening-history
-  SCREENING_HISTORY_ENDPOINT: "/v0-1/model-screening-history",
+  SCREENING_HISTORY_ENDPOINT: "/v0-1/model-history",
   
   // Weekly chart endpoint
   // TODO: Configure Kong Gateway route: GET /v0-1/model-weekly-chart → Flask /weekly-chart
@@ -227,7 +227,7 @@ export const API_URLS = {
  */
 export async function fetchScreeningHistory(userId, limit = 50, offset = 0) {
   try {
-    const url = `${API_CONFIG.SCREENING_HISTORY_ENDPOINT}?user_id=${userId}&limit=${limit}&offset=${offset}`;
+    const url = `${API_CONFIG.SCREENING_HISTORY_ENDPOINT}/${userId}`;
     const response = await apiClient.get(url);
     
     if (response.data.status === 'success') {

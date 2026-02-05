@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import "../css/dashboard.css";
 import WeeklyChart from "../../components/WeeklyChart";
 import { fetchWeeklyChart } from "../../config/api"; 
+import { useAuth } from "../../hooks/useAuth";
 
 export default function Dashboard() {
   const navigate = useNavigate();

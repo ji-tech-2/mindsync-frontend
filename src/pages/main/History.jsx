@@ -6,7 +6,6 @@ import "../css/history.css";
 
 export default function History() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
   const [historyData, setHistoryData] = useState([]);
   const [weeklyData, setWeeklyData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,6 +18,8 @@ export default function History() {
 
   // Fetch weekly chart data
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user_data"));
+    
     const loadWeeklyChart = async () => {
       const userId = getUserId(user);
       
@@ -53,10 +54,17 @@ export default function History() {
       console.warn("⚠️ Chart loading failed:", err);
       setIsLoadingChart(false);
     });
-  }, [user]);
+  }, []); // ✅ Empty dependency - hanya load sekali saat mount
 
-  // Fetch screening history from backend
+  // Check if user is logged in and fetch data
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user_data"));
+    
+    if (!user) {
+      navigate("/signIn");
+      return;
+    }
+
     const fetchHistory = async () => {
       const userId = getUserId(user);
       
@@ -73,7 +81,33 @@ export default function History() {
         
         if (response.success && response.data) {
           console.log("✅ Screening history loaded:", response.data);
-          setHistoryData(response.data);
+          
+          // Transform API data to match frontend format
+          const transformedData = response.data.map(item => {
+            // Normalize score to 0-100 range
+            // Assuming prediction_score can be negative, we need to map it to 0-100
+            let normalizedScore = item.prediction_score;
+            
+            // If score is already in 0-100 range, use it directly
+            // Otherwise, normalize from possible negative values
+            if (normalizedScore < 0) {
+              normalizedScore = 0;
+            } else if (normalizedScore > 100) {
+              normalizedScore = 100;
+            }
+            
+            return {
+              id: item.prediction_id,
+              predictionId: item.prediction_id,
+              date: item.created_at,
+              score: Math.round(normalizedScore), // Round to integer, clamped to 0-100
+              category: item.health_level, // 'healthy', 'average', 'not healthy', 'dangerous'
+              advice: item.advice,
+              wellness_analysis: item.wellness_analysis
+            };
+          });
+          
+          setHistoryData(transformedData);
         } else {
           console.warn("⚠️ History API not available:", response.error);
           setHistoryData([]);
@@ -90,20 +124,10 @@ export default function History() {
       console.warn("⚠️ History loading failed:", err);
       setIsLoading(false);
     });
-  }, [user]);
-
-  // Check if user is logged in
-  useEffect(() => {
-    if (!user) {
-      navigate("/signIn");
-    }
-  }, [user, navigate]);
-
-  if (!user) {
-    return null;
-  }
+  }, [navigate]); // ✅ Hanya depend on navigate, bukan user object
 
   const getCategoryColor = (category) => {
+    if(category == null) return '#718096'; // Default gray for null/undefined
     switch (category.toLowerCase()) {
       case 'healthy':
         return '#4CAF50';
@@ -115,6 +139,22 @@ export default function History() {
         return '#F44336';
       default:
         return '#718096';
+    }
+  };
+
+  const getCategoryLabel = (category) => {
+    if (!category) return 'Unknown';
+    switch (category.toLowerCase()) {
+      case 'healthy':
+        return 'Sehat';
+      case 'average':
+        return 'Rata-rata';
+      case 'not healthy':
+        return 'Perlu Perhatian';
+      case 'dangerous':
+        return 'Berbahaya';
+      default:
+        return category;
     }
   };
 
@@ -163,7 +203,7 @@ export default function History() {
             <div className="stat-item">
               <span className="stat-label">Tes Terakhir:</span>
               <span className="stat-value">
-                {historyData.length > 0 ? new Date(historyData[0].date).toLocaleDateString('id-ID') : '-'}
+                {historyData.length > 0 ? new Date(historyData[0].date).toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' }) : '-'}
               </span>
             </div>
           </div>
@@ -205,7 +245,8 @@ export default function History() {
                       month: 'long',
                       year: 'numeric',
                       hour: '2-digit',
-                      minute: '2-digit'
+                      minute: '2-digit',
+                      timeZone: 'Asia/Jakarta'
                     })}</span>
                   </div>
                   <div className="item-score-badge">
@@ -219,7 +260,7 @@ export default function History() {
                     background: getCategoryColor(item.category),
                     color: 'white'
                   }}>
-                    {item.category}
+                    {getCategoryLabel(item.category)}
                   </div>
                 </div>
               ))}

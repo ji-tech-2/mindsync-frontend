@@ -285,9 +285,22 @@ export default function Screening() {
       try {
         // 1. Transform data
         const transformedData = transformToJSON(updatedAnswers);
+        
+        // 2. Add user_id if user is logged in
+        const userData = JSON.parse(localStorage.getItem("user_data"));
+        if (userData) {
+          const userId = userData?.userId || userData?.id || userData?.user_id;
+          if (userId) {
+            transformedData.user_id = userId;
+            console.log("✅ User logged in, adding user_id:", userId);
+          }
+        } else {
+          console.log("⚠️ User not logged in, screening will be anonymous");
+        }
+        
         console.log("📤 Data yang dikirim ke Flask:", transformedData);
 
-        // 2. Kirim ke Flask API
+        // 3. Kirim ke Flask API
         const result = await sendToFlask(transformedData, API_URLS.predict);
 
         if (result.success) {
