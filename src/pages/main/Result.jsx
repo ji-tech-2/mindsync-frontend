@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { pollPredictionResult } from '../helpers/pollingHelper.js';
 import { API_CONFIG } from '../../config/api.js';
 import Advice from '../../components/Advice';
@@ -16,7 +16,7 @@ const ResultPage = () => {
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
   const [pollingError, setPollingError] = useState(null);
   const [loadingStage, setLoadingStage] = useState(1); // 1: processing, 2: numeric ready, 3: complete
-  const [hasPartialResult, setHasPartialResult] = useState(false);
+  const [setHasPartialResult] = useState(false);
 
   useEffect(() => {
     const loadResult = async () => {

@@ -1,7 +1,7 @@
 // login
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import apiClient, { API_CONFIG } from "../../config/api";
 import "../css/login.css";
 
