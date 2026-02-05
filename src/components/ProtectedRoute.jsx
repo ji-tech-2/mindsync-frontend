@@ -2,7 +2,7 @@
  * ProtectedRoute - Route Guard Component
  * 
  * Wraps protected routes to ensure only authenticated users can access them.
- * Redirects unauthenticated users to the login page.
+ * Redirects unauthenticated users to the login page (or custom path if specified).
  * 
  * During logout transition, this component does NOT redirect to prevent
  * the flash of /signIn page before the logout overlay completes.
@@ -12,7 +12,7 @@ import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, redirectTo = '/signIn' }) => {
   const { user, isLoading, isLoggingOut } = useAuth();
   const location = useLocation();
 
@@ -30,9 +30,9 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  // Redirect to login if not authenticated
+  // Redirect to specified path if not authenticated
   if (!user && !isLoggingOut) {
-    return <Navigate to="/signIn" state={{ from: location }} replace />;
+    return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
   return children ? children : <Outlet />;

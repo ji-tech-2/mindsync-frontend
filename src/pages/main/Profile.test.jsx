@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Profile from './Profile';
+import { AuthProvider } from '../../contexts/AuthContext';
 import apiClient from '../../config/api';
 
 // Mock apiClient
@@ -10,6 +11,12 @@ vi.mock('../../config/api', () => ({
     get: vi.fn(),
     put: vi.fn(),
     post: vi.fn(),
+  },
+  TokenManager: {
+    getToken: vi.fn(),
+    getUserData: vi.fn(),
+    setUserData: vi.fn(),
+    clearToken: vi.fn(),
   },
 }));
 
@@ -26,7 +33,9 @@ vi.mock('react-router-dom', async () => {
 const renderProfile = () => {
   return render(
     <BrowserRouter>
-      <Profile />
+      <AuthProvider>
+        <Profile />
+      </AuthProvider>
     </BrowserRouter>
   );
 };
