@@ -5,8 +5,22 @@ on:
     branches: [ "main" ]
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Frontend Image
+        run: docker build -t mindsync-frontend:latest .
+
+      - name: Run Tests in Container
+        run: docker run --rm mindsync-frontend:latest npm test
+
   deploy:
     runs-on: ubuntu-latest
+    needs: test
 
     steps:
     - name: Checkout code
