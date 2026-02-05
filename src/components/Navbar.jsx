@@ -10,7 +10,7 @@ function Navbar() {
     <nav className={styles.navbar}>
       <div className={styles.container}>
         <div className={styles.wordmark}>
-          <Link to="/">MindSync</Link>
+          <Link to={user ? "/dashboard" : "/"}>MindSync</Link>
         </div>
         
         <div className={styles.navRight}>

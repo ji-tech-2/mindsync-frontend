@@ -1,8 +1,23 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import "../css/dashboard.css"; 
 
 export default function Home() {
   const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
+
+  // Redirect to dashboard if user is logged in
+  useEffect(() => {
+    if (!isLoading && user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, isLoading, navigate]);
+
+  // Show nothing while checking auth status
+  if (isLoading) {
+    return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
+  }
   
   return (
     <div className="dashboard-container">
