@@ -8,7 +8,7 @@
 
 .weekly-chart-container:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 12px 40px rgba(125, 168, 123, 0.2);
 }
 
 .chart-header {
@@ -20,7 +20,7 @@
 
 .weekly-chart-container h3 {
   margin: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5a7c59 0%, #8b6f47 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -30,17 +30,17 @@
 }
 
 .chart-badge {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7da87b 0%, #91a885 100%);
   color: white;
   padding: 6px 16px;
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 500;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(125, 168, 123, 0.3);
 }
 
 .history-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7da87b 0%, #91a885 100%);
   color: white;
   padding: 8px 20px;
   border: none;
@@ -49,13 +49,13 @@
   font-weight: 600;
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(125, 168, 123, 0.3);
   transition: all 0.3s ease;
 }
 
 .history-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(125, 168, 123, 0.4);
 }
 
 .history-button:active {

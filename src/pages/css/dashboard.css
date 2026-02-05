@@ -18,8 +18,8 @@ body {
   position: relative;
   overflow-x: hidden;
   
-  /* Consistent gradient background */
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* Earth tone gradient background */
+  background: linear-gradient(135deg, #7da87b 0%, #a67c52 100%);
   background-size: 200% 200%;
   animation: gradientShift 15s ease infinite;
 }
@@ -92,7 +92,7 @@ body::before {
 .welcome-section h1 {
   font-size: 2.5em;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5a7c59 0%, #8b6f47 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -107,7 +107,7 @@ body::before {
 
 .welcome-section p span {
   font-weight: 600;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5a7c59 0%, #8b6f47 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -176,7 +176,7 @@ body::before {
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(180deg, #7da87b 0%, #91a885 100%);
   transition: width 0.3s;
 }
 
@@ -199,7 +199,7 @@ body::before {
   justify-content: center;
   font-size: 1.5em;
   margin-bottom: 15px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7da87b 0%, #91a885 100%);
   color: white;
 }
 
@@ -254,7 +254,7 @@ body::before {
 .action-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
-  border-color: #667eea;
+  border-color: #7da87b;
 }
 
 .action-icon {
@@ -266,7 +266,7 @@ body::before {
   align-items: center;
   justify-content: center;
   font-size: 1.8em;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7da87b 0%, #91a885 100%);
   color: white;
   transition: all 0.3s;
 }
@@ -304,7 +304,7 @@ body::before {
 .recent-activity h2 {
   font-size: 1.8em;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5a7c59 0%, #8b6f47 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -341,7 +341,7 @@ body::before {
   justify-content: center;
   margin-right: 15px;
   font-size: 1.2em;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7da87b 0%, #91a885 100%);
   color: white;
 }
 

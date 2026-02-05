@@ -35,7 +35,12 @@ export const AuthProvider = ({ children }) => {
       const userData = TokenManager.getUserData();
 
       if (token && userData) {
-        setUser(userData);
+        // Ensure user has userId field
+        const normalizedUser = {
+          ...userData,
+          userId: userData.userId || userData.id || userData.user_id || `temp_${Date.now()}`
+        };
+        setUser(normalizedUser);
         setIsAuthenticated(true);
       } else {
         setUser(null);
@@ -72,9 +77,16 @@ export const AuthProvider = ({ children }) => {
 
   // Login function - to be called after successful API login
   const login = useCallback((token, userData) => {
+    // Ensure user has an ID field for consistency
+    const normalizedUser = {
+      ...userData,
+      // If userId doesn't exist, try id, or generate a temporary one
+      userId: userData.userId || userData.id || userData.user_id || `temp_${Date.now()}`
+    };
+    
     TokenManager.setToken(token);
-    TokenManager.setUserData(userData);
-    setUser(userData);
+    TokenManager.setUserData(normalizedUser);
+    setUser(normalizedUser);
     setIsAuthenticated(true);
   }, []);
 

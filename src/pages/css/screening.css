@@ -16,7 +16,7 @@ html, body, #root, .screening-wrapper {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7da87b 0%, #a67c52 100%);
   background-size: 200% 200%;
   animation: gradientShift 15s ease infinite;
 }
@@ -77,7 +77,7 @@ html, body, #root, .screening-wrapper {
   transform: translateX(-50%);
   width: 60px;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #7da87b, #91a885);
   border-radius: 0 0 4px 4px;
 }
 
@@ -93,10 +93,10 @@ html, body, #root, .screening-wrapper {
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #7da87b, #91a885);
   border-radius: 10px;
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+  box-shadow: 0 0 10px rgba(125, 168, 123, 0.5);
 }
 
 .question-counter {
@@ -104,7 +104,7 @@ html, body, #root, .screening-wrapper {
   margin-bottom: 20px;
   font-size: 0.9em;
   font-weight: 500;
-  color: #667eea;
+  color: #7da87b;
   opacity: 0.9;
 }
 
@@ -156,10 +156,10 @@ html, body, #root, .screening-wrapper {
 
 .input-container input[type="number"]:focus,
 .input-container select:focus {
-  border-color: #667eea;
+  border-color: #7da87b;
   box-shadow:
-    0 0 0 3px rgba(102, 126, 234, 0.1),
-    0 4px 12px rgba(102, 126, 234, 0.15);
+    0 0 0 3px rgba(125, 168, 123, 0.1),
+    0 4px 12px rgba(125, 168, 123, 0.15);
   outline: none;
   transform: translateY(-2px);
   background-color: #ffffff;
@@ -256,15 +256,15 @@ html, body, #root, .screening-wrapper {
 
 .btn-back {
   background: #ffffff;
-  color: #667eea;
-  border: 2px solid #667eea;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+  color: #7da87b;
+  border: 2px solid #7da87b;
+  box-shadow: 0 2px 8px rgba(125, 168, 123, 0.15);
 }
 
 .btn-back:hover {
   background: #f7fafc;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+  box-shadow: 0 4px 12px rgba(125, 168, 123, 0.25);
 }
 
 .btn-back:active {
@@ -272,10 +272,10 @@ html, body, #root, .screening-wrapper {
 }
 
 .btn-next {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7da87b 0%, #91a885 100%);
   color: white;
   box-shadow:
-    0 4px 15px rgba(102, 126, 234, 0.4),
+    0 4px 15px rgba(125, 168, 123, 0.4),
     0 1px 3px rgba(0, 0, 0, 0.1);
 }
 

@@ -9,7 +9,7 @@
 html, body, #root {
   font-family: 'Poppins', sans-serif;
   margin: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7da87b 0%, #a67c52 100%);
   background-size: 200% 200%;
   animation: gradientShift 15s ease infinite;
   min-height: 100vh;
@@ -172,7 +172,7 @@ html, body, #root {
   transform: translateX(-50%);
   width: 60px;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #7da87b, #91a885);
   border-radius: 0 0 4px 4px;
 }
 
@@ -264,7 +264,7 @@ html, body, #root {
   transform: translateX(-50%);
   width: 60px;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #7da87b, #91a885);
   border-radius: 0 0 4px 4px;
 }
 
@@ -300,7 +300,7 @@ html, body, #root {
   position: absolute;
   top: 15px;
   right: 15px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7da87b 0%, #91a885 100%);
   color: white;
   width: 40px;
   height: 40px;
@@ -310,7 +310,7 @@ html, body, #root {
   justify-content: center;
   font-weight: 700;
   font-size: 1.2rem;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(125, 168, 123, 0.3);
 }
 
 .factor-card h3 {
@@ -394,7 +394,7 @@ html, body, #root {
   transform: translateX(-50%);
   width: 60px;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #7da87b, #91a885);
   border-radius: 0 0 4px 4px;
 }
 
@@ -420,7 +420,7 @@ html, body, #root {
 }
 
 .advice-link {
-  color: #667eea;
+  color: #7da87b;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
@@ -428,7 +428,7 @@ html, body, #root {
 }
 
 .advice-link:hover {
-  color: #764ba2;
+  color: #8b6f47;
   transform: translateX(4px);
 }
 
@@ -456,7 +456,7 @@ html, body, #root {
   transform: translateX(-50%);
   width: 60px;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #7da87b, #91a885);
   border-radius: 0 0 4px 4px;
 }
 
@@ -474,19 +474,19 @@ html, body, #root {
 }
 
 .metric-item {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7da87b 0%, #91a885 100%);
   color: white;
   padding: 20px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(125, 168, 123, 0.3);
   transition: all 0.3s ease;
 }
 
 .metric-item:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 20px rgba(125, 168, 123, 0.4);
 }
 
 .metric-label {
@@ -527,7 +527,7 @@ html, body, #root {
   transform: translateX(-50%);
   width: 60px;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #7da87b, #91a885);
   border-radius: 0 0 4px 4px;
 }
 
@@ -561,7 +561,7 @@ html, body, #root {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7da87b 0%, #91a885 100%);
   color: white;
   box-shadow:
     0 4px 15px rgba(102, 126, 234, 0.4),
@@ -596,16 +596,16 @@ html, body, #root {
 
 .btn-secondary {
   background: white;
-  color: #667eea;
-  border: 2px solid #667eea;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+  color: #7da87b;
+  border: 2px solid #7da87b;
+  box-shadow: 0 2px 8px rgba(125, 168, 123, 0.15);
 }
 
 .btn-secondary:hover {
-  background: #667eea;
+  background: #7da87b;
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+  box-shadow: 0 4px 12px rgba(125, 168, 123, 0.25);
 }
 
 .btn-secondary:active {
@@ -621,7 +621,7 @@ html, body, #root {
 
 .btn-outline:hover {
   background: white;
-  color: #667eea;
+  color: #7da87b;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.25);
 }

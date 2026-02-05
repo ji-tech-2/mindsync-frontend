@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { pollPredictionResult } from '../helpers/pollingHelper.js';
 import { API_CONFIG } from '../../config/api.js';
 import Advice from '../../components/Advice';
@@ -9,14 +9,14 @@ import '../css/result.css';
 const ResultPage = () => {
   const navigate = useNavigate();
   const { predictionId } = useParams();
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [resultData, setResultData] = useState(null);
   const [adviceData, setAdviceData] = useState(null);
   const [isPolling, setIsPolling] = useState(false);
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
   const [pollingError, setPollingError] = useState(null);
   const [loadingStage, setLoadingStage] = useState(1); // 1: processing, 2: numeric ready, 3: complete
-  const [hasPartialResult, setHasPartialResult] = useState(false);
+  const [setHasPartialResult] = useState(false);
 
   useEffect(() => {
     const loadResult = async () => {
@@ -24,6 +24,25 @@ const ResultPage = () => {
         alert("Data tidak ditemukan. Silakan lakukan screening ulang.");
         navigate('/screening');
         return;
+      }
+
+      // Check localStorage first for cached result
+      const cachedResult = localStorage.getItem(`result_${predictionId}`);
+      if (cachedResult) {
+        try {
+          const cached = JSON.parse(cachedResult);
+          console.log("✅ Using cached result from localStorage:", cached);
+          setResultData(cached.resultData);
+          if (cached.adviceData) {
+            setAdviceData(cached.adviceData);
+          }
+          setIsPolling(false);
+          setIsLoadingAdvice(false);
+          setLoadingStage(3);
+          return; // Skip polling, use cached data
+        } catch (e) {
+          console.warn("⚠️ Failed to parse cached result, will fetch fresh data");
+        }
       }
 
       setIsPolling(true);
@@ -63,12 +82,14 @@ const ResultPage = () => {
           const prediction = pollResult.data;
           
           // Set prediction data (always available)
-          setResultData({
+          const resultDataToSave = {
             mentalWellnessScore: Math.max(0, parseFloat(prediction.prediction_score)),
             category: prediction.health_level,
             wellnessAnalysis: prediction.wellness_analysis,
             isPartial: false
-          });
+          };
+          
+          setResultData(resultDataToSave);
           
           // If partial, show results but continue polling for advice
           if (pollResult.status === "partial") {
@@ -76,15 +97,32 @@ const ResultPage = () => {
             setIsPolling(false);
             setIsLoadingAdvice(true);
             
+            // Save partial result to localStorage
+            localStorage.setItem(`result_${predictionId}`, JSON.stringify({
+              resultData: resultDataToSave,
+              adviceData: null,
+              timestamp: new Date().toISOString()
+            }));
+            
             // Continue polling for full result with advice
             pollForAdvice(predictionId);
           } 
           // If ready, set advice data
           else if (pollResult.status === "ready") {
             console.log("✅ Full results with advice ready");
+            let adviceToSave = null;
             if (prediction.advice) {
               setAdviceData(prediction.advice);
+              adviceToSave = prediction.advice;
             }
+            
+            // Save complete result to localStorage
+            localStorage.setItem(`result_${predictionId}`, JSON.stringify({
+              resultData: resultDataToSave,
+              adviceData: adviceToSave,
+              timestamp: new Date().toISOString()
+            }));
+            
             setIsPolling(false);
             setIsLoadingAdvice(false);
           }
@@ -121,6 +159,14 @@ const ResultPage = () => {
             if (prediction.advice) {
               console.log("✅ Advice data received:", prediction.advice);
               setAdviceData(prediction.advice);
+              
+              // Update localStorage with complete advice
+              const cachedData = localStorage.getItem(`result_${predictionId}`);
+              if (cachedData) {
+                const parsed = JSON.parse(cachedData);
+                parsed.adviceData = prediction.advice;
+                localStorage.setItem(`result_${predictionId}`, JSON.stringify(parsed));
+              }
             }
             setIsLoadingAdvice(false);
             return;
@@ -235,7 +281,7 @@ const ResultPage = () => {
       </div>
 
       {/* Advice Section - Only for authenticated users */}
-      {isAuthenticated ? (
+      {user ? (
         <Advice resultData={resultData} adviceData={adviceData} isLoading={isLoadingAdvice} />
       ) : (
         <div className="advice-locked">

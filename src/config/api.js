@@ -39,6 +39,14 @@ export const API_CONFIG = {
   // Advice endpoint
   ADVICE_ENDPOINT: "/v0-1/model-advice",
   
+  // Screening history endpoint
+  // TODO: Configure Kong Gateway route: GET /v0-1/model-screening-history → Flask /screening-history
+  SCREENING_HISTORY_ENDPOINT: "/v0-1/model-screening-history",
+  
+  // Weekly chart endpoint
+  // TODO: Configure Kong Gateway route: GET /v0-1/model-weekly-chart → Flask /weekly-chart
+  WEEKLY_CHART_ENDPOINT: "/v0-1/model-weekly-chart",
+  
   // Polling configuration
   POLLING: {
     MAX_ATTEMPTS: 120,    // 120 attempts
@@ -158,5 +166,76 @@ export function getApiUrl(endpoint) {
 export const API_URLS = {
   predict: getApiUrl(API_CONFIG.PREDICT_ENDPOINT),
   result: (predictionId) => getApiUrl(`${API_CONFIG.RESULT_ENDPOINT}/${predictionId}`),
-  advice: getApiUrl(API_CONFIG.ADVICE_ENDPOINT)
+  advice: getApiUrl(API_CONFIG.ADVICE_ENDPOINT),
+  screeningHistory: (userId) => getApiUrl(`${API_CONFIG.SCREENING_HISTORY_ENDPOINT}?user_id=${userId}`),
+  weeklyChart: (userId) => getApiUrl(`${API_CONFIG.WEEKLY_CHART_ENDPOINT}?user_id=${userId}`)
 };
+
+// ====================================
+// API HELPER FUNCTIONS
+// ====================================
+
+/**
+ * Fetch user's screening history
+ * @param {string} userId - User ID (UUID)
+ * @param {number} limit - Maximum number of results (default: 50)
+ * @param {number} offset - Pagination offset (default: 0)
+ * @returns {Promise} - Array of screening history
+ */
+export async function fetchScreeningHistory(userId, limit = 50, offset = 0) {
+  try {
+    const url = `${API_CONFIG.SCREENING_HISTORY_ENDPOINT}?user_id=${userId}&limit=${limit}&offset=${offset}`;
+    const response = await apiClient.get(url);
+    
+    if (response.data.status === 'success') {
+      return {
+        success: true,
+        data: response.data.data,
+        total: response.data.total
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || 'Failed to fetch history'
+      };
+    }
+  } catch (error) {
+    console.error('Error fetching screening history:', error);
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Network error'
+    };
+  }
+}
+
+/**
+ * Fetch weekly chart data (last 7 days)
+ * @param {string} userId - User ID (UUID)
+ * @param {number} days - Number of days to look back (default: 7)
+ * @returns {Promise} - Array of daily chart data
+ */
+export async function fetchWeeklyChart(userId, days = 7) {
+  try {
+    const url = `${API_CONFIG.WEEKLY_CHART_ENDPOINT}?user_id=${userId}&days=${days}`;
+    const response = await apiClient.get(url);
+    
+    if (response.data.status === 'success') {
+      return {
+        success: true,
+        data: response.data.data,
+        days: response.data.days
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || 'Failed to fetch chart data'
+      };
+    }
+  } catch (error) {
+    console.error('Error fetching weekly chart:', error);
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Network error'
+    };
+  }
+}

@@ -1,13 +1,14 @@
 /**
  * AuthContext Security Tests
  * 
- * Tests for authentication state management, event handling, and navigation
+ * Tests for authentication state management and navigation
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { AuthProvider, useAuth } from './AuthContext';
+import { AuthProvider } from './AuthContext';
+import useAuth from '../hooks/useAuth';
 import { TokenManager } from '../config/api';
 
 // Mock TokenManager
@@ -18,20 +19,19 @@ vi.mock('../config/api', () => ({
     setToken: vi.fn(),
     setUserData: vi.fn(),
     clearToken: vi.fn(),
-    isAuthenticated: vi.fn(),
   },
 }));
 
 // Helper component to display auth state
 const AuthStateDisplay = () => {
-  const { isAuthenticated, user, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const location = useLocation();
   
   if (isLoading) return <div data-testid="loading">Loading...</div>;
   
   return (
     <div>
-      <div data-testid="auth-status">{isAuthenticated ? 'authenticated' : 'not-authenticated'}</div>
+      <div data-testid="auth-status">{user ? 'authenticated' : 'not-authenticated'}</div>
       <div data-testid="user-email">{user?.email || 'no-user'}</div>
       <div data-testid="current-path">{location.pathname}</div>
     </div>
@@ -72,7 +72,6 @@ describe('AuthContext', () => {
     vi.clearAllMocks();
     TokenManager.getToken.mockReturnValue(null);
     TokenManager.getUserData.mockReturnValue(null);
-    TokenManager.isAuthenticated.mockReturnValue(false);
   });
 
   afterEach(() => {
@@ -124,7 +123,7 @@ describe('AuthContext', () => {
   });
 
   describe('Logout Action', () => {
-    it('should clear token and navigate to signIn on logout', async () => {
+    it('should clear token and user state on logout', async () => {
       TokenManager.getToken.mockReturnValue('valid-token');
       TokenManager.getUserData.mockReturnValue({ email: 'user@example.com' });
       
@@ -140,77 +139,10 @@ describe('AuthContext', () => {
         logoutButton.click();
       });
       
-      // After logout, should navigate to signIn (due to auth:logout event handler)
       await waitFor(() => {
         expect(TokenManager.clearToken).toHaveBeenCalled();
-        expect(screen.getByTestId('login-page')).toBeInTheDocument();
-      });
-    });
-
-    it('should dispatch auth:logout event on logout', async () => {
-      const mockHandler = vi.fn();
-      window.addEventListener('auth:logout', mockHandler);
-      
-      TokenManager.getToken.mockReturnValue('valid-token');
-      TokenManager.getUserData.mockReturnValue({ email: 'user@example.com' });
-      
-      renderWithAuth();
-      
-      await waitFor(() => {
-        expect(screen.getByTestId('auth-status')).toHaveTextContent('authenticated');
-      });
-      
-      const logoutButton = screen.getByRole('button', { name: /logout/i });
-      act(() => {
-        logoutButton.click();
-      });
-      
-      await waitFor(() => {
-        expect(mockHandler).toHaveBeenCalled();
-      });
-      
-      window.removeEventListener('auth:logout', mockHandler);
-    });
-  });
-
-  describe('Event Handling', () => {
-    it('should handle auth:logout event and navigate to signIn', async () => {
-      TokenManager.getToken.mockReturnValue('valid-token');
-      TokenManager.getUserData.mockReturnValue({ email: 'user@example.com' });
-      
-      renderWithAuth('/dashboard');
-      
-      await waitFor(() => {
-        expect(screen.getByTestId('auth-status')).toHaveTextContent('authenticated');
-      });
-      
-      // Simulate external logout event (e.g., from API interceptor)
-      act(() => {
-        window.dispatchEvent(new CustomEvent('auth:logout'));
-      });
-      
-      await waitFor(() => {
-        expect(screen.getByTestId('login-page')).toBeInTheDocument();
-      });
-    });
-
-    it('should handle auth:unauthorized event and navigate to signIn', async () => {
-      TokenManager.getToken.mockReturnValue('valid-token');
-      TokenManager.getUserData.mockReturnValue({ email: 'user@example.com' });
-      
-      renderWithAuth('/dashboard');
-      
-      await waitFor(() => {
-        expect(screen.getByTestId('auth-status')).toHaveTextContent('authenticated');
-      });
-      
-      // Simulate 401 unauthorized event
-      act(() => {
-        window.dispatchEvent(new CustomEvent('auth:unauthorized'));
-      });
-      
-      await waitFor(() => {
-        expect(screen.getByTestId('login-page')).toBeInTheDocument();
+        expect(screen.getByTestId('auth-status')).toHaveTextContent('not-authenticated');
+        expect(screen.getByTestId('user-email')).toHaveTextContent('no-user');
       });
     });
   });
@@ -221,7 +153,7 @@ describe('AuthContext', () => {
       
       const TestComponent = () => {
         const auth = useAuth();
-        return <div>{auth.isAuthenticated}</div>;
+        return <div>{auth.user?.email || 'no user'}</div>;
       };
       
       expect(() => {

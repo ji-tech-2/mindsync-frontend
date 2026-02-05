@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../css/dashboard.css";
-import WeeklyChart from "../../components/WeeklyChart"; 
+import WeeklyChart from "../../components/WeeklyChart";
+import { fetchWeeklyChart } from "../../config/api"; 
 
 export default function Dashboard({ isProtected }) { 
   const navigate = useNavigate();
@@ -48,13 +49,13 @@ function DashboardLoggedOut({ navigate }) {
         <div className="actions-grid two-columns">
           
           <div className="action-card" onClick={() => navigate("/screening")}>
-              <div className="action-icon" style={{ background: '#7953c9' }}>📝</div>
+              <div className="action-icon" style={{ background: '#7da87b' }}>📝</div>
               <h3>Ambil Tes Kesehatan Mental</h3>
               <p>Mulai evaluasi kondisi mental Anda tanpa perlu akun.</p>
           </div>
           
           <div className="action-card" onClick={() => navigate("/signIn")}>
-              <div className="action-icon" style={{ background: '#59c2e0' }}>🔒</div>
+              <div className="action-icon" style={{ background: '#c9b896' }}>🔒</div>
               <h3>Sign In / Daftar</h3>
               <p>Masuk untuk menyimpan hasil dan riwayat Anda.</p>
           </div>
@@ -68,42 +69,51 @@ function DashboardLoggedOut({ navigate }) {
 
 // Tampilan Pengguna SUDAH LOGIN (Penuh)
 function DashboardLoggedIn({ user, navigate }) {
-    // Generate 7 hari terakhir dari hari ini
-    const generateLast7Days = () => {
-        const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        const result = [];
-        
-        for (let i = 0; i < 7; i++) {
-            const date = new Date();
-            date.setDate(date.getDate() - i);
-            
-            result.unshift({
-                day: days[date.getDay()],
-                date: `${date.getDate()} ${months[date.getMonth()]}`,
-                value: Math.floor(Math.random() * 100) // Random 0-100 (dummy data)
-            });
-        }
-        
-        return result;
+    const [weeklyData, setWeeklyData] = useState([]);
+    const [isLoadingChart, setIsLoadingChart] = useState(true);
+
+    // Get user ID safely from different possible field names
+    const getUserId = (user) => {
+        return user?.userId || user?.id || user?.user_id || null;
     };
 
-    // Mock data untuk testing - Nanti diganti dengan data dari API
-    const [weeklyData, setWeeklyData] = useState(generateLast7Days());
+    // Fetch weekly chart data from backend
+    useEffect(() => {
+        const loadWeeklyChart = async () => {
+            const userId = getUserId(user);
+            
+            if (!userId) {
+                console.warn("No user ID found in user object:", user);
+                setWeeklyData([]);
+                setIsLoadingChart(false);
+                return;
+            }
 
-    // TODO: Fetch data dari API
-    // useEffect(() => {
-    //   const fetchWeeklyData = async () => {
-    //     try {
-    //       const response = await fetch(`${API_CONFIG.BASE_URL}/user-mental-health/${user.id}`);
-    //       const data = await response.json();
-    //       setWeeklyData(data);
-    //     } catch (error) {
-    //       console.error('Error fetching weekly data:', error);
-    //     }
-    //   };
-    //   fetchWeeklyData();
-    // }, [user.id]);
+            setIsLoadingChart(true);
+            
+            try {
+                const response = await fetchWeeklyChart(userId, 7);
+                
+                if (response.success && response.data) {
+                    console.log("✅ Weekly chart data loaded:", response.data);
+                    setWeeklyData(response.data);
+                } else {
+                    console.warn("⚠️ Chart API not available:", response.error);
+                    setWeeklyData([]);
+                }
+            } catch (error) {
+                console.warn("⚠️ Chart API error (Kong Gateway not configured?):", error.message);
+                setWeeklyData([]);
+            } finally {
+                setIsLoadingChart(false);
+            }
+        };
+
+        loadWeeklyChart().catch(err => {
+            console.warn("⚠️ Chart loading failed:", err);
+            setIsLoadingChart(false);
+        });
+    }, [user]);
 
     return (
         <div className="dashboard-container">
@@ -139,12 +149,12 @@ function DashboardLoggedIn({ user, navigate }) {
                 <h2>Mulai Aktivitas Cepat</h2>
                 <div className="actions-grid">
                     <div className="action-card" onClick={() => navigate("/screening")}>
-                        <div className="action-icon" style={{ background: '#7953c9' }}>📝</div>
+                        <div className="action-icon" style={{ background: '#7da87b' }}>📝</div>
                         <h3>Ambil Tes Kesehatan Mental</h3>
                         <p>Mulai evaluasi kondisi mental Anda saat ini.</p>
                     </div>
                     <div className="action-card" onClick={() => navigate("/profile")}>
-                        <div className="action-icon" style={{ background: '#59c2e0' }}>👤</div>
+                        <div className="action-icon" style={{ background: '#a67c52' }}>👤</div>
                         <h3>Lihat Profil Saya</h3>
                         <p>Lihat hasil, riwayat, dan informasi akun.</p>
                     </div>

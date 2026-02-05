@@ -61,7 +61,14 @@ export default function WeeklyChart({
       <div className={styles['weekly-chart-container']}>
         <div className={styles['chart-header']}>
           <h3>{title}</h3>
-          <div className={styles['chart-badge']}>Data Dummy</div>
+          {navigate && (
+            <button 
+              className={styles['history-button']}
+              onClick={() => navigate('/history')}
+            >
+              📜 History
+            </button>
+          )}
         </div>
         <div className={styles['no-data']}>
           <div className={styles['no-data-icon']}>📊</div>

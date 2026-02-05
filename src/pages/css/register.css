@@ -16,7 +16,7 @@ html, body, #root {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7da87b 0%, #a67c52 100%);
   background-size: 200% 200%;
   animation: gradientShift 15s ease infinite;
   
@@ -79,7 +79,7 @@ body::before {
   transform: translateX(-50%);
   width: 50px;
   height: 3px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #7da87b, #91a885);
   border-radius: 0 0 4px 4px;
 }
 
@@ -87,7 +87,7 @@ body::before {
   font-size: 1.5em;
   font-weight: 700;
   margin-bottom: 4px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5a7c59 0%, #8b6f47 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -101,7 +101,7 @@ body::before {
   font-size: 0.38em;
   font-weight: 400;
   margin-top: 5px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5a7c59 0%, #8b6f47 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -147,10 +147,10 @@ body::before {
 
 .register-form input:focus,
 .register-form select:focus {
-  border-color: #667eea;
+  border-color: #7da87b;
   box-shadow:
-    0 0 0 3px rgba(102, 126, 234, 0.1),
-    0 4px 12px rgba(102, 126, 234, 0.15);
+    0 0 0 3px rgba(125, 168, 123, 0.1),
+    0 4px 12px rgba(125, 168, 123, 0.15);
   outline: none;
   transform: translateY(-2px);
   background-color: #ffffff;
@@ -167,7 +167,7 @@ body::before {
   font-size: 0.9em;
   font-weight: 600;
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7da87b 0%, #91a885 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -307,7 +307,7 @@ body::before {
 .login-link-btn {
   background: none;
   border: none;
-  color: #764ba2;
+  color: #8b6f47;
   font-weight: 600;
   cursor: pointer;
   padding: 0;
@@ -319,7 +319,7 @@ body::before {
 }
 
 .login-link-btn:hover {
-  color: #667eea;
+  color: #7da87b;
   text-decoration: underline;
 }
 

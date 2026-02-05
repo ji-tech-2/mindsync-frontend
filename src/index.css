@@ -22,8 +22,8 @@ body {
   position: relative;
   overflow-x: hidden;
   
-  /* Gradient yang lebih soothing untuk mental wellness */
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  /* Earth tone gradient untuk mental wellness */
+  background: linear-gradient(135deg, #7da87b 0%, #c9b896 50%, #a67c52 100%);
   background-size: 200% 200%;
   animation: gradientShift 15s ease infinite;
 }
@@ -106,7 +106,7 @@ body::before {
   transform: translateX(-50%);
   width: 60px;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #7da87b, #91a885);
   border-radius: 0 0 4px 4px;
 }
 
@@ -114,7 +114,7 @@ body::before {
   font-size: 2.4em;
   font-weight: 700;
   margin-bottom: 10px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5a7c59 0%, #8b6f47 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -182,10 +182,10 @@ body::before {
 
 .register-form input:focus,
 .register-form select:focus {
-  border-color: #667eea;
-  box-shadow: 
-    0 0 0 3px rgba(102, 126, 234, 0.1),
-    0 4px 12px rgba(102, 126, 234, 0.15);
+  border-color: #7da87b;
+  box-shadow:
+    0 0 0 3px rgba(125, 168, 123, 0.1),
+    0 4px 12px rgba(125, 168, 123, 0.15);
   outline: none;
   transform: translateY(-2px);
   background-color: #ffffff;

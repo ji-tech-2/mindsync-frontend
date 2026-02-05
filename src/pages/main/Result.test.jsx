@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
 import Result from './Result';
+import { AuthProvider } from '../../contexts/AuthContext';
 import * as pollingHelper from '../helpers/pollingHelper';
 
 // Mock the API config
@@ -21,14 +22,23 @@ vi.mock('../helpers/pollingHelper', () => ({
   pollPredictionResult: vi.fn(),
 }));
 
-// Mock the AuthContext with configurable auth state
+// Mock the useAuth hook with configurable auth state
 let mockIsAuthenticated = true;
-vi.mock('../../contexts/AuthContext', () => ({
-  useAuth: () => ({
-    isAuthenticated: mockIsAuthenticated,
+vi.mock('../../hooks/useAuth', () => {
+  const mockUseAuth = () => ({
     user: mockIsAuthenticated ? { email: 'test@example.com' } : null,
     isLoading: false,
-  }),
+  });
+  return {
+    default: mockUseAuth,
+    useAuth: mockUseAuth,
+  };
+});
+
+// Mock the AuthContext
+vi.mock('../../contexts/AuthContext', () => ({
+  default: {},
+  AuthProvider: ({ children }) => children,
 }));
 
 // Mock the Advice component
@@ -53,12 +63,13 @@ vi.mock('react-router-dom', async () => {
 
 // Helper to render Result with predictionId
 const renderResult = (predictionId = 'test-123') => {
-  return render(
-    <MemoryRouter initialEntries={[`/result/${predictionId}`]}>
-      <Routes>
-        <Route path="/result/:predictionId" element={<Result />} />
-      </Routes>
-    </MemoryRouter>
+  return render(<AuthProvider>
+      <MemoryRouter initialEntries={[`/result/${predictionId}`]}>
+        <Routes>
+          <Route path="/result/:predictionId" element={<Result />} />
+        </Routes>
+      </MemoryRouter>
+    </AuthProvider>
   );
 };
 
