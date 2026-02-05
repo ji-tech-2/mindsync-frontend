@@ -175,15 +175,14 @@ apiClient.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized - token expired or invalid
     if (error.response?.status === 401) {
-      // Don't redirect if already on login/register page
+      // Don't clear token if already on login/register page
       const publicPaths = ["/signIn", "/register", "/"];
       const currentPath = window.location.pathname;
 
       if (!publicPaths.includes(currentPath)) {
+        // Just clear the token - let ProtectedRoute handle the redirect
+        // This is a session expiry, not an intentional logout
         TokenManager.clearToken();
-        // Dispatch events for React components to handle
-        window.dispatchEvent(new CustomEvent("auth:logout"));
-        window.dispatchEvent(new CustomEvent("auth:unauthorized"));
       }
     }
 

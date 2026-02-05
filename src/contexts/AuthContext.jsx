@@ -1,12 +1,13 @@
 /**
  * AuthContext - Global Authentication State Management
  * 
- * Provides authentication state and methods to the entire application.
- * Wraps the app to provide user data, loading states, and auth actions.
+ * Simple, clean authentication state management.
+ * - Manages user state and authentication status
+ * - Provides login/logout methods
+ * - Does NOT handle navigation
  */
 
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { TokenManager } from '../config/api';
 
 // Create the context
@@ -26,7 +27,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
 
   // Initialize auth state on mount
   useEffect(() => {
@@ -48,29 +48,7 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  // Listen for logout events from API interceptor or authHelper
-  useEffect(() => {
-    const handleLogout = () => {
-      setUser(null);
-      setIsAuthenticated(false);
-      navigate('/signIn', { replace: true });
-    };
-
-    window.addEventListener('auth:logout', handleLogout);
-    return () => window.removeEventListener('auth:logout', handleLogout);
-  }, [navigate]);
-
-  // Listen for unauthorized events (401) and redirect via React Router
-  useEffect(() => {
-    const handleUnauthorized = () => {
-      navigate('/signIn', { replace: true });
-    };
-
-    window.addEventListener('auth:unauthorized', handleUnauthorized);
-    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
-  }, [navigate]);
-
-  // Login function - to be called after successful API login
+  // Login function
   const login = useCallback((token, userData) => {
     TokenManager.setToken(token);
     TokenManager.setUserData(userData);
@@ -78,25 +56,18 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(true);
   }, []);
 
-  // Logout function
+  // Logout function - just clears state
+  // Caller is responsible for navigation
   const logout = useCallback(() => {
     TokenManager.clearToken();
     setUser(null);
     setIsAuthenticated(false);
-    
-    // Dispatch logout event for other components
-    window.dispatchEvent(new CustomEvent('auth:logout'));
   }, []);
 
   // Update user data
   const updateUser = useCallback((userData) => {
     TokenManager.setUserData(userData);
     setUser(userData);
-  }, []);
-
-  // Check if user is authenticated
-  const checkAuth = useCallback(() => {
-    return TokenManager.isAuthenticated();
   }, []);
 
   const value = {
@@ -106,7 +77,6 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateUser,
-    checkAuth,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

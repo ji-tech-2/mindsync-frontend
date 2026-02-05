@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import LogoutHandler from "./components/LogoutHandler";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Login from "./pages/main/Login";
@@ -17,7 +18,7 @@ export default function App() {
   const location = useLocation();
   
   // Pages that should only show footer (no navbar)
-  const footerOnlyPages = ['/signIn', '/register', '/screening'];
+  const footerOnlyPages = ['/signIn', '/register', '/screening', '/logout'];
   const isFooterOnlyPage = footerOnlyPages.includes(location.pathname);
 
   return (
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/" element={<Home />} />      
           <Route path="/signIn" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/logout" element={<LogoutHandler />} />
           
           {/* Protected routes - require authentication */}
           <Route 
