@@ -8,6 +8,7 @@ import FormInput from "../../components/FormInput";
 import FormSelect from "../../components/FormSelect";
 import OTPInput from "../../components/OTPInput";
 import apiClient, { TokenManager } from "../../config/api";
+import useAuth from "../../hooks/useAuth";
 import { getPasswordError } from "../../utils/passwordValidation";
 import { 
   genderOptions, 
@@ -23,6 +24,7 @@ import {
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { updateUser } = useAuth();
   const [user, setUser] = useState({
     name: "",
     email: "",
@@ -150,8 +152,9 @@ export default function Profile() {
           };
           setUser(updatedUser);
           
-          // Update stored user data in localStorage
+          // Update both localStorage and global auth context
           TokenManager.setUserData(apiData);
+          updateUser(apiData);
           
           setMessage({ type: "success", text: response.data.message });
           setTimeout(() => {
