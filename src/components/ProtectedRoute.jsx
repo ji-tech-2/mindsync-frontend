@@ -3,6 +3,9 @@
  * 
  * Wraps protected routes to ensure only authenticated users can access them.
  * Redirects unauthenticated users to the login page.
+ * 
+ * During logout transition, this component does NOT redirect to prevent
+ * the flash of /signIn page before the logout overlay completes.
  */
 
 import React from 'react';
@@ -10,7 +13,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, isLoggingOut } = useAuth();
   const location = useLocation();
 
   // Show loading state while checking authentication
@@ -28,7 +31,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   // Redirect to login if not authenticated
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isLoggingOut) {
     return <Navigate to="/signIn" state={{ from: location }} replace />;
   }
 

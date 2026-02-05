@@ -1,19 +1,18 @@
 /**
  * LogoutButton Component
  * 
- * Simply navigates to the /logout route which handles
- * the actual logout process. This pattern ensures we
- * leave protected routes before clearing auth state.
+ * Triggers a graceful logout with visual transition overlay.
+ * Uses the logoutWithTransition method from AuthContext.
  */
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 
 const LogoutButton = ({ className, children }) => {
-  const navigate = useNavigate();
+  const { logoutWithTransition } = useAuth();
 
   const handleLogout = () => {
-    navigate('/logout');
+    logoutWithTransition();
   };
 
   return (
