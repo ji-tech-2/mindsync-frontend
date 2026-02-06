@@ -140,12 +140,13 @@ export default function Dashboard() {
       <div className="dashboard-content">
         <div className="cards-upper-section">
           <div className="cards-left-column">
-            <div className="card card-small">
+            
+            <div className="card card-small streak-card">
               <StreakCard 
-                data={streakData} 
-                loading={loadingStreak}
-                error={errorStreak}
-              />
+                  data={streakData} 
+                  loading={loadingStreak}
+                  error={errorStreak}
+                />  
             </div>
             
             {/* Card 2 - Daily Suggestion */}

@@ -44,7 +44,7 @@ export const API_CONFIG = {
   ADVICE_ENDPOINT: "/v0-1/model-advice",
 
   // Streak endpoint
-  STREAK_ENDPOINT: "/v0-1/streak",
+  STREAK_ENDPOINT: "/v0-1/model-streak",
 
   // Weekly critical factors endpoint
   WEEKLY_CRITICAL_FACTORS: "/v0-1/weekly-critical-factors",

@@ -220,6 +220,14 @@ body::before {
   gap: 2rem;
 }
 
+.card.streak-card {
+  padding: 0;
+  display: flex;
+  overflow: hidden;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
 /* Daily Suggestion Card Styling */
 .daily-suggestion-card {
   display: flex;

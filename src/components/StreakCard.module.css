@@ -1,7 +1,10 @@
 .container {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
   background-color: #F5F2E8;
   border-radius: 24px;
-  padding: 24px;
+  padding: 50px 54px 10px 54px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
@@ -158,4 +161,29 @@
 .emptyContent .label {
   color: #999;
   font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 30px 30px 30px 30px; 
+  }
+
+  .header {
+    flex-direction: column; 
+    align-items: flex-start;
+  }
+
+  .toggleContainer {
+    width: 100%; 
+    justify-content: center;
+  }
+
+  .toggleBtn {
+    flex: 1; 
+    text-align: center;
+  }
+  
+  .dayName {
+    font-size: 10px; 
+  }
 }
