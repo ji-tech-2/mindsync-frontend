@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react"; 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { API_CONFIG } from "../../config/api";
-import CriticalFactorCard from "../../components/CriticalFactorCard"; // Pastikan path benar
+import { API_CONFIG, API_URLS } from "../../config/api";
+import CriticalFactorCard from "../../components/CriticalFactorCard"; 
 import DashboardSuggestion from "../../components/DashboardSuggestion";
+import StreakCard from "../../components/StreakCard";
 import "../css/dashboard.css"; 
 
 export default function Dashboard() {
@@ -18,12 +19,15 @@ export default function Dashboard() {
   const [dailySuggestion, setDailySuggestion] = useState("");
   const [loading, setLoading] = useState(true);
   const [loadingSuggestion, setLoadingSuggestion] = useState(true);
+  const [streakData, setStreakData] = useState(null);
+  const [loadingStreak, setLoadingStreak] = useState(true);
+  const [errorStreak, setErrorStreak] = useState(null);
 
   // Fetch critical factors dari API (7 hari terakhir)
   useEffect(() => {
     if (userId) {
       setLoading(true);
-      const url = `${API_CONFIG.BASE_URL}/v0-1/weekly-critical-factors?user_id=${userId}&days=7`;
+      const url = API_URLS.weeklyCriticalFactors(userId, 7);
       fetch(url)
         .then(res => res.json())
         .then(data => {
@@ -61,7 +65,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (userId) {
       setLoadingSuggestion(true);
-      const url = `${API_CONFIG.BASE_URL}/v0-1/daily-suggestion?user_id=${userId}`;
+      const url = API_URLS.dailySuggestion(userId);
       fetch(url)
         .then(res => res.json())
         .then(data => {
@@ -93,6 +97,31 @@ export default function Dashboard() {
     return '💡';
   };
 
+  // fetch streak data dari API
+  useEffect(() => {
+    if (userId) {
+      setLoadingStreak(true);
+      setErrorStreak(null);
+      const url = API_URLS.streak(userId);
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === "success") {
+            setStreakData(data.data);
+            setErrorStreak(null);
+          } else {
+            setErrorStreak(data.message || "Failed to fetch streak data");
+          }
+          setLoadingStreak(false);
+        })
+        .catch(err => {
+          console.error("❌ Error fetching streak:", err);
+          setErrorStreak(err.message || "Network error");
+          setLoadingStreak(false);
+        });
+    }
+  }, [userId]);
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header-full">
@@ -111,7 +140,13 @@ export default function Dashboard() {
       <div className="dashboard-content">
         <div className="cards-upper-section">
           <div className="cards-left-column">
-            <div className="card card-small">Card 1</div>
+            <div className="card card-small">
+              <StreakCard 
+                data={streakData} 
+                loading={loadingStreak}
+                error={errorStreak}
+              />
+            </div>
             
             {/* Card 2 - Daily Suggestion */}
             <div className="card card-small daily-suggestion-card">
@@ -127,7 +162,6 @@ export default function Dashboard() {
 
         <h2 className="section-title">Critical Factors</h2>
         <div className="cards-lower-section">
-          {/* Mapping 3 slot agar layout tetap rapi */}
           {[0, 1, 2].map((index) => (
             <CriticalFactorCard 
               key={index} 

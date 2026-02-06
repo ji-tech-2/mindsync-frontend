@@ -43,6 +43,15 @@ export const API_CONFIG = {
   // Advice endpoint
   ADVICE_ENDPOINT: "/v0-1/model-advice",
 
+  // Streak endpoint
+  STREAK_ENDPOINT: "/v0-1/streak",
+
+  // Weekly critical factors endpoint
+  WEEKLY_CRITICAL_FACTORS: "/v0-1/weekly-critical-factors",
+
+  // Daily suggestion endpoint
+  DAILY_SUGGESTION: "/v0-1/daily-suggestion",
+
   // Polling configuration
   POLLING: {
     MAX_ATTEMPTS: 120, // 120 attempts
@@ -203,4 +212,10 @@ export const API_URLS = {
   result: (predictionId) =>
     getApiUrl(`${API_CONFIG.RESULT_ENDPOINT}/${predictionId}`),
   advice: getApiUrl(API_CONFIG.ADVICE_ENDPOINT),
+  streak: (userId) =>
+    getApiUrl(`${API_CONFIG.STREAK_ENDPOINT}/${userId}`),
+  weeklyCriticalFactors: (userId, days = 7) =>
+    getApiUrl(`${API_CONFIG.WEEKLY_CRITICAL_FACTORS}?user_id=${userId}&days=${days}`),
+  dailySuggestion: (userId) =>
+    getApiUrl(`${API_CONFIG.DAILY_SUGGESTION}?user_id=${userId}`),
 };
