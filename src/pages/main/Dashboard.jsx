@@ -1,9 +1,9 @@
-// 1. Tambahkan useState dan useEffect di baris paling atas
 import React, { useState, useEffect } from "react"; 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { API_CONFIG } from "../../config/api";
 import CriticalFactorCard from "../../components/CriticalFactorCard"; // Pastikan path benar
+import DashboardSuggestion from "../../components/DashboardSuggestion";
 import "../css/dashboard.css"; 
 
 export default function Dashboard() {
@@ -116,15 +116,10 @@ export default function Dashboard() {
             {/* Card 2 - Daily Suggestion */}
             <div className="card card-small daily-suggestion-card">
               <h3 className="daily-suggestion-title">Daily Suggestion</h3>
-              {loadingSuggestion ? (
-                <p>Memuat saran harian...</p>
-              ) : dailySuggestion ? (
-                <div className="daily-suggestion-content">
-                  <p className="suggestion-text">{dailySuggestion}</p>
-                </div>
-              ) : (
-                <p>Tidak ada saran tersedia. Lakukan screening untuk mendapatkan saran personal!</p>
-              )}
+              <DashboardSuggestion 
+                data={dailySuggestion}
+                loading={loadingSuggestion}
+              />
             </div>
           </div>
           <div className="card card-large">Card 3</div>

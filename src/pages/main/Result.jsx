@@ -15,7 +15,7 @@ const ResultPage = () => {
   const [isPolling, setIsPolling] = useState(false);
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
   const [pollingError, setPollingError] = useState(null);
-  const [loadingStage, setLoadingStage] = useState(1); // 1: processing, 2: numeric ready, 3: complete
+  const [loadingStage, setLoadingStage] = useState(1); 
   const [setHasPartialResult] = useState(false);
 
   useEffect(() => {
