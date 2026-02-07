@@ -20,15 +20,19 @@ const DashboardSuggestion = ({ data, loading }) => {
 
   // Cek apakah data berupa Array (Poin-poin)
   const isArray = Array.isArray(data);
+  const isObject = typeof data === 'object' && data !== null && !isArray;
 
   return (
     <div className={styles.suggestionContainer}>
       {isArray ? (
         <ul className={styles.suggestionList}>
-          {data.map((item, index) => (
-            <li key={index} className={styles.suggestionItem}>
-              {item}
-            </li>
+          {data.map((item, index) => <li key={index} className={styles.suggestionItem}>{item}</li>)}
+        </ul>
+      ) : isObject ? (
+        <ul className={styles.suggestionList}>
+          {/* Mengambil semua value dari object saran AI */}
+          {Object.values(data).map((item, index) => (
+            <li key={index} className={styles.suggestionItem}>{item}</li>
           ))}
         </ul>
       ) : (

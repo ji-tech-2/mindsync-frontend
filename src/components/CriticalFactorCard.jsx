@@ -1,13 +1,8 @@
-import React, {useState} from 'react';
-import styles from './CriticalFactorCard.module.css'; 
+import React from 'react';
+import styles from './CriticalFactorCard.module.css';
 
 const CriticalFactorCard = ({ data, loading }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  if (loading) return <div className={styles.loadingState}>Menganalisis...</div>;
-  if (!data) return <div className={`${styles.cardContainer} ${styles.emptyCard}`}>No Data</div>;
-  
-  // image cuma contoh aja belum ada immagenya
+  // Image Mapping Logic
   const getFactorImage = (rawName) => {
     const images = {
       "num__sleep_quality_1_5^2": "/assets/factors/sleep.png",
@@ -16,6 +11,7 @@ const CriticalFactorCard = ({ data, loading }) => {
     };
     return images[rawName] || "/assets/factors/default-factor.png";
   };
+
   if (loading) {
     return <div className={styles.loadingState}>Menganalisis Faktor Kritis...</div>;
   }
@@ -27,39 +23,47 @@ const CriticalFactorCard = ({ data, loading }) => {
       </div>
     );
   }
-return (
-    <div className={`${styles.cardContainer} ${isExpanded ? styles.expanded : ''}`}>
-      {/* Header: Selalu Terlihat */}
+
+  return (
+    <div className={styles.cardContainer}>
       <div className={styles.imageHeader}>
-        <img src={getFactorImage(data.raw_name)} alt={data.factor_name} className={styles.factorImg} />
+        <img 
+          src={getFactorImage(data.raw_name)} 
+          alt={data.factor_name} 
+          className={styles.factorImg} 
+        />
       </div>
 
-      <div className={styles.headerInfo} onClick={() => setIsExpanded(!isExpanded)}>
+      <div className={styles.headerInfo}>
         <h3 className={styles.factorName}>{data.factor_name}</h3>
-        {/* Ikon Panah Dropdown */}
-        <span className={`${styles.arrowIcon} ${isExpanded ? styles.rotate : ''}`}>▼</span>
       </div>
 
-      {/* Konten Dropdown: Tersembunyi/Terlihat */}
-      <div className={`${styles.collapsibleContent} ${isExpanded ? styles.show : ''}`}>
-        <div className={styles.innerContent}>
+      <div className={styles.content}>
+        {data.description ? (
           <p className={styles.description}>{data.description}</p>
-          
-          {data.references && data.references.length > 0 && (
-            <div className={styles.referenceSection}>
-              <h4 className={styles.refTitle}>Sources & Resources:</h4>
-              <ul className={styles.refList}>
-                {data.references.map((ref, idx) => (
-                  <li key={idx} className={styles.refItem}>
-                    <a href={typeof ref === 'object' ? ref.url : ref} target="_blank" rel="noopener noreferrer" className={styles.refLink}>
-                      Resource {idx + 1}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+        ) : (
+          <p className={styles.noSuggestions}>No suggestions available.</p>
+        )}
+
+        {data.references && data.references.length > 0 && (
+          <div className={styles.referenceSection}>
+            <h4 className={styles.refTitle}>Sources & Resources:</h4>
+            <ul className={styles.refList}>
+              {data.references.map((ref, idx) => (
+                <li key={idx} className={styles.refItem}>
+                  <a 
+                    href={typeof ref === 'object' ? ref.url : ref} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className={styles.refLink}
+                  >
+                    Resource {idx + 1}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
