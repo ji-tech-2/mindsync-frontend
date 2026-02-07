@@ -48,7 +48,7 @@ export const API_CONFIG = {
   SCREENING_HISTORY_ENDPOINT: "/v0-1/model-history",
   
   // Weekly chart endpoint
-  // TODO: Configure Kong Gateway route: GET /v0-1/model-weekly-chart → Flask /weekly-chart
+  // Kong route: /v0-1/model-weekly-chart/{user_id} → Flask /chart/weekly?user_id={user_id}
   WEEKLY_CHART_ENDPOINT: "/v0-1/model-weekly-chart",
   
   // Polling configuration
@@ -227,6 +227,7 @@ export const API_URLS = {
  */
 export async function fetchScreeningHistory(userId, limit = 50, offset = 0) {
   try {
+    // Kong strips /v0-1/model-history, Flask expects /history/<user_id>
     const url = `${API_CONFIG.SCREENING_HISTORY_ENDPOINT}/${userId}`;
     const response = await apiClient.get(url);
     
@@ -257,16 +258,29 @@ export async function fetchScreeningHistory(userId, limit = 50, offset = 0) {
  * @param {number} days - Number of days to look back (default: 7)
  * @returns {Promise} - Array of daily chart data
  */
-export async function fetchWeeklyChart(userId, days = 7) {
+export async function fetchWeeklyChart(userId) {
   try {
-    const url = `${API_CONFIG.WEEKLY_CHART_ENDPOINT}?user_id=${userId}&days=${days}`;
+    // Kong expects path param: /v0-1/model-weekly-chart/{userId}
+    // Kong converts to query param for Flask: /chart/weekly?user_id={userId}
+    const url = `${API_CONFIG.WEEKLY_CHART_ENDPOINT}/${userId}`;
+    console.log("📡 Fetching weekly chart from:", url);
     const response = await apiClient.get(url);
+    console.log("📡 Weekly chart raw response:", response.data);
     
     if (response.data.status === 'success') {
+      // Map Flask fields to WeeklyChart component format
+      // Flask: { label, date, mental_health_index, ... }
+      // WeeklyChart: { day, date, value }
+      const mappedData = response.data.data.map(item => ({
+        day: item.label,
+        date: item.date,
+        value: item.mental_health_index
+      }));
+
       return {
         success: true,
-        data: response.data.data,
-        days: response.data.days
+        data: mappedData,
+        days: mappedData.length
       };
     } else {
       return {

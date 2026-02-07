@@ -9,52 +9,11 @@ export default function History() {
   const [historyData, setHistoryData] = useState([]);
   const [weeklyData, setWeeklyData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingChart, setIsLoadingChart] = useState(true);
 
   // Get user ID safely from different possible field names
   const getUserId = (user) => {
     return user?.userId || user?.id || user?.user_id || null;
   };
-
-  // Fetch weekly chart data
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user_data"));
-    
-    const loadWeeklyChart = async () => {
-      const userId = getUserId(user);
-      
-      if (!userId) {
-        console.warn("No user ID found in user object:", user);
-        setWeeklyData([]);
-        setIsLoadingChart(false);
-        return;
-      }
-
-      setIsLoadingChart(true);
-      
-      try {
-        const response = await fetchWeeklyChart(userId, 7);
-        
-        if (response.success && response.data) {
-          console.log("✅ Weekly chart data loaded:", response.data);
-          setWeeklyData(response.data);
-        } else {
-          console.warn("⚠️ Chart API not available:", response.error);
-          setWeeklyData([]);
-        }
-      } catch (error) {
-        console.warn("⚠️ Chart API error (Kong Gateway not configured?):", error.message);
-        setWeeklyData([]);
-      } finally {
-        setIsLoadingChart(false);
-      }
-    };
-
-    loadWeeklyChart().catch(err => {
-      console.warn("⚠️ Chart loading failed:", err);
-      setIsLoadingChart(false);
-    });
-  }, []); // ✅ Empty dependency - hanya load sekali saat mount
 
   // Check if user is logged in and fetch data
   useEffect(() => {
@@ -108,6 +67,15 @@ export default function History() {
           });
           
           setHistoryData(transformedData);
+          
+          // Fetch weekly chart data from API
+          const chartResponse = await fetchWeeklyChart(userId);
+          if (chartResponse.success && chartResponse.data) {
+            setWeeklyData(chartResponse.data);
+          } else {
+            console.warn("⚠️ Weekly chart API not available, using empty data");
+            setWeeklyData([]);
+          }
         } else {
           console.warn("⚠️ History API not available:", response.error);
           setHistoryData([]);
