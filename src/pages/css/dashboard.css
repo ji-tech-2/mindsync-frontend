@@ -590,6 +590,15 @@ body::before {
   color: #718096;
 }
 
+.cards-lower-section.full-width-layout {
+  grid-template-columns: 1fr; 
+}
+
+.cards-lower-section.full-width-layout > div {
+  max-width: 100% !important; 
+  width: 100%;
+}
+
 /* ======================================= */
 /* Responsiveness */
 /* ======================================= */
