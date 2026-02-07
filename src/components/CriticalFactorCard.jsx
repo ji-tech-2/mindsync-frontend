@@ -6,7 +6,8 @@ const CriticalFactorCard = ({ data, loading }) => {
 
   if (loading) return <div className={styles.loadingState}>Menganalisis...</div>;
   if (!data) return <div className={`${styles.cardContainer} ${styles.emptyCard}`}>No Data</div>;
-
+  
+  // image cuma contoh aja belum ada immagenya
   const getFactorImage = (rawName) => {
     const images = {
       "num__sleep_quality_1_5^2": "/assets/factors/sleep.png",
