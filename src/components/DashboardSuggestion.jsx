@@ -5,26 +5,35 @@ const DashboardSuggestion = ({ data, loading }) => {
   if (loading) {
     return (
       <div className={styles.suggestionContainer}>
-        <p className={styles.text}>Memuat saran harian...</p>
+        <p className={styles.text}>Loading daily suggestions...</p>
       </div>
     );
   }
 
-  if (!data) {
+  if (!data || (Array.isArray(data) && data.length === 0)) {
     return (
       <div className={styles.suggestionContainer}>
-        <p className={styles.text}>
-          Tidak ada saran tersedia. Lakukan screening untuk mendapatkan saran personal!
-        </p>
+        <p className={styles.text}>No suggestion available at the moment.</p>
       </div>
     );
   }
+
+  // Cek apakah data berupa Array (Poin-poin)
+  const isArray = Array.isArray(data);
 
   return (
     <div className={styles.suggestionContainer}>
-      <p className={styles.text}>
-        <span className={styles.highlight}>Saran MindSync:</span> {data}
-      </p>
+      {isArray ? (
+        <ul className={styles.suggestionList}>
+          {data.map((item, index) => (
+            <li key={index} className={styles.suggestionItem}>
+              {item}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className={styles.text}>{data}</p>
+      )}
     </div>
   );
 };

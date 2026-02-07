@@ -1,31 +1,44 @@
 .suggestionContainer {
-  background: #fdf2f2; 
-  border: 1px solid #d9534f; 
   border-radius: 12px;
-  padding: 18px 22px;
-  margin: 0 20px 0 0;
-  box-shadow: 0 4px 12px rgba(217, 83, 79, 0.1);
+  padding: 10px 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  height: 305px;
+  height: 305px; 
+  overflow-y: auto; 
+  scrollbar-width: thin;
+}
+
+.suggestionList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.suggestionItem {
+  position: relative;
+  padding-left: 28px;
+  margin-bottom: 14px;
+  font-size: 0.95rem;
+  color: #4a4a4a;
+  line-height: 1.5;
+  text-align: left; 
 }
 
 
+.suggestionItem::before {
+  content: '✨'; 
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 1rem;
+}
+
 .text {
-  margin: 20px;
+  margin: auto; 
   font-size: 1.02rem;
   color: #4a4a4a;
   line-height: 1.6;
   font-weight: 500;
-  max-width: 85%;
-  padding: 0 10px;
   text-align: center;
-}
-
-.highlight {
-  color: #d9534f;
-  font-weight: 600;
 }

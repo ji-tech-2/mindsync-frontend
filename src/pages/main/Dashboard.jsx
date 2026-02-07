@@ -23,43 +23,65 @@ export default function Dashboard() {
   const [loadingStreak, setLoadingStreak] = useState(true);
   const [errorStreak, setErrorStreak] = useState(null);
 
-  // Fetch critical factors dari API (7 hari terakhir)
-  useEffect(() => {
-    if (userId) {
-      setLoading(true);
-      const url = API_URLS.weeklyCriticalFactors(userId, 7);
-      fetch(url)
-        .then(res => res.json())
-        .then(data => {
-          console.log("📦 Critical factors response:", data);
-          
-          if (data.status === "success") {
-            // Format factors dengan description dari AI advice
-            const factorsWithDesc = data.top_critical_factors.map(factor => {
-              const factorAdvice = data.advice?.factors?.[factor.factor_name];
-              const advices = factorAdvice?.advices || [];
-              const description = advices.length > 0 ? advices.join(" ") : "Tidak ada saran tersedia.";
+  // Tambahkan ini di atas function Dashboard()
+  const FACTOR_MAP = {
+    "num__sleep_quality_1_5^2": "Sleep Quality",
+    "num__productivity_0_100": "Productivity Score",
+    "num__age sleep_hours": "Sleep Duration",
+    "num__physical_activity": "Physical Activity",
+    "num__stress_level": "Stress Level",
+    "num__social_interaction": "Social Interaction"
+  };
+
+  // Fungsi helper untuk membersihkan nama jika tidak ada di mapping
+  const formatDisplayName = (rawName) => {
+    if (FACTOR_MAP[rawName]) return FACTOR_MAP[rawName];
+    
+    // Jika tidak ada di map, bersihkan otomatis: 
+    // hapus 'num__', ganti '_' dengan spasi, dan kapitalisasi
+    return rawName
+      .replace(/^num__/, '')
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+  // Fetch critical factors dari API
+    useEffect(() => {
+      if (userId) {
+        setLoading(true);
+        const url = API_URLS.weeklyCriticalFactors(userId, 7);
+        fetch(url)
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === "success") {
+              const factorsWithDesc = data.top_critical_factors.map(factor => {
+                const factorAdvice = data.advice?.factors?.[factor.factor_name];
+                const advices = factorAdvice?.advices || [];
+                const references = factorAdvice?.references || []; 
+                const description = advices.length > 0 
+                  ? advices.join(" ") 
+                  : "No suggestions available.";
+                
+                return {
+                  factor_name: formatDisplayName(factor.factor_name), 
+                  raw_name: factor.factor_name, 
+                  description: description,
+                  references: references, 
+                  count: factor.count,
+                  avg_impact_score: factor.avg_impact_score
+                };
+              });
               
-              return {
-                factor_name: factor.factor_name,
-                description: description,
-                count: factor.count,
-                avg_impact_score: factor.avg_impact_score
-              };
-            });
-            
-            setFactors(factorsWithDesc);
-          }
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error("❌ Error fetching factors:", err);
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
-  }, [userId]);
+              setFactors(factorsWithDesc);
+            }
+            setLoading(false);
+          })
+          .catch(err => {
+            console.error("❌ Error fetching factors:", err);
+            setLoading(false);
+          });
+      }
+    }, [userId]);
 
   // Fetch daily suggestion dari API
   useEffect(() => {
@@ -106,6 +128,7 @@ export default function Dashboard() {
       fetch(url)
         .then(res => res.json())
         .then(data => {
+          console.log("🔥 Streak response data:", data);
           if (data.status === "success") {
             setStreakData(data.data);
             setErrorStreak(null);

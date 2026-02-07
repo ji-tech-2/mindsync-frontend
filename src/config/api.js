@@ -47,10 +47,10 @@ export const API_CONFIG = {
   STREAK_ENDPOINT: "/v0-1/model-streak",
 
   // Weekly critical factors endpoint
-  WEEKLY_CRITICAL_FACTORS: "/v0-1/weekly-critical-factors",
+  WEEKLY_CRITICAL_FACTORS: "/v0-1/model-critical-factors",
 
   // Daily suggestion endpoint
-  DAILY_SUGGESTION: "/v0-1/daily-suggestion",
+  DAILY_SUGGESTION: "/v0-1/model-daily-suggestion",
 
   // Polling configuration
   POLLING: {
