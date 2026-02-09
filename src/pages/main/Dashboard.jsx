@@ -8,7 +8,7 @@ import { useAuth } from "../../hooks/useAuth";
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const userName = user?.name || "Pengguna";
+  const userName = user?.name || "User";
   const [weeklyData, setWeeklyData] = useState([]);
 
   useEffect(() => {
@@ -53,8 +53,9 @@ export default function Dashboard() {
           <div className="card card-large card-chart">
             <WeeklyChart
               data={weeklyData}
-              title="Aktivitas Mingguan"
+              title="Last 7 Days Trend"
               navigate={navigate}
+              compact
             />
           </div>
         </div>

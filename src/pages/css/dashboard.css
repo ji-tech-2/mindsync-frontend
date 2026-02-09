@@ -129,13 +129,18 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
-  min-height: 400px;
+  align-items: stretch;
 }
 
 .cards-left-column {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  height: 550px; /* Card 1 + Card 2 height */
+}
+
+.card-chart {
+  height: 550px; /* Chart height — edit independently */
 }
 
 .card {
@@ -160,15 +165,20 @@ body {
   flex: 1;
 }
 
-.card-chart {
+.card.card-chart {
   flex-direction: column;
   align-items: stretch;
   padding: 0;
   cursor: default;
+  overflow: hidden;
   background: none;
   border: none;
-  box-shadow: none;
   border-radius: 0;
+  box-shadow: none;
+}
+
+.card-chart > * {
+  height: 100%;
 }
 
 .section-title {
@@ -185,7 +195,7 @@ body {
 @media (max-width: 768px) {
   .cards-upper-section {
     grid-template-columns: 1fr;
-    min-height: auto;
+    height: auto;
   }
 
   .card-large {

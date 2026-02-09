@@ -24,26 +24,26 @@ export default function Home() {
       
       <header className="dashboard-header logged-out-header">
         <div className="welcome-section">
-          <h1>Selamat Datang</h1>
+          <h1>Welcome</h1>
           <p>Mental Wellness Advisor</p>
-          <p>Mulai perjalanan kesehatan mental Anda hari ini.</p>
+          <p>Start your mental health journey today.</p>
         </div>
       </header>
 
       <div className="quick-actions logged-out-actions">
-        <h2>Pilih Aksi Berikut</h2>
+        <h2>Choose an Action</h2>
         <div className="actions-grid two-columns">
           
           <div className="action-card" onClick={() => navigate("/screening")}>
               <div className="action-icon" style={{ background: '#7953c9' }}>📝</div>
-              <h3>Ambil Tes Kesehatan Mental</h3>
-              <p>Mulai evaluasi kondisi mental Anda tanpa perlu akun.</p>
+              <h3>Take Mental Health Test</h3>
+              <p>Start evaluating your mental condition without an account.</p>
           </div>
           
           <div className="action-card" onClick={() => navigate("/signIn")}>
               <div className="action-icon" style={{ background: '#59c2e0' }}>🔒</div>
-              <h3>Sign In / Daftar</h3>
-              <p>Masuk untuk menyimpan hasil dan riwayat Anda.</p>
+              <h3>Sign In / Register</h3>
+              <p>Sign in to save your results and history.</p>
           </div>
           
         </div>

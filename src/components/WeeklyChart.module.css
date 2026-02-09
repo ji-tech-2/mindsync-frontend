@@ -11,6 +11,28 @@
   overflow: hidden;
   height: 100%;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.compact {
+  padding: 20px;
+  box-shadow: none;
+  border: none;
+}
+
+.compact .chart-header {
+  margin-bottom: 12px;
+}
+
+.compact .chart-legend {
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.compact .chart-footer {
+  margin-top: 10px;
+  padding-top: 8px;
 }
 
 .chart-header {
@@ -176,6 +198,14 @@
 }
 
 .info-text {
+  font-style: italic;
+}
+
+/* No data tooltip */
+.tooltip-no-data {
+  margin: 4px 0 0 0;
+  color: #999;
+  font-size: 0.85rem;
   font-style: italic;
 }
 

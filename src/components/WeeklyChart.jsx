@@ -3,33 +3,34 @@ import styles from './WeeklyChart.module.css';
 
 /**
  * WeeklyChart Component
- * Menampilkan bar chart nilai mental health user dalam 1 minggu terakhir
+ * Displays a bar chart of user's mental health scores for the last 7 days
  * 
  * Props:
- * - data: Array of objects dengan format { day: string, date: string, value: number }
- * - title: Judul chart (optional)
- * - dataKey: Key untuk nilai data (default: 'value')
- * - navigate: Function untuk navigasi (optional)
+ * - data: Array of objects with format { day: string, date: string, value: number }
+ * - title: Chart title (optional)
+ * - dataKey: Key for data value (default: 'value')
+ * - navigate: Navigation function (optional)
  */
 export default function WeeklyChart({ 
   data = [], 
-  title = "Aktivitas Mingguan",
+  title = "Weekly Activity",
   dataKey = "value",
-  navigate = null
+  navigate = null,
+  compact = false
 }) {
   
-  // Batas kategori dari model Flask (model.py categorize_mental_health_score)
+  // Category thresholds from Flask model (model.py categorize_mental_health_score)
   const THRESHOLDS = { DANGEROUS: 12, NOT_HEALTHY: 28.6, AVERAGE: 61.4 };
 
-  // Fungsi untuk menentukan warna berdasarkan kategori model
+  // Get bar color based on model category
   const getBarColor = (value) => {
-    if (value > THRESHOLDS.AVERAGE) return '#4CAF50';    // Healthy - Hijau
-    if (value > THRESHOLDS.NOT_HEALTHY) return '#FFC107'; // Average - Kuning
-    if (value > THRESHOLDS.DANGEROUS) return '#FF9800';   // Not Healthy - Oranye
-    return '#F44336';                                     // Dangerous - Merah
+    if (value > THRESHOLDS.AVERAGE) return '#4CAF50';    // Healthy - Green
+    if (value > THRESHOLDS.NOT_HEALTHY) return '#FFC107'; // Average - Yellow
+    if (value > THRESHOLDS.DANGEROUS) return '#FF9800';   // Not Healthy - Orange
+    return '#F44336';                                     // Dangerous - Red
   };
 
-  // Fungsi untuk menentukan status
+  // Get health status label
   const getHealthStatus = (value) => {
     if (value > THRESHOLDS.AVERAGE) return 'Healthy';
     if (value > THRESHOLDS.NOT_HEALTHY) return 'Average';
@@ -37,30 +38,39 @@ export default function WeeklyChart({
     return 'Dangerous';
   };
   
-  // Custom Tooltip dengan status mental health
+  // Gray color for days without data
+  const NO_DATA_COLOR = '#D0D0D0';
+
+  // Custom Tooltip with mental health status
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
+      const entry = payload[0].payload;
       const value = payload[0].value;
-      const status = getHealthStatus(value);
-      const color = getBarColor(value);
+      const hasData = entry.hasData !== false;
       
       return (
         <div className={styles['custom-tooltip']}>
-          <p className={styles['tooltip-day']}>{payload[0].payload.day}</p>
-          <p className={styles['tooltip-date']}>{payload[0].payload.date}</p>
-          <p className={styles['tooltip-value']}>
-            <span className={styles['value-number']}>{value}</span>/100
-          </p>
-          <p className={styles['tooltip-status']} style={{ color }}>
-            {status}
-          </p>
+          <p className={styles['tooltip-day']}>{entry.day}</p>
+          <p className={styles['tooltip-date']}>{entry.date}</p>
+          {hasData ? (
+            <>
+              <p className={styles['tooltip-value']}>
+                <span className={styles['value-number']}>{value}</span>/100
+              </p>
+              <p className={styles['tooltip-status']} style={{ color: getBarColor(value) }}>
+                {getHealthStatus(value)}
+              </p>
+            </>
+          ) : (
+            <p className={styles['tooltip-no-data']}>No data</p>
+          )}
         </div>
       );
     }
     return null;
   };
   
-  // Jika tidak ada data, tampilkan pesan
+  // If no data available, show message
   if (!data || data.length === 0) {
     return (
       <div className={styles['weekly-chart-container']}>
@@ -77,15 +87,15 @@ export default function WeeklyChart({
         </div>
         <div className={styles['no-data']}>
           <div className={styles['no-data-icon']}>📊</div>
-          <p>Belum ada data untuk ditampilkan</p>
-          <span className={styles['no-data-hint']}>Data akan muncul setelah mengambil tes</span>
+          <p>No data to display yet</p>
+          <span className={styles['no-data-hint']}>Data will appear after completing a screening</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={styles['weekly-chart-container']}>
+    <div className={`${styles['weekly-chart-container']} ${compact ? styles['compact'] : ''}`}>
       <div className={styles['chart-header']}>
         <h3>{title}</h3>
         {navigate && (
@@ -116,11 +126,18 @@ export default function WeeklyChart({
           <span className={styles['legend-color']} style={{ background: '#F44336' }}></span>
           <span>Dangerous (≤12)</span>
         </div>
+        <div className={styles['legend-item']}>
+          <span className={styles['legend-color']} style={{ background: '#D0D0D0' }}></span>
+          <span>No data</span>
+        </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={280} minHeight={200}>
+      <div style={{ flex: 1, minHeight: compact ? 160 : 200 }}>
+      <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={data}
+          data={data.map(entry =>
+            entry.hasData === false ? { ...entry, [dataKey]: 5 } : entry
+          )}
           margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" strokeOpacity={0.5} />
@@ -153,15 +170,20 @@ export default function WeeklyChart({
             animationDuration={800}
           >
             {Array.isArray(data) && data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={getBarColor(entry[dataKey])} />
+              <Cell
+                key={`cell-${index}`}
+                fill={entry.hasData === false ? NO_DATA_COLOR : getBarColor(entry[dataKey])}
+                fillOpacity={entry.hasData === false ? 0.5 : 1}
+              />
             ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+      </div>
       <div className={styles['chart-footer']}>
         <div className={styles['chart-info']}>
           <span className={styles['info-icon']}>ℹ️</span>
-          <span className={styles['info-text']}>Data 7 hari terakhir</span>
+          <span className={styles['info-text']}>Last 7 days data</span>
         </div>
       </div>
     </div>

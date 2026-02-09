@@ -110,13 +110,13 @@ export default function History() {
     if (!category) return 'Unknown';
     switch (category.toLowerCase()) {
       case 'healthy':
-        return 'Sehat';
+        return 'Healthy';
       case 'average':
-        return 'Rata-rata';
+        return 'Average';
       case 'not healthy':
-        return 'Perlu Perhatian';
+        return 'Needs Attention';
       case 'dangerous':
-        return 'Berbahaya';
+        return 'Dangerous';
       default:
         return category;
     }
@@ -128,70 +128,35 @@ export default function History() {
       <header className="history-header">
         <div className="header-content">
           <button className="back-button" onClick={() => navigate("/dashboard")}>
-            ← Kembali ke Dashboard
+            ← Back to Dashboard
           </button>
           <div className="header-title">
-            <h1>Riwayat Screening</h1>
-            <p>Lihat semua hasil tes kesehatan mental Anda</p>
+            <h1>Screening History</h1>
+            <p>View all your mental health test results</p>
           </div>
         </div>
       </header>
 
       <div className="history-container">
-        {/* Left Side - Chart */}
-        <div className="history-chart-section">
-          <div className="chart-card">
-            <WeeklyChart 
-              data={weeklyData}
-              title="📊 Tren 7 Hari Terakhir"
-              dataKey="value"
-              navigate={null} // Remove history button on this page
-            />
-          </div>
-
-          {/* Summary Stats */}
-          <div className="summary-stats">
-            <h3>Ringkasan</h3>
-            <div className="stat-item">
-              <span className="stat-label">Total Tes:</span>
-              <span className="stat-value">{historyData.length}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Rata-rata Score:</span>
-              <span className="stat-value">
-                {historyData.length > 0 
-                  ? Math.round(historyData.reduce((sum, item) => sum + Math.max(0, item.score), 0) / historyData.length)
-                  : 0}
-              </span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Tes Terakhir:</span>
-              <span className="stat-value">
-                {historyData.length > 0 ? new Date(historyData[0].date).toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' }) : '-'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Side - History List */}
+        {/* Left Side - History List */}
         <div className="history-list-section">
           <div className="list-header">
-            <h2>Semua Riwayat Screening</h2>
-            <span className="result-count">{historyData.length} hasil</span>
+            <h2>All Screening History</h2>
+            <span className="result-count">{historyData.length} results</span>
           </div>
 
           {isLoading ? (
             <div className="loading-state">
               <div className="spinner"></div>
-              <p>Memuat riwayat...</p>
+              <p>Loading history...</p>
             </div>
           ) : historyData.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon">📋</div>
-              <h3>Belum Ada Riwayat</h3>
-              <p>Anda belum melakukan screening. Mulai sekarang untuk melihat riwayat Anda.</p>
+              <h3>No History Yet</h3>
+              <p>You haven't taken any screenings yet. Start now to see your history.</p>
               <button className="start-screening-btn" onClick={() => navigate("/screening")}>
-                Mulai Screening
+                Start Screening
               </button>
             </div>
           ) : (
@@ -230,6 +195,41 @@ export default function History() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Right Side - Chart */}
+        <div className="history-chart-section">
+          <div className="chart-card">
+            <WeeklyChart 
+              data={weeklyData}
+              title="📊 Last 7 Days Trend"
+              dataKey="value"
+              navigate={null}
+            />
+          </div>
+
+          {/* Summary Stats */}
+          <div className="summary-stats">
+            <h3>Summary</h3>
+            <div className="stat-item">
+              <span className="stat-label">Total Tests:</span>
+              <span className="stat-value">{historyData.length}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Average Score:</span>
+              <span className="stat-value">
+                {historyData.length > 0 
+                  ? Math.round(historyData.reduce((sum, item) => sum + Math.max(0, item.score), 0) / historyData.length)
+                  : 0}
+              </span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Last Test:</span>
+              <span className="stat-value">
+                {historyData.length > 0 ? new Date(historyData[0].date).toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' }) : '-'}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

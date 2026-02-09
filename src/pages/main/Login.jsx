@@ -65,7 +65,7 @@ export default function Login() {
       setLoading(false);
 
       if (data.success && data.token) {
-        setMessage("Login berhasil!");
+        setMessage("Login successful!");
 
         // Use AuthContext login to update global auth state
         login(data.token, data.user);
@@ -73,11 +73,11 @@ export default function Login() {
         // Redirect to the page they were trying to visit, or dashboard
         navigate(from, { replace: true });
       } else {
-        setMessage(data.message || "Login gagal");
+        setMessage(data.message || "Login failed");
       }
     } catch (err) {
       setLoading(false);
-      const errorMessage = err.response?.data?.message || "Terjadi kesalahan server";
+      const errorMessage = err.response?.data?.message || "Server error occurred";
       setMessage(errorMessage);
       console.error("Login error:", err);
     }
@@ -128,15 +128,15 @@ export default function Login() {
       </form>
 
       {message && (
-        <p className={`login-message ${message.includes('berhasil') ? 'success' : 'error'}`}>
+        <p className={`login-message ${message.includes('success') ? 'success' : 'error'}`}>
           {message}
         </p>
       )}
 
       <div className="register-link-container">
-        <p>Belum punya akun?</p>
+        <p>Don't have an account?</p>
         <button type="button" onClick={handleRegisterClick} className="register-link-btn">
-          Daftar di sini.
+          Register here.
         </button>
       </div>
     </div>

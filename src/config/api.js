@@ -279,10 +279,11 @@ export function buildWeeklyChartFromHistory(historyItems) {
     d.setDate(today.getDate() - i);
     const key = d.toISOString().split('T')[0];
     const scores = scoresByDate[key];
+    const hasData = !!scores;
     const avg = scores
       ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
       : 0;
-    chart.push({ day: dayLabels[d.getDay()], date: key, value: avg });
+    chart.push({ day: dayLabels[d.getDay()], date: key, value: avg, hasData });
   }
   return chart;
 }

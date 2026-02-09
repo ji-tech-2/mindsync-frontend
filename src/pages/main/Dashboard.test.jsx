@@ -65,7 +65,7 @@ describe('Dashboard Component', () => {
     it('should display default greeting when user name is not available', () => {
       renderDashboard({ email: 'john@example.com' });
       
-      expect(screen.getByText(/Hello, Pengguna!/i)).toBeInTheDocument();
+      expect(screen.getByText(/Hello, User!/i)).toBeInTheDocument();
     });
 
     it('should display subtitle text', () => {
@@ -106,7 +106,7 @@ describe('Dashboard Component', () => {
       expect(screen.getByText('Card 1')).toBeInTheDocument();
       expect(screen.getByText('Card 2')).toBeInTheDocument();
       // Third card is the WeeklyChart component (renders chart title, not "Card 3")
-      expect(screen.getByText('Aktivitas Mingguan')).toBeInTheDocument();
+      expect(screen.getByText('Last 7 Days Trend')).toBeInTheDocument();
     });
 
     it('should render left column with 2 small cards', () => {

@@ -326,7 +326,7 @@ describe('Register Component', () => {
       fireEvent.click(submitButton);
       
       await waitFor(() => {
-        expect(screen.getByText('✅ Registrasi Berhasil!')).toBeInTheDocument();
+        expect(screen.getByText('✅ Registration Successful!')).toBeInTheDocument();
         expect(screen.getByText(/Registration successful! Welcome aboard./i)).toBeInTheDocument();
       });
     });
@@ -418,10 +418,10 @@ describe('Register Component', () => {
       fireEvent.click(submitButton);
       
       await waitFor(() => {
-        expect(screen.getByText('✅ Registrasi Berhasil!')).toBeInTheDocument();
+        expect(screen.getByText('✅ Registration Successful!')).toBeInTheDocument();
       });
       
-      const continueButton = screen.getByText('Login Sekarang');
+      const continueButton = screen.getByText('Login Now');
       fireEvent.click(continueButton);
       
       expect(mockNavigate).toHaveBeenCalledWith('/signIn');
