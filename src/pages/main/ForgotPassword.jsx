@@ -97,6 +97,8 @@ export default function ForgotPassword() {
         setTimeout(() => {
           navigate("/signIn");
         }, 2000);
+      } else {
+        setMessage(response.data.message || "Failed to reset password");
       }
     } catch (error) {
       console.error("Error resetting password:", error);
@@ -111,7 +113,7 @@ export default function ForgotPassword() {
       <div className="forgot-password-container">
         <h2>Reset Password</h2>
 
-        <form onSubmit={handleSubmit} className="forgot-password-form">
+        <form onSubmit={handleSubmit} className="forgot-password-form" noValidate>
           <div className="form-field">
             <input
               type="email"
@@ -156,7 +158,7 @@ export default function ForgotPassword() {
                 type="button"
                 className="otp-send-btn"
                 onClick={sendOTP}
-                disabled={loading || !email}
+                disabled={loading}
               >
                 Send OTP
               </button>

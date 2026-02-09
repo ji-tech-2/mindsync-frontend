@@ -55,6 +55,7 @@ describe('Login Component', () => {
       expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /forgot password\?/i })).toBeInTheDocument();
     });
 
     it('should render register link', () => {
@@ -282,6 +283,15 @@ describe('Login Component', () => {
       fireEvent.click(registerButton);
       
       expect(mockNavigate).toHaveBeenCalledWith('/register');
+    });
+
+    it('should navigate to forgot password page when clicking the button', () => {
+      renderLogin();
+      
+      const forgotPasswordButton = screen.getByRole('button', { name: /forgot password\?/i });
+      fireEvent.click(forgotPasswordButton);
+      
+      expect(mockNavigate).toHaveBeenCalledWith('/forgot-password');
     });
   });
 });

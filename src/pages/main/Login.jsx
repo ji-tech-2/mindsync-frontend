@@ -127,12 +127,6 @@ export default function Login() {
           </button>
         </form>
 
-        {message && (
-          <p className={`login-message ${message.includes('berhasil') ? 'success' : 'error'}`}>
-            {message}
-          </p>
-        )}
-
         <button
           type="button"
           onClick={() => navigate("/forgot-password")}
@@ -141,11 +135,11 @@ export default function Login() {
           Forgot Password?
         </button>
 
-      {message && (
-        <p className={`login-message ${message.includes('success') ? 'success' : 'error'}`}>
-          {message}
-        </p>
-      )}
+        {message && (
+          <p className={`login-message ${message.includes('successful') || message.includes('berhasil') ? 'success' : 'error'}`}>
+            {message}
+          </p>
+        )}
 
         <div className="register-link-container">
           <p>Don't have an account?</p>
