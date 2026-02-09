@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 import "../css/screening.css";
 import { API_CONFIG, API_URLS } from "../../config/api";
 import { toApiGender, toApiOccupation, toApiWorkMode } from "../../utils/fieldMappings";
 
 // ============= FUNGSI TRANSFORM & KIRIM =============
 
-function transformToJSON(screeningData) {
+function transformToJSON(screeningData, userId = null) {
 
-  return {
+  const payload = {
     age: parseInt(screeningData.age),
     gender: toApiGender(screeningData.gender),
     occupation: toApiOccupation(screeningData.occupation),
@@ -24,6 +25,13 @@ function transformToJSON(screeningData) {
     social_hours_per_week: parseFloat(screeningData.social_hours_per_week),
     mental_wellness_index_0_100: null
   };
+  
+  // Add user_id if available (for database storage)
+  if (userId) {
+    payload.user_id = userId;
+  }
+  
+  return payload;
 }
 
 async function sendToFlask(data, flaskURL = "http://localhost:5000/predict") {
@@ -86,6 +94,10 @@ async function sendToFlask(data, flaskURL = "http://localhost:5000/predict") {
 
 export default function Screening() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  // Get userId from authenticated user
+  const userId = user?.userId || user?.id || JSON.parse(localStorage.getItem("user") || "{}")?.userId;
 
   const questions = [
     {
@@ -299,6 +311,7 @@ export default function Screening() {
         }
         
         console.log("📤 Data yang dikirim ke Flask:", transformedData);
+        console.log("👤 User ID:", userId || "[Guest - No user_id]");
 
         // 3. Kirim ke Flask API
         const result = await sendToFlask(transformedData, API_URLS.predict);
