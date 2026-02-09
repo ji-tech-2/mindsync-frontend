@@ -44,7 +44,7 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate form before submitting
     if (!validateForm()) {
       return;
@@ -69,7 +69,7 @@ export default function Login() {
 
         // Use AuthContext login to update global auth state
         login(data.token, data.user);
-        
+
         // Redirect to the page they were trying to visit, or dashboard
         navigate(from, { replace: true });
       } else {
@@ -90,56 +90,64 @@ export default function Login() {
 
   return (
     <div className="login-wrapper">
-    <div className="login-container">
-      <h2>Login</h2>
+      <div className="login-container">
+        <h2>Login</h2>
 
-      <form onSubmit={handleSubmit} className="login-form">
-        <div className="form-field">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (errors.email) setErrors({ ...errors, email: "" });
-            }}
-            className={errors.email ? "input-error" : ""}
-          />
-          {errors.email && <span className="error-text">{errors.email}</span>}
-        </div>
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="form-field">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) setErrors({ ...errors, email: "" });
+              }}
+              className={errors.email ? "input-error" : ""}
+            />
+            {errors.email && <span className="error-text">{errors.email}</span>}
+          </div>
 
-        <div className="form-field">
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (errors.password) setErrors({ ...errors, password: "" });
-            }}
-            className={errors.password ? "input-error" : ""}
-          />
-          {errors.password && <span className="error-text">{errors.password}</span>}
-        </div>
+          <div className="form-field">
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (errors.password) setErrors({ ...errors, password: "" });
+              }}
+              className={errors.password ? "input-error" : ""}
+            />
+            {errors.password && <span className="error-text">{errors.password}</span>}
+          </div>
 
-        <button type="submit" className="login-btn" disabled={loading}>
-          {loading ? "Loading..." : "Login"}
+          <button type="submit" className="login-btn" disabled={loading}>
+            {loading ? "Loading..." : "Login"}
+          </button>
+        </form>
+
+        <button
+          type="button"
+          onClick={() => navigate("/forgot-password")}
+          className="forgot-password-btn"
+        >
+          Forgot Password?
         </button>
-      </form>
 
-      {message && (
-        <p className={`login-message ${message.includes('success') ? 'success' : 'error'}`}>
-          {message}
-        </p>
-      )}
+        {message && (
+          <p className={`login-message ${message.includes('successful') || message.includes('berhasil') ? 'success' : 'error'}`}>
+            {message}
+          </p>
+        )}
 
-      <div className="register-link-container">
-        <p>Don't have an account?</p>
-        <button type="button" onClick={handleRegisterClick} className="register-link-btn">
-          Register here.
-        </button>
+        <div className="register-link-container">
+          <p>Don't have an account?</p>
+          <button type="button" onClick={handleRegisterClick} className="register-link-btn">
+            Register here.
+          </button>
+        </div>
       </div>
-    </div>
     </div>
   );
 }

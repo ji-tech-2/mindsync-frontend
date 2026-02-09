@@ -11,35 +11,37 @@ import Screening from "./pages/main/Screening";
 import Result from "./pages/main/Result";
 import History from "./pages/main/History";
 import Profile from "./pages/main/Profile";
+import ForgotPassword from "./pages/main/ForgotPassword";
 import "./App.css";
 
 
 // Inner App component that can use AuthContext
 function AppContent() {
   const location = useLocation();
-  
+
   // Pages that should only show footer (no navbar)
-  const footerOnlyPages = ['/signIn', '/register', '/screening'];
+  const footerOnlyPages = ['/signIn', '/register', '/screening', '/forgot-password'];
   const isFooterOnlyPage = footerOnlyPages.includes(location.pathname);
 
   return (
     <>
-      
+
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
         {!isFooterOnlyPage && <Navbar />}
-        
+
         <main style={{ flex: 1 }}>
           <Routes>
             {/* Public routes */}
-            <Route path="/" element={<Home />} />      
+            <Route path="/" element={<Home />} />
             <Route path="/signIn" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+
             {/* Protected routes - require authentication */}
-            <Route  
+            <Route
               element={
                 <ProtectedRoute />
-              } 
+              }
             >
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
@@ -51,7 +53,7 @@ function AppContent() {
             <Route path="/result/:predictionId" element={<Result />} />
           </Routes>
         </main>
-        
+
         <Footer />
       </div>
     </>
