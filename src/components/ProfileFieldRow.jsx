@@ -1,4 +1,9 @@
-export default function ProfileFieldRow({ label, value, onEdit, buttonText = "Edit" }) {
+export default function ProfileFieldRow({
+  label,
+  value,
+  onEdit,
+  buttonText = 'Edit',
+}) {
   return (
     <div className="field-row">
       <div className="field-info">

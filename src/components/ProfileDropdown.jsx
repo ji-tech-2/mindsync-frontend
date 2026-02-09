@@ -39,8 +39,8 @@ function ProfileDropdown() {
 
   return (
     <div className={styles.profileDropdown} ref={dropdownRef}>
-      <button 
-        className={styles.avatarButton} 
+      <button
+        className={styles.avatarButton}
         onClick={toggleDropdown}
         aria-label="Profile menu"
       >
@@ -59,8 +59,8 @@ function ProfileDropdown() {
           </div>
 
           <div className={styles.dropdownActions}>
-            <Link 
-              to="/profile" 
+            <Link
+              to="/profile"
               className={styles.actionButton}
               onClick={closeDropdown}
             >

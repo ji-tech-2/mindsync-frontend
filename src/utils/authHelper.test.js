@@ -1,16 +1,16 @@
 /**
  * authHelper Utility Tests
- * 
+ *
  * Tests for authentication helper functions
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { 
-  isAuthenticated, 
-  getCurrentUser, 
-  logout, 
-  getAuthToken, 
-  requireAuth 
+import {
+  isAuthenticated,
+  getCurrentUser,
+  logout,
+  getAuthToken,
+  requireAuth,
 } from './authHelper';
 import { TokenManager } from '../config/api';
 
@@ -56,7 +56,7 @@ describe('authHelper', () => {
     it('should return user data when available', () => {
       const userData = { email: 'test@example.com', name: 'Test User' };
       TokenManager.getUserData.mockReturnValue(userData);
-      
+
       expect(getCurrentUser()).toEqual(userData);
     });
 
@@ -87,18 +87,18 @@ describe('authHelper', () => {
     it('should dispatch auth:logout event', () => {
       const mockHandler = vi.fn();
       window.addEventListener('auth:logout', mockHandler);
-      
+
       logout();
-      
+
       expect(mockHandler).toHaveBeenCalled();
       window.removeEventListener('auth:logout', mockHandler);
     });
 
     it('should NOT use window.location.href (SPA compliance)', () => {
       const originalHref = window.location.href;
-      
+
       logout();
-      
+
       // window.location.href should not have changed
       expect(window.location.href).toBe(originalHref);
     });
@@ -119,9 +119,9 @@ describe('authHelper', () => {
       TokenManager.isAuthenticated.mockReturnValue(false);
       const mockHandler = vi.fn();
       window.addEventListener('auth:unauthorized', mockHandler);
-      
+
       requireAuth();
-      
+
       expect(mockHandler).toHaveBeenCalled();
       window.removeEventListener('auth:unauthorized', mockHandler);
     });
@@ -130,9 +130,9 @@ describe('authHelper', () => {
       TokenManager.isAuthenticated.mockReturnValue(true);
       const mockHandler = vi.fn();
       window.addEventListener('auth:unauthorized', mockHandler);
-      
+
       requireAuth();
-      
+
       expect(mockHandler).not.toHaveBeenCalled();
       window.removeEventListener('auth:unauthorized', mockHandler);
     });
@@ -140,9 +140,9 @@ describe('authHelper', () => {
     it('should NOT use window.location.href (SPA compliance)', () => {
       TokenManager.isAuthenticated.mockReturnValue(false);
       const originalHref = window.location.href;
-      
+
       requireAuth();
-      
+
       // window.location.href should not have changed
       expect(window.location.href).toBe(originalHref);
     });
@@ -159,9 +159,9 @@ describe('authHelper - Security Considerations', () => {
     // This is a documentation/awareness test
     const userData = { email: 'test@example.com', name: 'Test' };
     TokenManager.getUserData.mockReturnValue(userData);
-    
+
     const result = getCurrentUser();
-    
+
     // Should match what TokenManager returns (TokenManager handles filtering)
     expect(result).toEqual(userData);
   });
@@ -170,21 +170,21 @@ describe('authHelper - Security Considerations', () => {
     // Logout should dispatch event, not redirect directly
     const logoutEventHandler = vi.fn();
     window.addEventListener('auth:logout', logoutEventHandler);
-    
+
     logout();
-    
+
     expect(logoutEventHandler).toHaveBeenCalledTimes(1);
     window.removeEventListener('auth:logout', logoutEventHandler);
   });
 
   it('should use event-based navigation for unauthorized access', () => {
     TokenManager.isAuthenticated.mockReturnValue(false);
-    
+
     const unauthorizedEventHandler = vi.fn();
     window.addEventListener('auth:unauthorized', unauthorizedEventHandler);
-    
+
     requireAuth();
-    
+
     expect(unauthorizedEventHandler).toHaveBeenCalledTimes(1);
     window.removeEventListener('auth:unauthorized', unauthorizedEventHandler);
   });

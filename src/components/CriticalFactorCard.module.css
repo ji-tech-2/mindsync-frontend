@@ -1,22 +1,22 @@
 .cardContainer {
-  background: #F2EDE4; 
+  background: #f2ede4;
   border-radius: 30px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 5%);
   transition: transform 0.3s ease;
   height: 100%; /* Agar tinggi card seragam jika dalam grid */
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(0, 0, 0, 0.03);
+  border: 1px solid rgb(0 0 0 / 3%);
 }
 
 .cardContainer:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 30px rgb(0 0 0 / 8%);
 }
 
 .imageHeader {
-  background: #C4C1B4; 
+  background: #c4c1b4;
   height: 160px;
   width: 100%;
 }
@@ -28,7 +28,7 @@
 }
 
 .headerInfo {
-  padding: 24px 24px 12px 24px;
+  padding: 24px 24px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -44,7 +44,7 @@
 }
 
 .content {
-  padding: 0 32px 32px 32px;
+  padding: 0 32px 32px;
   flex-grow: 1; /* Supaya konten mengisi sisa ruang */
 }
 
@@ -59,13 +59,13 @@
 
 .noSuggestions {
   font-size: 0.9rem;
-  color: #8A8678;
+  color: #8a8678;
   text-align: center;
   margin-top: 10px;
 }
 
 .referenceSection {
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid rgb(0 0 0 / 8%);
   padding-top: 16px;
 }
 
@@ -90,7 +90,7 @@
 }
 
 .refItem::before {
-  content: "🔗";
+  content: '🔗';
   position: absolute;
   left: 0;
   font-size: 0.75rem;
@@ -110,14 +110,13 @@
   color: #999;
 }
 
-
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .cardContainer {
-    border-radius: 24px; 
+    border-radius: 24px;
   }
 
   .imageHeader {
-    height: 140px; 
+    height: 140px;
   }
 
   .headerInfo {
@@ -129,11 +128,11 @@
   }
 
   .innerContent {
-    padding: 0 24px 24px 24px; 
+    padding: 0 24px 24px;
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .imageHeader {
     height: 120px;
   }
@@ -147,12 +146,12 @@
   }
 
   .innerContent {
-    padding: 0 20px 20px 20px; 
+    padding: 0 20px 20px;
   }
 
   .description {
-    font-size: 0.9rem; 
-    text-align: left; 
+    font-size: 0.9rem;
+    text-align: left;
   }
 
   .refItem {

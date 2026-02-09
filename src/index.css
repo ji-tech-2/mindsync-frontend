@@ -1,6 +1,9 @@
 /* ======================================= */
+
 /* Mental Wellness Advisor - Register Page */
+
 /* Modern, Calming & Engaging Design */
+
 /* ======================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
@@ -16,7 +19,7 @@ html {
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: Poppins, sans-serif;
   margin: 0;
   display: flex;
   justify-content: center;
@@ -25,13 +28,15 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  
+
   /* Earth tone gradient untuk mental wellness */
   background: linear-gradient(135deg, #f5f0e8 0%, #e8dcc8 50%, #d4c4a8 100%);
 }
 
 /* ======================================= */
+
 /* Form Container - Glassmorphism Style */
+
 /* ======================================= */
 
 .register-container {
@@ -41,22 +46,20 @@ body {
   border-radius: 24px;
   position: relative;
   z-index: 1;
-  
+
   /* Glassmorphism effect */
-  background: rgba(255, 255, 255, 0.95);
+  background: rgb(255 255 255 / 95%);
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  
+
   /* Elegant shadow */
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 2px 8px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  
+  box-shadow:
+    0 8px 32px rgb(0 0 0 / 10%),
+    0 2px 8px rgb(0 0 0 / 5%),
+    inset 0 1px 0 rgb(255 255 255 / 80%);
+  border: 1px solid rgb(255 255 255 / 30%);
+
   /* Smooth entrance animation */
-  
+
   color: #2d3748;
   text-align: center;
 }
@@ -79,7 +82,6 @@ body {
   font-weight: 700;
   margin-bottom: 10px;
   background: linear-gradient(135deg, #5a7c59 0%, #8b6f47 100%);
-  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.5px;
@@ -93,17 +95,16 @@ body {
   font-weight: 400;
   margin-top: 8px;
   background: linear-gradient(135deg, #5a7c59 0%, #6b9b6a 100%);
-  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   opacity: 0.8;
   letter-spacing: 0.5px;
 }
 
-
-
 /* ======================================= */
+
 /* Form Styling */
+
 /* ======================================= */
 
 .register-form {
@@ -120,8 +121,8 @@ body {
   border: 2px solid #e2e8f0;
   border-radius: 12px;
   font-size: 1em;
-  font-family: 'Poppins', sans-serif;
-  background-color: #ffffff;
+  font-family: Poppins, sans-serif;
+  background-color: #fff;
   color: #2d3748;
   width: 100%;
   box-sizing: border-box;
@@ -132,10 +133,10 @@ body {
 .register-form select:focus {
   border-color: #5a7c59;
   box-shadow:
-    0 0 0 3px rgba(90, 124, 89, 0.1),
-    0 4px 12px rgba(90, 124, 89, 0.15);
+    0 0 0 3px rgb(90 124 89 / 10%),
+    0 4px 12px rgb(90 124 89 / 15%);
   outline: none;
-  background-color: #ffffff;
+  background-color: #fff;
 }
 
 .register-form input::placeholder {
@@ -160,12 +161,14 @@ body {
 
 .register-form select option {
   padding: 10px;
-  background: #ffffff;
+  background: #fff;
   color: #2d3748;
 }
 
 /* ======================================= */
+
 /* Button Styling */
+
 /* ======================================= */
 
 .register-btn {
@@ -173,21 +176,21 @@ body {
   padding: 16px 28px;
   font-size: 1.05em;
   font-weight: 600;
-  font-family: 'Poppins', sans-serif;
-  
+  font-family: Poppins, sans-serif;
   background: linear-gradient(135deg, #5a7c59 0%, #6b9b6a 100%);
   color: white;
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  
-  box-shadow: 
-    0 4px 15px rgba(90, 124, 89, 0.4),
-    0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 4px 15px rgb(90 124 89 / 40%),
+    0 1px 3px rgb(0 0 0 / 10%);
 }
 
 /* ======================================= */
+
 /* Success Message */
+
 /* ======================================= */
 
 .register-message {
@@ -196,30 +199,30 @@ body {
   border-radius: 10px;
   font-weight: 500;
   font-size: 0.95em;
-  
   background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
   color: white;
-  
-  box-shadow: 
-    0 4px 12px rgba(72, 187, 120, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 4px 12px rgb(72 187 120 / 30%),
+    inset 0 1px 0 rgb(255 255 255 / 20%);
 }
 
 /* ======================================= */
+
 /* Responsiveness - Mobile, Tablet & Desktop */
+
 /* ======================================= */
 
 /* Tablet (768px and below) */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .register-container {
     max-width: 420px;
     padding: 35px 30px;
   }
-  
+
   .register-container h2 {
     font-size: 2.2em;
   }
-  
+
   .register-form input,
   .register-form select {
     padding: 14px 17px;
@@ -227,46 +230,46 @@ body {
 }
 
 /* Mobile (480px and below) */
-@media (max-width: 480px) {
+@media (width <= 480px) {
   body {
     padding: 15px 0;
   }
-  
+
   .register-container {
     max-width: 100%;
     width: 95%;
     padding: 30px 20px;
     border-radius: 20px;
   }
-  
+
   .register-container h2 {
     font-size: 1.8em;
     margin-bottom: 8px;
   }
-  
+
   .register-container h2::after {
     font-size: 0.4em;
     margin-top: 6px;
   }
-  
+
   .register-form {
     gap: 14px;
     margin-top: 25px;
   }
-  
+
   .register-form input,
   .register-form select {
     padding: 13px 15px;
     font-size: 0.95em;
     border-radius: 10px;
   }
-  
+
   .register-btn {
     padding: 14px 20px;
     font-size: 1em;
     border-radius: 10px;
   }
-  
+
   .register-message {
     padding: 12px 16px;
     font-size: 0.9em;
@@ -275,21 +278,21 @@ body {
 }
 
 /* Extra Small Mobile (360px and below) */
-@media (max-width: 360px) {
+@media (width <= 360px) {
   .register-container {
     padding: 25px 18px;
   }
-  
+
   .register-container h2 {
     font-size: 1.6em;
   }
-  
+
   .register-form input,
   .register-form select {
     padding: 12px 14px;
     font-size: 0.9em;
   }
-  
+
   .register-btn {
     padding: 12px 18px;
     font-size: 0.95em;
@@ -297,22 +300,22 @@ body {
 }
 
 /* Large Desktop (1200px and above) */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .register-container {
     max-width: 520px;
     padding: 45px 40px;
   }
-  
+
   .register-container h2 {
     font-size: 2.6em;
   }
-  
+
   .register-form input,
   .register-form select {
     padding: 16px 20px;
     font-size: 1.05em;
   }
-  
+
   .register-btn {
     padding: 17px 30px;
     font-size: 1.1em;
@@ -320,7 +323,9 @@ body {
 }
 
 /* ======================================= */
+
 /* Loading State (Optional Enhancement) */
+
 /* ======================================= */
 
 .register-btn:disabled {
@@ -329,14 +334,15 @@ body {
 }
 
 .register-btn:disabled:hover {
-  box-shadow: 
-    0 4px 15px rgba(102, 126, 234, 0.4),
-    0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 4px 15px rgb(102 126 234 / 40%),
+    0 1px 3px rgb(0 0 0 / 10%);
 }
 
 /* Date input calendar icon color fix */
-.register-form input[type="date"]::-webkit-calendar-picker-indicator {
+.register-form input[type='date']::-webkit-calendar-picker-indicator {
   cursor: pointer;
-  filter: invert(45%) sepia(89%) saturate(1250%) hue-rotate(216deg) brightness(95%) contrast(92%);
+  filter: invert(45%) sepia(89%) saturate(1250%) hue-rotate(216deg)
+    brightness(95%) contrast(92%);
   opacity: 0.8;
 }

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Advice from './Advice';
 
@@ -12,12 +12,6 @@ vi.mock('./AdviceFactor', () => ({
 }));
 
 describe('Advice Component - Partial Polling', () => {
-  const mockResultData = {
-    mentalWellnessScore: 75.5,
-    category: 'average',
-    wellnessAnalysis: 'Your mental wellness is average',
-  };
-
   const mockAdviceData = {
     description: 'Focus on improving your sleep and exercise habits',
     factors: {
@@ -38,80 +32,53 @@ describe('Advice Component - Partial Polling', () => {
 
   describe('Loading State', () => {
     it('should show loading message when isLoading is true', () => {
-      render(
-        <Advice
-          adviceData={null}
-          isLoading={true}
-        />
-      );
+      render(<Advice adviceData={null} isLoading={true} />);
 
       expect(screen.getByText('Advice')).toBeInTheDocument();
-      expect(screen.getByText('Loading personalized advice...')).toBeInTheDocument();
+      expect(
+        screen.getByText('Loading personalized advice...')
+      ).toBeInTheDocument();
     });
 
     it('should not show advice content while loading', () => {
-      render(
-        <Advice
-          
-          adviceData={mockAdviceData}
-          isLoading={true}
-        />
-      );
+      render(<Advice adviceData={mockAdviceData} isLoading={true} />);
 
       // Should not show advice description even if adviceData is present
-      expect(screen.queryByText(mockAdviceData.description)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(mockAdviceData.description)
+      ).not.toBeInTheDocument();
     });
   });
 
   describe('No Advice State', () => {
     it('should show placeholder message when no advice data', () => {
-      render(
-        <Advice
-          
-          adviceData={null}
-          isLoading={false}
-        />
-      );
+      render(<Advice adviceData={null} isLoading={false} />);
 
       expect(screen.getByText('Advice')).toBeInTheDocument();
-      expect(screen.getByText('Advice will appear once analysis is complete...')).toBeInTheDocument();
+      expect(
+        screen.getByText('Advice will appear once analysis is complete...')
+      ).toBeInTheDocument();
     });
 
     it('should not show loading message when not loading', () => {
-      render(
-        <Advice
-          
-          adviceData={null}
-          isLoading={false}
-        />
-      );
+      render(<Advice adviceData={null} isLoading={false} />);
 
-      expect(screen.queryByText('Loading personalized advice...')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Loading personalized advice...')
+      ).not.toBeInTheDocument();
     });
   });
 
   describe('Advice Display', () => {
     it('should display advice description when data is available', () => {
-      render(
-        <Advice
-          
-          adviceData={mockAdviceData}
-          isLoading={false}
-        />
-      );
+      render(<Advice adviceData={mockAdviceData} isLoading={false} />);
 
       expect(screen.getByText('Advice')).toBeInTheDocument();
       expect(screen.getByText(mockAdviceData.description)).toBeInTheDocument();
     });
 
     it('should render all advice factors', () => {
-      render(
-        <Advice
-          
-          adviceData={mockAdviceData}
-          isLoading={false}
-        />
-      );
+      render(<Advice adviceData={mockAdviceData} isLoading={false} />);
 
       // Check that all factors are rendered
       expect(screen.getByTestId('advice-factor-sleep')).toBeInTheDocument();
@@ -119,21 +86,23 @@ describe('Advice Component - Partial Polling', () => {
       expect(screen.getByTestId('advice-factor-social')).toBeInTheDocument();
 
       // Check factor content
-      expect(screen.getByText('Aim for 7-8 hours of quality sleep per night')).toBeInTheDocument();
-      expect(screen.getByText('Engage in 30 minutes of moderate exercise daily')).toBeInTheDocument();
-      expect(screen.getByText('Connect with friends and family regularly')).toBeInTheDocument();
+      expect(
+        screen.getByText('Aim for 7-8 hours of quality sleep per night')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Engage in 30 minutes of moderate exercise daily')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Connect with friends and family regularly')
+      ).toBeInTheDocument();
     });
 
     it('should not show placeholder when advice is displayed', () => {
-      render(
-        <Advice
-          
-          adviceData={mockAdviceData}
-          isLoading={false}
-        />
-      );
+      render(<Advice adviceData={mockAdviceData} isLoading={false} />);
 
-      expect(screen.queryByText('Advice will appear once analysis is complete...')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Advice will appear once analysis is complete...')
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -144,13 +113,7 @@ describe('Advice Component - Partial Polling', () => {
         factors: {},
       };
 
-      render(
-        <Advice
-          
-          adviceData={adviceWithNoFactors}
-          isLoading={false}
-        />
-      );
+      render(<Advice adviceData={adviceWithNoFactors} isLoading={false} />);
 
       expect(screen.getByText('You are doing well')).toBeInTheDocument();
       // Should not crash, just show no factors
@@ -164,11 +127,7 @@ describe('Advice Component - Partial Polling', () => {
       };
 
       render(
-        <Advice
-          
-          adviceData={adviceWithUndefinedFactors}
-          isLoading={false}
-        />
+        <Advice adviceData={adviceWithUndefinedFactors} isLoading={false} />
       );
 
       expect(screen.getByText('You are doing well')).toBeInTheDocument();
@@ -177,70 +136,54 @@ describe('Advice Component - Partial Polling', () => {
     });
 
     it('should handle missing resultData gracefully', () => {
-      render(
-        <Advice
-          resultData={null}
-          adviceData={null}
-          isLoading={false}
-        />
-      );
+      render(<Advice resultData={null} adviceData={null} isLoading={false} />);
 
       // Should still render the component
       expect(screen.getByText('Advice')).toBeInTheDocument();
-      expect(screen.getByText('Advice will appear once analysis is complete...')).toBeInTheDocument();
+      expect(
+        screen.getByText('Advice will appear once analysis is complete...')
+      ).toBeInTheDocument();
     });
   });
 
   describe('Partial to Full Transition', () => {
     it('should transition from loading to showing advice', () => {
       const { rerender } = render(
-        <Advice
-          
-          adviceData={null}
-          isLoading={true}
-        />
+        <Advice adviceData={null} isLoading={true} />
       );
 
       // Initially loading
-      expect(screen.getByText('Loading personalized advice...')).toBeInTheDocument();
+      expect(
+        screen.getByText('Loading personalized advice...')
+      ).toBeInTheDocument();
 
       // Simulate advice data arriving
-      rerender(
-        <Advice
-          
-          adviceData={mockAdviceData}
-          isLoading={false}
-        />
-      );
+      rerender(<Advice adviceData={mockAdviceData} isLoading={false} />);
 
       // Should now show advice
-      expect(screen.queryByText('Loading personalized advice...')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Loading personalized advice...')
+      ).not.toBeInTheDocument();
       expect(screen.getByText(mockAdviceData.description)).toBeInTheDocument();
     });
 
     it('should transition from placeholder to showing advice', () => {
       const { rerender } = render(
-        <Advice
-          
-          adviceData={null}
-          isLoading={false}
-        />
+        <Advice adviceData={null} isLoading={false} />
       );
 
       // Initially showing placeholder
-      expect(screen.getByText('Advice will appear once analysis is complete...')).toBeInTheDocument();
+      expect(
+        screen.getByText('Advice will appear once analysis is complete...')
+      ).toBeInTheDocument();
 
       // Simulate advice data arriving
-      rerender(
-        <Advice
-          
-          adviceData={mockAdviceData}
-          isLoading={false}
-        />
-      );
+      rerender(<Advice adviceData={mockAdviceData} isLoading={false} />);
 
       // Should now show advice
-      expect(screen.queryByText('Advice will appear once analysis is complete...')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Advice will appear once analysis is complete...')
+      ).not.toBeInTheDocument();
       expect(screen.getByText(mockAdviceData.description)).toBeInTheDocument();
     });
   });
@@ -248,11 +191,7 @@ describe('Advice Component - Partial Polling', () => {
   describe('Styling', () => {
     it('should render advice section container', () => {
       const { container } = render(
-        <Advice
-          
-          adviceData={mockAdviceData}
-          isLoading={false}
-        />
+        <Advice adviceData={mockAdviceData} isLoading={false} />
       );
 
       // CSS modules transform class names, so we check for div structure instead
@@ -262,13 +201,7 @@ describe('Advice Component - Partial Polling', () => {
     });
 
     it('should render advice factors container when advice data present', () => {
-      const { container } = render(
-        <Advice
-          
-          adviceData={mockAdviceData}
-          isLoading={false}
-        />
-      );
+      render(<Advice adviceData={mockAdviceData} isLoading={false} />);
 
       // Check that factors are rendered (they're in a container div)
       expect(screen.getByTestId('advice-factor-sleep')).toBeInTheDocument();
@@ -287,16 +220,12 @@ describe('Advice Component - Partial Polling', () => {
         },
       };
 
-      render(
-        <Advice
-          
-          adviceData={singleFactorAdvice}
-          isLoading={false}
-        />
-      );
+      render(<Advice adviceData={singleFactorAdvice} isLoading={false} />);
 
       expect(screen.getByTestId('advice-factor-sleep')).toBeInTheDocument();
-      expect(screen.queryByTestId('advice-factor-exercise')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('advice-factor-exercise')
+      ).not.toBeInTheDocument();
     });
 
     it('should handle many factors', () => {
@@ -311,19 +240,15 @@ describe('Advice Component - Partial Polling', () => {
         },
       };
 
-      render(
-        <Advice
-          
-          adviceData={manyFactorsAdvice}
-          isLoading={false}
-        />
-      );
+      render(<Advice adviceData={manyFactorsAdvice} isLoading={false} />);
 
       expect(screen.getByTestId('advice-factor-sleep')).toBeInTheDocument();
       expect(screen.getByTestId('advice-factor-exercise')).toBeInTheDocument();
       expect(screen.getByTestId('advice-factor-nutrition')).toBeInTheDocument();
       expect(screen.getByTestId('advice-factor-social')).toBeInTheDocument();
-      expect(screen.getByTestId('advice-factor-mindfulness')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('advice-factor-mindfulness')
+      ).toBeInTheDocument();
     });
   });
 });

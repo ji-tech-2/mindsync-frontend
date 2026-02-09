@@ -6,8 +6,11 @@
   box-sizing: border-box;
 }
 
-html, body, #root, .screening-wrapper {
-  font-family: 'Poppins', sans-serif;
+html,
+body,
+#root,
+.screening-wrapper {
+  font-family: Poppins, sans-serif;
   margin: 0;
   display: flex;
   justify-content: center;
@@ -26,15 +29,18 @@ html, body, #root, .screening-wrapper {
   border-radius: 30px;
   position: relative;
   z-index: 1;
-  background: linear-gradient(145deg, rgba(248, 243, 235, 0.95), rgba(245, 240, 232, 0.9));
+  background: linear-gradient(
+    145deg,
+    rgb(248 243 235 / 95%),
+    rgb(245 240 232 / 90%)
+  );
   backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.15),
-    0 8px 30px rgba(90, 124, 89, 0.1),
-    inset 0 1px 1px rgba(255, 255, 255, 0.9),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+    0 20px 60px rgb(0 0 0 / 15%),
+    0 8px 30px rgb(90 124 89 / 10%),
+    inset 0 1px 1px rgb(255 255 255 / 90%),
+    inset 0 -1px 1px rgb(0 0 0 / 5%);
+  border: 1px solid rgb(255 255 255 / 60%);
   color: #2d3748;
 }
 
@@ -57,14 +63,14 @@ html, body, #root, .screening-wrapper {
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 30px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: inset 0 2px 4px rgb(0 0 0 / 6%);
 }
 
 .progress-bar {
   height: 100%;
   background: linear-gradient(90deg, #5a7c59, #6b9b6a, #7db87c);
   border-radius: 10px;
-  box-shadow: 0 2px 15px rgba(90, 124, 89, 0.6);
+  box-shadow: 0 2px 15px rgb(90 124 89 / 60%);
 }
 
 .question-counter {
@@ -95,14 +101,14 @@ html, body, #root, .screening-wrapper {
   gap: 20px;
 }
 
-.input-container input[type="number"],
+.input-container input[type='number'],
 .input-container select {
   padding: 16px 20px;
   border: 2px solid #e2e8f0;
   border-radius: 12px;
   font-size: 1.05em;
-  font-family: 'Poppins', sans-serif;
-  background-color: #ffffff;
+  font-family: Poppins, sans-serif;
+  background-color: #fff;
   color: #2d3748;
   width: 100%;
   box-sizing: border-box;
@@ -110,21 +116,21 @@ html, body, #root, .screening-wrapper {
   cursor: pointer;
 }
 
-.input-container input[type="number"] {
+.input-container input[type='number'] {
   cursor: text;
 }
 
-.input-container input[type="number"]:focus,
+.input-container input[type='number']:focus,
 .input-container select:focus {
   border-color: #5a7c59;
   box-shadow:
-    0 0 0 3px rgba(90, 124, 89, 0.1),
-    0 4px 12px rgba(90, 124, 89, 0.15);
+    0 0 0 3px rgb(90 124 89 / 10%),
+    0 4px 12px rgb(90 124 89 / 15%);
   outline: none;
-  background-color: #ffffff;
+  background-color: #fff;
 }
 
-.input-container input[type="number"]::placeholder {
+.input-container input[type='number']::placeholder {
   color: #a0aec0;
   font-weight: 300;
 }
@@ -150,8 +156,8 @@ html, body, #root, .screening-wrapper {
 .input-container select.input-error:focus {
   border-color: #f56565;
   box-shadow:
-    0 0 0 3px rgba(252, 129, 129, 0.15),
-    0 4px 12px rgba(252, 129, 129, 0.2);
+    0 0 0 3px rgb(252 129 129 / 15%),
+    0 4px 12px rgb(252 129 129 / 20%);
 }
 
 .error-message {
@@ -162,8 +168,8 @@ html, body, #root, .screening-wrapper {
   font-size: 0.9em;
   font-weight: 500;
   box-shadow:
-    0 4px 12px rgba(252, 129, 129, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    0 4px 12px rgb(252 129 129 / 30%),
+    inset 0 1px 0 rgb(255 255 255 / 20%);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -181,25 +187,25 @@ html, body, #root, .screening-wrapper {
   padding: 16px 28px;
   font-size: 1.05em;
   font-weight: 600;
-  font-family: 'Poppins', sans-serif;
+  font-family: Poppins, sans-serif;
   border: none;
   border-radius: 12px;
   cursor: pointer;
 }
 
 .btn-back {
-  background: #ffffff;
+  background: #fff;
   color: #5a7c59;
   border: 2px solid #5a7c59;
-  box-shadow: 0 2px 8px rgba(90, 124, 89, 0.15);
+  box-shadow: 0 2px 8px rgb(90 124 89 / 15%);
 }
 
 .btn-next {
   background: linear-gradient(135deg, #5a7c59 0%, #6b9b6a 50%, #7db87c 100%);
   color: white;
   box-shadow:
-    0 8px 25px rgba(90, 124, 89, 0.4),
-    0 4px 15px rgba(0, 0, 0, 0.15);
+    0 8px 25px rgb(90 124 89 / 40%),
+    0 4px 15px rgb(0 0 0 / 15%);
 }
 
 .btn-next:disabled,
@@ -214,56 +220,69 @@ html, body, #root, .screening-wrapper {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .screening-container {
     max-width: 500px;
     padding: 40px 35px;
   }
+
   .screening-container h2 {
     font-size: 1.35em;
     min-height: 60px;
   }
-  .input-container input[type="number"],
+
+  .input-container input[type='number'],
   .input-container select {
     padding: 15px 18px;
   }
 }
 
-@media (max-width: 480px) {
-  html, body, #root, .screening-wrapper {
+@media (width <= 480px) {
+  html,
+  body,
+  #root,
+  .screening-wrapper {
     padding: 15px 0;
   }
+
   .screening-container {
     max-width: 100%;
     width: 95%;
     padding: 35px 25px;
     border-radius: 20px;
   }
+
   .screening-container h2 {
     font-size: 1.2em;
     margin-bottom: 25px;
     min-height: 55px;
   }
+
   .question-counter {
     font-size: 0.85em;
     margin-bottom: 15px;
   }
+
   .progress-bar-container {
     margin-bottom: 25px;
   }
+
   .input-container {
     gap: 16px;
   }
-  .input-container input[type="number"],
+
+  .input-container input[type='number'],
   .input-container select {
     padding: 14px 16px;
     font-size: 1em;
     border-radius: 10px;
   }
+
   .button-container {
     gap: 10px;
     margin-top: 25px;
   }
+
   .btn-back,
   .btn-next {
     padding: 14px 20px;
@@ -272,19 +291,22 @@ html, body, #root, .screening-wrapper {
   }
 }
 
-@media (max-width: 360px) {
+@media (width <= 360px) {
   .screening-container {
     padding: 30px 20px;
   }
+
   .screening-container h2 {
     font-size: 1.1em;
     min-height: 50px;
   }
-  .input-container input[type="number"],
+
+  .input-container input[type='number'],
   .input-container select {
     padding: 13px 15px;
     font-size: 0.95em;
   }
+
   .btn-back,
   .btn-next {
     padding: 13px 18px;
@@ -292,20 +314,23 @@ html, body, #root, .screening-wrapper {
   }
 }
 
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .screening-container {
     max-width: 600px;
     padding: 50px 45px;
   }
+
   .screening-container h2 {
     font-size: 1.65em;
     min-height: 70px;
   }
-  .input-container input[type="number"],
+
+  .input-container input[type='number'],
   .input-container select {
     padding: 17px 22px;
     font-size: 1.1em;
   }
+
   .btn-back,
   .btn-next {
     padding: 17px 32px;

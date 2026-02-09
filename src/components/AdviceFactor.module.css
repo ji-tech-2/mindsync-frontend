@@ -1,8 +1,8 @@
 .card {
-  background: #ffffff;
+  background: #fff;
   border-radius: 12px;
   margin-bottom: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
   overflow: hidden;
 }
 
@@ -12,7 +12,7 @@
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  background-color: #ffffff;
+  background-color: #fff;
 }
 
 .title {
@@ -31,7 +31,7 @@
 .content {
   padding: 20px 25px;
   border-top: 1px solid #edf2f7;
-  background-color: #ffffff;
+  background-color: #fff;
 }
 
 .list {

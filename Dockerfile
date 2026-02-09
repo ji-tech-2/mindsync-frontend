@@ -6,6 +6,8 @@ RUN npm install
 COPY . .
 
 FROM base AS test
+RUN npm run format:check
+RUN npm run lint
 RUN npm test
 
 FROM base AS build

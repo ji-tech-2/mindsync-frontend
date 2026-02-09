@@ -51,17 +51,21 @@ describe('Login Component', () => {
   describe('Form Rendering', () => {
     it('should render login form with all fields', () => {
       renderLogin();
-      
+
       expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /forgot password\?/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /login/i })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /forgot password\?/i })
+      ).toBeInTheDocument();
     });
 
     it('should render register link', () => {
       renderLogin();
-      
-      expect(screen.getByText('Don\'t have an account?')).toBeInTheDocument();
+
+      expect(screen.getByText("Don't have an account?")).toBeInTheDocument();
       expect(screen.getByText('Register here.')).toBeInTheDocument();
     });
   });
@@ -69,10 +73,10 @@ describe('Login Component', () => {
   describe('Form Validation', () => {
     it('should show error when email is empty', async () => {
       renderLogin();
-      
+
       const submitButton = screen.getByRole('button', { name: /login/i });
       fireEvent.click(submitButton);
-      
+
       await waitFor(() => {
         expect(screen.getByText('Email is required')).toBeInTheDocument();
       });
@@ -80,27 +84,29 @@ describe('Login Component', () => {
 
     it('should accept valid email format', async () => {
       renderLogin();
-      
+
       const emailInput = screen.getByPlaceholderText('Email');
       fireEvent.change(emailInput, { target: { value: 'valid@email.com' } });
-      
+
       const submitButton = screen.getByRole('button', { name: /login/i });
       fireEvent.click(submitButton);
-      
+
       // Email error should NOT be present when email is valid
-      const emailError = screen.queryByText(/Please enter a valid email address/i);
+      const emailError = screen.queryByText(
+        /Please enter a valid email address/i
+      );
       expect(emailError).not.toBeInTheDocument();
     });
 
     it('should show error when password is empty', async () => {
       renderLogin();
-      
+
       const emailInput = screen.getByPlaceholderText('Email');
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-      
+
       const submitButton = screen.getByRole('button', { name: /login/i });
       fireEvent.click(submitButton);
-      
+
       await waitFor(() => {
         expect(screen.getByText('Password is required')).toBeInTheDocument();
       });
@@ -108,34 +114,36 @@ describe('Login Component', () => {
 
     it('should show error when password is too short', async () => {
       renderLogin();
-      
+
       const emailInput = screen.getByPlaceholderText('Email');
       const passwordInput = screen.getByPlaceholderText('Password');
-      
+
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: '12345' } });
-      
+
       const submitButton = screen.getByRole('button', { name: /login/i });
       fireEvent.click(submitButton);
-      
+
       await waitFor(() => {
-        expect(screen.getByText('Password must be at least 6 characters')).toBeInTheDocument();
+        expect(
+          screen.getByText('Password must be at least 6 characters')
+        ).toBeInTheDocument();
       });
     });
 
     it('should clear error when user starts typing', async () => {
       renderLogin();
-      
+
       const submitButton = screen.getByRole('button', { name: /login/i });
       fireEvent.click(submitButton);
-      
+
       await waitFor(() => {
         expect(screen.getByText('Email is required')).toBeInTheDocument();
       });
-      
+
       const emailInput = screen.getByPlaceholderText('Email');
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-      
+
       await waitFor(() => {
         expect(screen.queryByText('Email is required')).not.toBeInTheDocument();
       });
@@ -148,31 +156,31 @@ describe('Login Component', () => {
         success: true,
         token: 'fake-jwt-token',
         type: 'Bearer',
-        user: { 
+        user: {
           email: 'test@example.com',
           name: 'Test User',
-          userId: 1
-        }
+          userId: 1,
+        },
       };
-      
+
       apiClient.post.mockResolvedValue({ data: mockResponse });
-      
+
       renderLogin();
-      
+
       const emailInput = screen.getByPlaceholderText('Email');
       const passwordInput = screen.getByPlaceholderText('Password');
-      
+
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
-      
+
       const submitButton = screen.getByRole('button', { name: /login/i });
       fireEvent.click(submitButton);
-      
+
       await waitFor(() => {
-        expect(apiClient.post).toHaveBeenCalledWith(
-          '/v0-1/auth-login',
-          { email: 'test@example.com', password: 'password123' }
-        );
+        expect(apiClient.post).toHaveBeenCalledWith('/v0-1/auth-login', {
+          email: 'test@example.com',
+          password: 'password123',
+        });
       });
     });
 
@@ -181,75 +189,77 @@ describe('Login Component', () => {
         success: true,
         token: 'fake-jwt-token',
         type: 'Bearer',
-        user: { 
+        user: {
           email: 'test@example.com',
           name: 'Test User',
-          userId: 1
-        }
+          userId: 1,
+        },
       };
-      
+
       apiClient.post.mockResolvedValue({ data: mockResponse });
-      
+
       renderLogin();
-      
+
       const emailInput = screen.getByPlaceholderText('Email');
       const passwordInput = screen.getByPlaceholderText('Password');
-      
+
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
-      
+
       const submitButton = screen.getByRole('button', { name: /login/i });
       fireEvent.click(submitButton);
-      
+
       await waitFor(() => {
         expect(screen.getByText('Login successful!')).toBeInTheDocument();
       });
-      
+
       // Verify navigation
-      expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true });
+      expect(mockNavigate).toHaveBeenCalledWith('/dashboard', {
+        replace: true,
+      });
     });
 
     it('should handle login failure response', async () => {
       apiClient.post.mockResolvedValue({
         data: {
           success: false,
-          message: 'Invalid credentials'
-        }
+          message: 'Invalid credentials',
+        },
       });
-      
+
       renderLogin();
-      
+
       const emailInput = screen.getByPlaceholderText('Email');
       const passwordInput = screen.getByPlaceholderText('Password');
-      
+
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } });
-      
+
       const submitButton = screen.getByRole('button', { name: /login/i });
       fireEvent.click(submitButton);
-      
+
       await waitFor(() => {
         expect(screen.getByText('Invalid credentials')).toBeInTheDocument();
       });
-      
+
       // Verify no navigation
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
     it('should handle network error', async () => {
       apiClient.post.mockRejectedValue(new Error('Network error'));
-      
+
       renderLogin();
-      
+
       const emailInput = screen.getByPlaceholderText('Email');
       const passwordInput = screen.getByPlaceholderText('Password');
-      
+
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
-      
+
       const submitButton = screen.getByRole('button', { name: /login/i });
       fireEvent.click(submitButton);
-      
+
       await waitFor(() => {
         expect(screen.getByText('Server error occurred')).toBeInTheDocument();
       });
@@ -258,19 +268,21 @@ describe('Login Component', () => {
 
   describe('Loading State', () => {
     it('should show loading state during submission', async () => {
-      apiClient.post.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
-      
+      apiClient.post.mockImplementation(
+        () => new Promise((resolve) => setTimeout(resolve, 100))
+      );
+
       renderLogin();
-      
+
       const emailInput = screen.getByPlaceholderText('Email');
       const passwordInput = screen.getByPlaceholderText('Password');
-      
+
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
-      
+
       const submitButton = screen.getByRole('button', { name: /login/i });
       fireEvent.click(submitButton);
-      
+
       expect(screen.getByRole('button', { name: /loading/i })).toBeDisabled();
     });
   });
@@ -278,19 +290,21 @@ describe('Login Component', () => {
   describe('Navigation', () => {
     it('should navigate to register page when clicking register link', () => {
       renderLogin();
-      
+
       const registerButton = screen.getByText('Register here.');
       fireEvent.click(registerButton);
-      
+
       expect(mockNavigate).toHaveBeenCalledWith('/register');
     });
 
     it('should navigate to forgot password page when clicking the button', () => {
       renderLogin();
-      
-      const forgotPasswordButton = screen.getByRole('button', { name: /forgot password\?/i });
+
+      const forgotPasswordButton = screen.getByRole('button', {
+        name: /forgot password\?/i,
+      });
       fireEvent.click(forgotPasswordButton);
-      
+
       expect(mockNavigate).toHaveBeenCalledWith('/forgot-password');
     });
   });

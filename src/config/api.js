@@ -16,50 +16,49 @@
  * - HttpOnly cookies support (when backend implements it)
  */
 
-import axios from "axios";
+import axios from 'axios';
 
 export const API_CONFIG = {
   // Base URL for the API
   // In development: uses Vite proxy (/api) to bypass CORS
   // In production: uses direct URL
-  BASE_URL: import.meta.env.DEV ? "/api" : "http://139.59.109.5:8000",  
-  
+  BASE_URL: import.meta.env.DEV ? '/api' : 'http://139.59.109.5:8000',
+
   // Authentication endpoints
-  AUTH_LOGIN: "/v0-1/auth-login",
-  AUTH_REGISTER: "/v0-1/auth-register",
+  AUTH_LOGIN: '/v0-1/auth-login',
+  AUTH_REGISTER: '/v0-1/auth-register',
 
   // Profile endpoints
-  PROFILE: "/v0-1/auth-profile",
-  PROFILE_REQUEST_OTP: "/v0-1/auth-profile/request-otp",
-  PROFILE_CHANGE_PASSWORD: "/v0-1/auth-profile/change-password",
+  PROFILE: '/v0-1/auth-profile',
+  PROFILE_REQUEST_OTP: '/v0-1/auth-profile/request-otp',
+  PROFILE_CHANGE_PASSWORD: '/v0-1/auth-profile/change-password',
 
   // Prediction endpoint (working)
-  PREDICT_ENDPOINT: "/v0-1/model-predict",
+  PREDICT_ENDPOINT: '/v0-1/model-predict',
 
   // Result polling endpoint
   // ✅ Configured endpoint: /v0-1/model-result/{id}
-  RESULT_ENDPOINT: "/v0-1/model-result",
+  RESULT_ENDPOINT: '/v0-1/model-result',
 
   // Advice endpoint
-  ADVICE_ENDPOINT: "/v0-1/model-advice",
-  
+  ADVICE_ENDPOINT: '/v0-1/model-advice',
+
   // Screening history endpoint
   // TODO: Configure Kong Gateway route: GET /v0-1/model-screening-history → Flask /screening-history
-  SCREENING_HISTORY_ENDPOINT: "/v0-1/model-history",
-  
+  SCREENING_HISTORY_ENDPOINT: '/v0-1/model-history',
+
   // Weekly chart endpoint
   // Kong route: /v0-1/model-weekly-chart/{user_id} → Flask /chart/weekly?user_id={user_id}
-  WEEKLY_CHART_ENDPOINT: "/v0-1/model-weekly-chart",
-  
+  WEEKLY_CHART_ENDPOINT: '/v0-1/model-weekly-chart',
 
   // Streak endpoint
-  STREAK_ENDPOINT: "/v0-1/model-streak",
+  STREAK_ENDPOINT: '/v0-1/model-streak',
 
   // Weekly critical factors endpoint
-  WEEKLY_CRITICAL_FACTORS: "/v0-1/model-critical-factors",
+  WEEKLY_CRITICAL_FACTORS: '/v0-1/model-critical-factors',
 
   // Daily suggestion endpoint
-  DAILY_SUGGESTION: "/v0-1/model-daily-suggestion",
+  DAILY_SUGGESTION: '/v0-1/model-daily-suggestion',
 
   // Polling configuration
   POLLING: {
@@ -78,8 +77,8 @@ export const API_CONFIG = {
 let authToken = null;
 let userData = null;
 
-const TOKEN_KEY = "auth_token";
-const USER_DATA_KEY = "user_data";
+const TOKEN_KEY = 'auth_token';
+const USER_DATA_KEY = 'user_data';
 
 export const TokenManager = {
   // Set token after successful login/register
@@ -144,7 +143,7 @@ export const TokenManager = {
         userData = JSON.parse(storedData);
         return userData;
       } catch (e) {
-        console.error("Failed to parse user data:", e);
+        console.error('Failed to parse user data:', e);
         return null;
       }
     }
@@ -163,7 +162,7 @@ export const TokenManager = {
 const apiClient = axios.create({
   baseURL: API_CONFIG.BASE_URL,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
   withCredentials: true, // Enable cookies for HttpOnly cookie support
 });
@@ -182,7 +181,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  },
+  }
 );
 
 // Response Interceptor: Handle token refresh and errors
@@ -194,7 +193,7 @@ apiClient.interceptors.response.use(
     // Handle 401 Unauthorized - token expired or invalid
     if (error.response?.status === 401) {
       // Don't clear token if already on login/register page
-      const publicPaths = ["/signIn", "/register", "/"];
+      const publicPaths = ['/signIn', '/register', '/'];
       const currentPath = window.location.pathname;
 
       if (!publicPaths.includes(currentPath)) {
@@ -205,7 +204,7 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export default apiClient;
@@ -218,14 +217,18 @@ export function getApiUrl(endpoint) {
 // Specific API URLs
 export const API_URLS = {
   predict: getApiUrl(API_CONFIG.PREDICT_ENDPOINT),
-  result: (predictionId) => getApiUrl(`${API_CONFIG.RESULT_ENDPOINT}/${predictionId}`),
+  result: (predictionId) =>
+    getApiUrl(`${API_CONFIG.RESULT_ENDPOINT}/${predictionId}`),
   advice: getApiUrl(API_CONFIG.ADVICE_ENDPOINT),
-  screeningHistory: (userId) => getApiUrl(`${API_CONFIG.SCREENING_HISTORY_ENDPOINT}/${userId}`),
-  weeklyChart: (userId) => getApiUrl(`${API_CONFIG.WEEKLY_CHART_ENDPOINT}/${userId}`),
-  streak: (userId) =>
-    getApiUrl(`${API_CONFIG.STREAK_ENDPOINT}/${userId}`),
+  screeningHistory: (userId) =>
+    getApiUrl(`${API_CONFIG.SCREENING_HISTORY_ENDPOINT}/${userId}`),
+  weeklyChart: (userId) =>
+    getApiUrl(`${API_CONFIG.WEEKLY_CHART_ENDPOINT}/${userId}`),
+  streak: (userId) => getApiUrl(`${API_CONFIG.STREAK_ENDPOINT}/${userId}`),
   weeklyCriticalFactors: (userId, days = 7) =>
-    getApiUrl(`${API_CONFIG.WEEKLY_CRITICAL_FACTORS}?user_id=${userId}&days=${days}`),
+    getApiUrl(
+      `${API_CONFIG.WEEKLY_CRITICAL_FACTORS}?user_id=${userId}&days=${days}`
+    ),
   dailySuggestion: (userId) =>
     getApiUrl(`${API_CONFIG.DAILY_SUGGESTION}?user_id=${userId}`),
 };
@@ -241,29 +244,29 @@ export const API_URLS = {
  * @param {number} offset - Pagination offset (default: 0)
  * @returns {Promise} - Array of screening history
  */
-export async function fetchScreeningHistory(userId, limit = 50, offset = 0) {
+export async function fetchScreeningHistory(userId) {
   try {
     // Kong strips /v0-1/model-history, Flask expects /history/<user_id>
     const url = `${API_CONFIG.SCREENING_HISTORY_ENDPOINT}/${userId}`;
     const response = await apiClient.get(url);
-    
+
     if (response.data.status === 'success') {
       return {
         success: true,
         data: response.data.data,
-        total: response.data.total
+        total: response.data.total,
       };
     } else {
       return {
         success: false,
-        error: response.data.message || 'Failed to fetch history'
+        error: response.data.message || 'Failed to fetch history',
       };
     }
   } catch (error) {
     console.error('Error fetching screening history:', error);
     return {
       success: false,
-      error: error.response?.data?.message || error.message || 'Network error'
+      error: error.response?.data?.message || error.message || 'Network error',
     };
   }
 }
@@ -279,7 +282,7 @@ export function buildWeeklyChartFromHistory(historyItems) {
 
   // Group clamped scores by date
   const scoresByDate = {};
-  historyItems.forEach(item => {
+  historyItems.forEach((item) => {
     const d = new Date(item.created_at || item.date);
     const key = d.toISOString().split('T')[0];
     const raw = item.prediction_score ?? item.score ?? 0;
@@ -315,36 +318,36 @@ export async function fetchWeeklyChart(userId) {
     // Kong expects path param: /v0-1/model-weekly-chart/{userId}
     // Kong converts to query param for Flask: /chart/weekly?user_id={userId}
     const url = `${API_CONFIG.WEEKLY_CHART_ENDPOINT}/${userId}`;
-    console.log("📡 Fetching weekly chart from:", url);
+    console.log('📡 Fetching weekly chart from:', url);
     const response = await apiClient.get(url);
-    console.log("📡 Weekly chart raw response:", response.data);
-    
+    console.log('📡 Weekly chart raw response:', response.data);
+
     if (response.data.status === 'success') {
       // Map Flask fields to WeeklyChart component format
       // Flask: { label, date, mental_health_index, ... }
       // WeeklyChart: { day, date, value }
-      const mappedData = response.data.data.map(item => ({
+      const mappedData = response.data.data.map((item) => ({
         day: item.label,
         date: item.date,
-        value: Math.max(0, item.mental_health_index ?? 0)
+        value: Math.max(0, item.mental_health_index ?? 0),
       }));
 
       return {
         success: true,
         data: mappedData,
-        days: mappedData.length
+        days: mappedData.length,
       };
     } else {
       return {
         success: false,
-        error: response.data.message || 'Failed to fetch chart data'
+        error: response.data.message || 'Failed to fetch chart data',
       };
     }
   } catch (error) {
     console.error('Error fetching weekly chart:', error);
     return {
       success: false,
-      error: error.response?.data?.message || error.message || 'Network error'
+      error: error.response?.data?.message || error.message || 'Network error',
     };
   }
 }

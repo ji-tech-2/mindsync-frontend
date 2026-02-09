@@ -5,13 +5,13 @@
  * Includes built-in error checking to ensure it's used within an AuthProvider.
  */
 
-import { useContext } from "react";
-import AuthContext from "../contexts/AuthContext";
+import { useContext } from 'react';
+import AuthContext from '../contexts/AuthContext';
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

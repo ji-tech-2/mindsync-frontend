@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import styles from "./StreakCard.module.css";
+import React, { useState } from 'react';
+import styles from './StreakCard.module.css';
 
 export default function StreakCard({ data, loading, error }) {
-  const [viewType, setViewType] = useState("daily");
+  const [viewType, setViewType] = useState('daily');
 
   // Loading state
   if (loading) {
@@ -47,22 +47,23 @@ export default function StreakCard({ data, loading, error }) {
   }
 
   // Data dari backend (predict.py)
-  const currentStreak = viewType === "daily" 
-    ? (data?.daily?.current || 0) 
-    : (data?.weekly?.current || 0);
-  
-  const unit = viewType === "daily" ? "days" : "weeks";
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const currentStreak =
+    viewType === 'daily'
+      ? data?.daily?.current || 0
+      : data?.weekly?.current || 0;
+
+  const unit = viewType === 'daily' ? 'days' : 'weeks';
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   // Logika untuk menentukan hari yang sudah "checked" di minggu ini
   const isDayCompleted = (index) => {
     // Gunakan data completed_days_this_week dari backend
     const completedDays = data?.completed_days_this_week || [];
-    
+
     if (completedDays.length === 0) return false;
 
     const now = new Date();
-    
+
     // Hitung awal minggu ini (Senin)
     const startOfWeek = new Date(now);
     const currentDay = now.getDay();
@@ -73,10 +74,10 @@ export default function StreakCard({ data, loading, error }) {
     // Buat tanggal untuk hari yang sedang dicek
     const checkDate = new Date(startOfWeek);
     checkDate.setDate(startOfWeek.getDate() + index);
-    
+
     // Format tanggal sebagai YYYY-MM-DD untuk dibandingkan dengan data backend
     const checkDateStr = checkDate.toISOString().split('T')[0];
-    
+
     // Check apakah tanggal ini ada dalam completed_days
     return completedDays.includes(checkDateStr);
   };
@@ -95,15 +96,15 @@ export default function StreakCard({ data, loading, error }) {
         </div>
 
         <div className={styles.toggleContainer}>
-          <button 
-            className={`${styles.toggleBtn} ${viewType === "daily" ? styles.activeToggle : ""}`}
-            onClick={() => setViewType("daily")}
+          <button
+            className={`${styles.toggleBtn} ${viewType === 'daily' ? styles.activeToggle : ''}`}
+            onClick={() => setViewType('daily')}
           >
             Daily
           </button>
-          <button 
-            className={`${styles.toggleBtn} ${viewType === "weekly" ? styles.activeToggle : ""}`}
-            onClick={() => setViewType("weekly")}
+          <button
+            className={`${styles.toggleBtn} ${viewType === 'weekly' ? styles.activeToggle : ''}`}
+            onClick={() => setViewType('weekly')}
           >
             Weekly
           </button>
@@ -113,8 +114,10 @@ export default function StreakCard({ data, loading, error }) {
       <div className={styles.daysRow}>
         {days.map((day, index) => (
           <div key={day} className={styles.dayItem}>
-            <div className={`${styles.dayCircle} ${isDayCompleted(index) ? styles.completed : ""}`}>
-              {isDayCompleted(index) ? "✓" : ""}
+            <div
+              className={`${styles.dayCircle} ${isDayCompleted(index) ? styles.completed : ''}`}
+            >
+              {isDayCompleted(index) ? '✓' : ''}
             </div>
             <span className={styles.dayName}>{day}</span>
           </div>

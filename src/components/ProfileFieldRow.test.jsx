@@ -7,11 +7,7 @@ describe('ProfileFieldRow Component', () => {
 
   it('should render label and value correctly', () => {
     render(
-      <ProfileFieldRow
-        label="Name"
-        value="John Doe"
-        onEdit={mockOnEdit}
-      />
+      <ProfileFieldRow label="Name" value="John Doe" onEdit={mockOnEdit} />
     );
 
     expect(screen.getByText('Name')).toBeInTheDocument();
@@ -44,13 +40,7 @@ describe('ProfileFieldRow Component', () => {
   });
 
   it('should call onEdit when button clicked', () => {
-    render(
-      <ProfileFieldRow
-        label="Gender"
-        value="Male"
-        onEdit={mockOnEdit}
-      />
-    );
+    render(<ProfileFieldRow label="Gender" value="Male" onEdit={mockOnEdit} />);
 
     const editButton = screen.getByRole('button', { name: /edit/i });
     fireEvent.click(editButton);
@@ -74,11 +64,7 @@ describe('ProfileFieldRow Component', () => {
 
   it('should handle empty values', () => {
     render(
-      <ProfileFieldRow
-        label="Optional Field"
-        value=""
-        onEdit={mockOnEdit}
-      />
+      <ProfileFieldRow label="Optional Field" value="" onEdit={mockOnEdit} />
     );
 
     expect(screen.getByText('Optional Field')).toBeInTheDocument();

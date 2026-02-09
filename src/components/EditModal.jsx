@@ -5,27 +5,27 @@ export default function EditModal({
   onSubmit,
   loading,
   message,
-  children
+  children,
 }) {
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="modal-overlay" 
+    <div
+      className="modal-overlay"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
     >
-      <div 
-        className="modal-content" 
+      <div
+        className="modal-content"
         onClick={(e) => e.stopPropagation()}
         role="document"
       >
         <div className="modal-header">
           <h2 id="modal-title">{title}</h2>
-          <button 
-            className="close-btn" 
+          <button
+            className="close-btn"
             onClick={onClose}
             aria-label="Close modal"
             type="button"
@@ -36,21 +36,23 @@ export default function EditModal({
         <form onSubmit={onSubmit}>
           {children}
           {message.text && (
-            <div 
+            <div
               className={`message ${message.type}`}
-              role={message.type === "error" ? "alert" : "status"}
+              role={message.type === 'error' ? 'alert' : 'status'}
               aria-live="polite"
             >
               {message.text}
             </div>
           )}
-          <button 
-            type="submit" 
-            className="submit-btn" 
+          <button
+            type="submit"
+            className="submit-btn"
             disabled={loading}
             aria-busy={loading}
           >
-            {loading ? "Updating..." : `Update ${title.replace('Edit ', '').replace('Change ', '')}`}
+            {loading
+              ? 'Updating...'
+              : `Update ${title.replace('Edit ', '').replace('Change ', '')}`}
           </button>
         </form>
       </div>

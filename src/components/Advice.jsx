@@ -17,9 +17,7 @@ const Advice = ({ adviceData, isLoading }) => {
       <h2>Advice</h2>
       {adviceData ? (
         <>
-          <p>
-            {adviceData.description}
-          </p>
+          <p>{adviceData.description}</p>
           <div className={styles.adviceFactors}>
             {Object.entries(adviceData.factors || {}).map(([key, value]) => (
               <AdviceFactor key={key} factorKey={key} factorData={value} />

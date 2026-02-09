@@ -1,13 +1,19 @@
 /**
  * AuthContext - Global Authentication State Management
- * 
+ *
  * Enterprise-grade authentication state management with graceful logout.
  * - Manages user state and authentication status
  * - Provides login/logout methods
  * - Prevents redirect flash during logout
  */
 
-import React, { createContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TokenManager } from '../config/api';
 
@@ -19,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  
+
   const navigate = useNavigate();
   const logoutTimeoutRef = useRef(null);
 
@@ -33,13 +39,17 @@ export const AuthProvider = ({ children }) => {
         // Ensure user has userId field
         const normalizedUser = {
           ...userData,
-          userId: userData.userId || userData.id || userData.user_id || `temp_${Date.now()}`
+          userId:
+            userData.userId ||
+            userData.id ||
+            userData.user_id ||
+            `temp_${Date.now()}`,
         };
         setUser(normalizedUser);
       } else {
         setUser(null);
       }
-      
+
       setIsLoading(false);
     };
 
@@ -61,9 +71,13 @@ export const AuthProvider = ({ children }) => {
     const normalizedUser = {
       ...userData,
       // If userId doesn't exist, try id, or generate a temporary one
-      userId: userData.userId || userData.id || userData.user_id || `temp_${Date.now()}`
+      userId:
+        userData.userId ||
+        userData.id ||
+        userData.user_id ||
+        `temp_${Date.now()}`,
     };
-    
+
     TokenManager.setToken(token);
     TokenManager.setUserData(normalizedUser);
     setUser(normalizedUser);
@@ -98,7 +112,7 @@ export const AuthProvider = ({ children }) => {
 
   // Update user data
   const updateUser = useCallback((userData) => {
-      // Merge with existing stored user data to avoid dropping fields/identifiers
+    // Merge with existing stored user data to avoid dropping fields/identifiers
     const existingUserData = TokenManager.getUserData() || {};
     const mergedUser = {
       ...existingUserData,

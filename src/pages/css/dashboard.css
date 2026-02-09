@@ -1,9 +1,12 @@
-﻿/* ======================================= */
-/* Mental Wellness Advisor - Dashboard */
-/* Interactive & Engaging Design */
 /* ======================================= */
 
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+/* Mental Wellness Advisor - Dashboard */
+
+/* Interactive & Engaging Design */
+
+/* ======================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 * {
   margin: 0;
@@ -16,44 +19,43 @@ html {
 }
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: Poppins, sans-serif;
   margin: 0;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  
+
   /* Earth tone gradient background */
   background: linear-gradient(135deg, #f5f0e8 0%, #e8dcc8 50%, #d4c4a8 100%);
 }
 
-
-
 /* ======================================= */
+
 /* Dashboard Container */
+
 /* ======================================= */
 
 .dashboard-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0px 20px 40px;
+  padding: 0 20px 40px;
   position: relative;
   z-index: 1;
 }
 
 /* ======================================= */
+
 /* Header Section - Full Width */
+
 /* ======================================= */
 
 .dashboard-header-full {
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
   padding: 60px 20px;
   background: linear-gradient(135deg, #5a7c59 0%, #6b9b6a 50%, #7db87c 100%);
-  box-shadow: 
-    0 10px 40px rgba(90, 124, 89, 0.3),
-    0 4px 20px rgba(0, 0, 0, 0.15),
-    inset 0 -2px 10px rgba(255, 255, 255, 0.1);
-  position: relative;
+  box-shadow:
+    0 10px 40px rgb(90 124 89 / 30%),
+    0 4px 20px rgb(0 0 0 / 15%),
+    inset 0 -2px 10px rgb(255 255 255 / 10%);
   margin-bottom: 40px;
   position: relative;
   left: 50%;
@@ -76,12 +78,12 @@ body {
 .dashboard-greeting {
   font-size: 3em;
   font-weight: 700;
-  color: #ffffff;
+  color: #fff;
   margin: 0;
-  text-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.2),
-    0 2px 10px rgba(90, 124, 89, 0.4),
-    2px 2px 0px rgba(0, 0, 0, 0.1);
+  text-shadow:
+    0 4px 20px rgb(0 0 0 / 20%),
+    0 2px 10px rgb(90 124 89 / 40%),
+    2px 2px 0 rgb(0 0 0 / 10%);
   position: relative;
   display: inline-block;
 }
@@ -94,8 +96,8 @@ body {
 
 .dashboard-subtitle {
   font-size: 1.2em;
-  color: rgba(255, 255, 255, 0.9);
-  margin: 0 0 1.5rem 0;
+  color: rgb(255 255 255 / 90%);
+  margin: 0 0 1.5rem;
   font-weight: 400;
 }
 
@@ -103,20 +105,22 @@ body {
   padding: 18px 45px;
   font-size: 1.1em;
   font-weight: 600;
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(145deg, #ffffff, #f5f0e8);
+  font-family: Poppins, sans-serif;
+  background: linear-gradient(145deg, #fff, #f5f0e8);
   color: #5a7c59;
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border: 2px solid rgb(255 255 255 / 50%);
   border-radius: 50px;
   cursor: pointer;
-  box-shadow: 
-    0 8px 25px rgba(90, 124, 89, 0.3),
-    0 4px 15px rgba(0, 0, 0, 0.1),
-    inset 0 -2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 8px 25px rgb(90 124 89 / 30%),
+    0 4px 15px rgb(0 0 0 / 10%),
+    inset 0 -2px 5px rgb(0 0 0 / 5%);
 }
 
 /* ======================================= */
+
 /* Dashboard Content & Cards */
+
 /* ======================================= */
 
 .dashboard-content {
@@ -147,11 +151,11 @@ body {
   background: linear-gradient(145deg, #f8f3eb, #f5f0e8);
   border-radius: 20px;
   padding: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 
-    0 10px 35px rgba(0, 0, 0, 0.1),
-    0 4px 15px rgba(90, 124, 89, 0.08),
-    inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  border: 1px solid rgb(255 255 255 / 50%);
+  box-shadow:
+    0 10px 35px rgb(0 0 0 / 10%),
+    0 4px 15px rgb(90 124 89 / 8%),
+    inset 0 1px 1px rgb(255 255 255 / 80%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -243,7 +247,7 @@ body {
   line-height: 1.5;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .cards-upper-section {
     grid-template-columns: 1fr;
     height: auto;
@@ -267,14 +271,13 @@ body {
   background: #f5f0e8;
   backdrop-filter: blur(20px);
   border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 10%);
 }
 
 .welcome-section h1 {
   font-size: 2.5em;
   font-weight: 700;
   background: linear-gradient(135deg, #5a7c59 0%, #8b6f47 100%);
-  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 8px;
@@ -289,7 +292,6 @@ body {
 .welcome-section p span {
   font-weight: 600;
   background: linear-gradient(135deg, #5a7c59 0%, #8b6f47 100%);
-  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -298,17 +300,19 @@ body {
   padding: 12px 28px;
   font-size: 1em;
   font-weight: 600;
-  font-family: "Poppins", sans-serif;
+  font-family: Poppins, sans-serif;
   background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
   color: white;
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(252, 129, 129, 0.3);
+  box-shadow: 0 4px 15px rgb(252 129 129 / 30%);
 }
 
 /* ======================================= */
+
 /* Stats Cards */
+
 /* ======================================= */
 
 .stats-grid {
@@ -319,21 +323,25 @@ body {
 }
 
 .stat-card {
-  background: linear-gradient(135deg, rgba(248, 243, 235, 0.95), rgba(245, 240, 232, 0.9));
+  background: linear-gradient(
+    135deg,
+    rgb(248 243 235 / 95%),
+    rgb(245 240 232 / 90%)
+  );
   padding: 25px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgb(255 255 255 / 60%);
   border-radius: 20px;
-  box-shadow: 
-    0 8px 30px rgba(0, 0, 0, 0.1),
-    0 4px 15px rgba(90, 124, 89, 0.08),
-    inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 8px 30px rgb(0 0 0 / 10%),
+    0 4px 15px rgb(90 124 89 / 8%),
+    inset 0 1px 1px rgb(255 255 255 / 80%);
   position: relative;
   cursor: pointer;
   overflow: hidden;
 }
 
 .stat-card::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -353,9 +361,9 @@ body {
   margin-bottom: 15px;
   background: linear-gradient(135deg, #5a7c59 0%, #6b9b6a 50%, #7db87c 100%);
   color: white;
-  box-shadow: 
-    0 8px 20px rgba(90, 124, 89, 0.4),
-    0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 8px 20px rgb(90 124 89 / 40%),
+    0 4px 10px rgb(0 0 0 / 20%);
 }
 
 .stat-card h3 {
@@ -372,7 +380,9 @@ body {
 }
 
 /* ======================================= */
+
 /* Quick Actions */
+
 /* ======================================= */
 
 .quick-actions {
@@ -384,7 +394,7 @@ body {
   font-weight: 700;
   color: white;
   margin-bottom: 20px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 2px 10px rgb(0 0 0 / 10%);
 }
 
 .actions-grid {
@@ -394,13 +404,14 @@ body {
 }
 
 .action-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgb(255 255 255 / 95%);
   padding: 25px 20px;
   border-radius: 16px;
   text-align: center;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 15px rgb(0 0 0 / 8%);
   border: 2px solid transparent;
+  margin-bottom: 0;
 }
 
 .action-icon {
@@ -430,7 +441,9 @@ body {
 }
 
 /* ======================================= */
+
 /* Recent Activity */
+
 /* ======================================= */
 
 .recent-activity {
@@ -438,14 +451,13 @@ body {
   backdrop-filter: blur(20px);
   padding: 30px;
   border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 10%);
 }
 
 .recent-activity h2 {
   font-size: 1.8em;
   font-weight: 700;
   background: linear-gradient(135deg, #5a7c59 0%, #8b6f47 100%);
-  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 20px;
@@ -492,20 +504,22 @@ body {
 }
 
 .cards-lower-section.full-width-layout {
-  grid-template-columns: 1fr; 
+  grid-template-columns: 1fr;
 }
 
 .cards-lower-section.full-width-layout > div {
-  max-width: 100% !important; 
+  max-width: 100% !important;
   width: 100%;
 }
 
 /* ======================================= */
+
 /* Responsiveness */
+
 /* ======================================= */
 
 /* Tablet */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .dashboard-container {
     padding: 30px 15px;
   }
@@ -530,7 +544,7 @@ body {
 }
 
 /* Mobile */
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .dashboard-header {
     padding: 20px;
   }
@@ -571,26 +585,24 @@ body {
   grid-template-columns: repeat(2, 1fr);
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .actions-grid.two-columns {
     grid-template-columns: 1fr;
     max-width: 100%;
   }
 }
 
-.action-card {
-    margin-bottom: 0;
-}
-
 /* ======================================= */
+
 /* Chart Section */
+
 /* ======================================= */
 
 .chart-section {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgb(255 255 255 / 95%);
   backdrop-filter: blur(20px);
   padding: 30px;
   border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 10%);
   margin-bottom: 40px;
 }

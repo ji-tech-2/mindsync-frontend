@@ -84,12 +84,7 @@ describe('FormInput Component', () => {
 
   it('should call onChange when value changes', () => {
     render(
-      <FormInput
-        label="Name"
-        name="name"
-        value=""
-        onChange={mockOnChange}
-      />
+      <FormInput label="Name" name="name" value="" onChange={mockOnChange} />
     );
 
     const input = screen.getByRole('textbox');
@@ -138,17 +133,14 @@ describe('FormInput Component', () => {
       />
     );
 
-    expect(screen.getByPlaceholderText('Enter your full name')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Enter your full name')
+    ).toBeInTheDocument();
   });
 
   it('should have proper CSS classes', () => {
     const { container } = render(
-      <FormInput
-        label="Test"
-        name="test"
-        value=""
-        onChange={mockOnChange}
-      />
+      <FormInput label="Test" name="test" value="" onChange={mockOnChange} />
     );
 
     expect(container.querySelector('.form-group')).toBeInTheDocument();

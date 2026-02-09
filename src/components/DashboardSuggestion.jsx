@@ -26,12 +26,18 @@ const DashboardSuggestion = ({ data, loading }) => {
     <div className={styles.suggestionContainer}>
       {isArray ? (
         <ul className={styles.suggestionList}>
-          {data.map((item, index) => <li key={index} className={styles.suggestionItem}>{item}</li>)}
+          {data.map((item, index) => (
+            <li key={index} className={styles.suggestionItem}>
+              {item}
+            </li>
+          ))}
         </ul>
       ) : isObject ? (
         <ul className={styles.suggestionList}>
           {Object.values(data).map((item, index) => (
-            <li key={index} className={styles.suggestionItem}>{item}</li>
+            <li key={index} className={styles.suggestionItem}>
+              {item}
+            </li>
           ))}
         </ul>
       ) : (

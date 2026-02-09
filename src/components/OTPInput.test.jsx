@@ -36,7 +36,9 @@ describe('OTPInput Component', () => {
       />
     );
 
-    expect(screen.getByRole('button', { name: /send otp/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /send otp/i })
+    ).toBeInTheDocument();
   });
 
   it('should display OTP Code label', () => {
