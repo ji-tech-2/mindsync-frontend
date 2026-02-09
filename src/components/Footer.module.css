@@ -5,8 +5,8 @@
   margin-top: auto;
   width: 100%;
   box-shadow:
-    0 -4px 20px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    0 -4px 20px rgb(0 0 0 / 10%),
+    inset 0 1px 0 rgb(255 255 255 / 30%);
 }
 
 .container {
@@ -34,10 +34,10 @@
   border-radius: 50%;
   background: linear-gradient(
     135deg,
-    rgba(245, 240, 232, 0.8),
-    rgba(232, 220, 200, 0.8)
+    rgb(245 240 232 / 80%),
+    rgb(232 220 200 / 80%)
   );
-  box-shadow: 0 4px 12px rgba(90, 124, 89, 0.2);
+  box-shadow: 0 4px 12px rgb(90 124 89 / 20%);
   text-decoration: none;
 }
 

@@ -4,8 +4,8 @@
   box-sizing: border-box;
   background-color: #f5f2e8;
   border-radius: 24px;
-  padding: 50px 54px 10px 54px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  padding: 50px 54px 10px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 5%);
 }
 
 .header {
@@ -42,7 +42,7 @@
 .label {
   color: #777;
   font-weight: 500;
-  margin: 4px 0 0 0;
+  margin: 4px 0 0;
 }
 
 .toggleContainer {
@@ -79,7 +79,6 @@
 
 .dayItem {
   display: flex;
-  flex-col: column;
   flex-direction: column;
   align-items: center;
   gap: 8px;
@@ -163,9 +162,9 @@
   font-size: 14px;
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .container {
-    padding: 30px 30px 30px 30px;
+    padding: 30px;
   }
 
   .header {

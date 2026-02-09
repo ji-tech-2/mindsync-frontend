@@ -42,18 +42,19 @@
   text-align: center;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .suggestionContainer {
     padding: 10px 15px;
     height: auto;
     max-height: 350px;
   }
+
   .text {
     font-size: 0.95rem;
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .suggestionContainer {
     padding: 10px 12px;
     height: auto;

@@ -1,5 +1,7 @@
 /* ======================================= */
+
 /* Profile Settings Page */
+
 /* ======================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
@@ -8,7 +10,7 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f0e8 0%, #e8dcc8 50%, #d4c4a8 100%);
   padding: 2rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: Poppins, sans-serif;
 }
 
 .profile-header {
@@ -18,7 +20,7 @@
 }
 
 .back-button {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgb(255 255 255 / 20%);
   border: none;
   color: white;
   padding: 0.75rem 1.5rem;
@@ -48,16 +50,16 @@
 .profile-card {
   background: linear-gradient(
     145deg,
-    rgba(248, 243, 235, 0.95),
-    rgba(245, 240, 232, 0.9)
+    rgb(248 243 235 / 95%),
+    rgb(245 240 232 / 90%)
   );
   border-radius: 25px;
   padding: 3rem;
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgb(255 255 255 / 60%);
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.15),
-    0 8px 30px rgba(90, 124, 89, 0.1),
-    inset 0 1px 1px rgba(255, 255, 255, 0.9);
+    0 20px 60px rgb(0 0 0 / 15%),
+    0 8px 30px rgb(90 124 89 / 10%),
+    inset 0 1px 1px rgb(255 255 255 / 90%);
   position: relative;
   overflow: hidden;
 }
@@ -78,7 +80,7 @@
   font-size: 1rem;
   color: white;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(90, 124, 89, 0.3);
+  box-shadow: 0 2px 8px rgb(90 124 89 / 30%);
   cursor: pointer;
 }
 
@@ -93,7 +95,7 @@
   font-size: 2rem;
   color: white;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(90, 124, 89, 0.3);
+  box-shadow: 0 4px 12px rgb(90 124 89 / 30%);
   cursor: pointer;
 }
 
@@ -109,8 +111,8 @@
   color: white;
   font-weight: 700;
   box-shadow:
-    0 10px 30px rgba(90, 124, 89, 0.4),
-    0 0 40px rgba(125, 184, 124, 0.3);
+    0 10px 30px rgb(90 124 89 / 40%),
+    0 0 40px rgb(125 184 124 / 30%);
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -135,11 +137,11 @@
   padding: 1.25rem;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.7),
-    rgba(245, 240, 232, 0.6)
+    rgb(255 255 255 / 70%),
+    rgb(245 240 232 / 60%)
   );
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid rgb(255 255 255 / 50%);
   position: relative;
   overflow: hidden;
 }
@@ -175,18 +177,15 @@
   font-weight: 600;
   font-size: 0.95rem;
   box-shadow:
-    0 6px 20px rgba(90, 124, 89, 0.4),
-    0 3px 10px rgba(0, 0, 0, 0.15);
+    0 6px 20px rgb(90 124 89 / 40%),
+    0 3px 10px rgb(0 0 0 / 15%);
 }
 
 /* Modal Styles */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  inset: 0;
+  background: rgb(0 0 0 / 60%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -201,7 +200,7 @@
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 30%);
 }
 
 .modal-header {
@@ -253,7 +252,7 @@
   border: 2px solid #e9ecef;
   border-radius: 10px;
   font-size: 1rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: Poppins, sans-serif;
 }
 
 .otp-input-group {
@@ -319,7 +318,7 @@
   cursor: pointer;
   font-weight: 700;
   font-size: 1.05rem;
-  box-shadow: 0 4px 15px rgba(90, 124, 89, 0.3);
+  box-shadow: 0 4px 15px rgb(90 124 89 / 30%);
 }
 
 .submit-btn:disabled {
@@ -329,7 +328,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .profile-container {
     padding: 1rem;
   }
