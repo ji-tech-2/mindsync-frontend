@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react"; 
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import "../css/dashboard.css";
 import WeeklyChart from "../../components/WeeklyChart";
 import { fetchScreeningHistory, buildWeeklyChartFromHistory } from "../../config/api"; 
