@@ -109,24 +109,25 @@ export default function WeeklyChart({
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={320}>
+      <ResponsiveContainer width="100%" height={280} minHeight={200}>
         <BarChart
           data={data}
-          margin={{ top: 10, right: 30, left: 0, bottom: 5 }}
+          margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" strokeOpacity={0.5} />
           <XAxis 
             dataKey="day" 
-            tick={{ fill: '#666', fontSize: 13, fontWeight: 500 }}
+            tick={{ fill: '#666', fontSize: 12, fontWeight: 500 }}
             tickLine={false}
             axisLine={{ stroke: '#e0e0e0' }}
+            interval={0}
           />
           <YAxis 
             domain={[0, 100]}
-            tick={{ fill: '#666', fontSize: 12 }}
+            tick={{ fill: '#666', fontSize: 11 }}
             tickLine={false}
             axisLine={{ stroke: '#e0e0e0' }}
-            label={{ value: 'Nilai Mental Health', angle: -90, position: 'insideLeft', style: { fill: '#666', fontSize: 12 } }}
+            width={35}
           />
           <Tooltip 
             content={<CustomTooltip />}
@@ -134,12 +135,12 @@ export default function WeeklyChart({
           />
           <Bar 
             dataKey={dataKey} 
-            radius={[10, 10, 0, 0]}
-            maxBarSize={60}
+            radius={[8, 8, 0, 0]}
+            maxBarSize={50}
+            isAnimationActive={true}
             animationDuration={800}
-            animationBegin={0}
           >
-            {data.map((entry, index) => (
+            {Array.isArray(data) && data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={getBarColor(entry[dataKey])} />
             ))}
           </Bar>
@@ -148,7 +149,7 @@ export default function WeeklyChart({
       <div className={styles['chart-footer']}>
         <div className={styles['chart-info']}>
           <span className={styles['info-icon']}>ℹ️</span>
-          <span className={styles['info-text']}>Data ini menggunakan data dummy untuk demo</span>
+          <span className={styles['info-text']}>Data 7 hari terakhir</span>
         </div>
       </div>
     </div>

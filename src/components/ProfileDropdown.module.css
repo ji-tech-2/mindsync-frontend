@@ -22,18 +22,6 @@
   min-width: 280px;
   z-index: 1000;
   overflow: hidden;
-  animation: slideDown 0.2s ease-out;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .dropdownHeader {
@@ -94,11 +82,6 @@
   text-decoration: none;
   border-radius: 6px;
   font-weight: 500;
-  transition: background-color 0.2s ease;
-}
-
-.actionButton:hover {
-  background-color: #e9ecef;
 }
 
 .logoutWrapper {
@@ -114,9 +97,4 @@
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.logoutWrapper button:hover {
-  background-color: #c82333;
 }

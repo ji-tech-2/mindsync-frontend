@@ -98,8 +98,26 @@ export const AuthProvider = ({ children }) => {
 
   // Update user data
   const updateUser = useCallback((userData) => {
-    TokenManager.setUserData(userData);
-    setUser(userData);
+      // Merge with existing stored user data to avoid dropping fields/identifiers
+    const existingUserData = TokenManager.getUserData() || {};
+    const mergedUser = {
+      ...existingUserData,
+      ...userData,
+    };
+    // Ensure user has a stable userId, consistent with login/initializeAuth
+    const normalizedUser = {
+      ...mergedUser,
+      userId:
+        mergedUser.userId ||
+        mergedUser.id ||
+        mergedUser.user_id ||
+        existingUserData.userId ||
+        existingUserData.id ||
+        existingUserData.user_id ||
+        `temp_${Date.now()}`,
+    };
+    TokenManager.setUserData(normalizedUser);
+    setUser(normalizedUser);
   }, []);
 
   const value = {

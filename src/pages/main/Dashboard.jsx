@@ -2,13 +2,30 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../css/dashboard.css";
 import WeeklyChart from "../../components/WeeklyChart";
-import { fetchWeeklyChart } from "../../config/api"; 
+import { fetchScreeningHistory, buildWeeklyChartFromHistory } from "../../config/api"; 
 import { useAuth } from "../../hooks/useAuth";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const userName = user?.name || "Pengguna";
+  const [weeklyData, setWeeklyData] = useState([]);
+
+  useEffect(() => {
+    const loadWeeklyData = async () => {
+      const userId = user?.userId || user?.id || user?.user_id;
+      if (!userId) return;
+      try {
+        const response = await fetchScreeningHistory(userId, 50, 0);
+        if (response.success && response.data) {
+          setWeeklyData(buildWeeklyChartFromHistory(response.data));
+        }
+      } catch (err) {
+        console.error("Failed to fetch weekly chart:", err);
+      }
+    };
+    loadWeeklyData();
+  }, [user]);
 
   return (
     <div className="dashboard-container">
@@ -33,7 +50,13 @@ export default function Dashboard() {
             <div className="card card-small">Card 1</div>
             <div className="card card-small">Card 2</div>
           </div>
-          <div className="card card-large">Card 3</div>
+          <div className="card card-large card-chart">
+            <WeeklyChart
+              data={weeklyData}
+              title="Aktivitas Mingguan"
+              navigate={navigate}
+            />
+          </div>
         </div>
 
         {/* Lower Section: 3 cards horizontal */}

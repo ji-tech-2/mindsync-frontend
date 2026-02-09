@@ -210,8 +210,8 @@ export const API_URLS = {
   predict: getApiUrl(API_CONFIG.PREDICT_ENDPOINT),
   result: (predictionId) => getApiUrl(`${API_CONFIG.RESULT_ENDPOINT}/${predictionId}`),
   advice: getApiUrl(API_CONFIG.ADVICE_ENDPOINT),
-  screeningHistory: (userId) => getApiUrl(`${API_CONFIG.SCREENING_HISTORY_ENDPOINT}?user_id=${userId}`),
-  weeklyChart: (userId) => getApiUrl(`${API_CONFIG.WEEKLY_CHART_ENDPOINT}?user_id=${userId}`)
+  screeningHistory: (userId) => getApiUrl(`${API_CONFIG.SCREENING_HISTORY_ENDPOINT}/${userId}`),
+  weeklyChart: (userId) => getApiUrl(`${API_CONFIG.WEEKLY_CHART_ENDPOINT}/${userId}`)
 };
 
 // ====================================
@@ -253,6 +253,41 @@ export async function fetchScreeningHistory(userId, limit = 50, offset = 0) {
 }
 
 /**
+ * Build weekly chart data from screening history.
+ * Clamps each score to [0, 100] BEFORE averaging per day.
+ * This avoids the issue where Flask averages raw negative scores.
+ */
+export function buildWeeklyChartFromHistory(historyItems) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Group clamped scores by date
+  const scoresByDate = {};
+  historyItems.forEach(item => {
+    const d = new Date(item.created_at || item.date);
+    const key = d.toISOString().split('T')[0];
+    const raw = item.prediction_score ?? item.score ?? 0;
+    const clamped = Math.max(0, Math.min(100, raw));
+    if (!scoresByDate[key]) scoresByDate[key] = [];
+    scoresByDate[key].push(clamped);
+  });
+
+  const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const chart = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    const scores = scoresByDate[key];
+    const avg = scores
+      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+      : 0;
+    chart.push({ day: dayLabels[d.getDay()], date: key, value: avg });
+  }
+  return chart;
+}
+
+/**
  * Fetch weekly chart data (last 7 days)
  * @param {string} userId - User ID (UUID)
  * @param {number} days - Number of days to look back (default: 7)
@@ -274,7 +309,7 @@ export async function fetchWeeklyChart(userId) {
       const mappedData = response.data.data.map(item => ({
         day: item.label,
         date: item.date,
-        value: item.mental_health_index
+        value: Math.max(0, item.mental_health_index ?? 0)
       }));
 
       return {

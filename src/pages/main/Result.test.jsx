@@ -298,6 +298,8 @@ describe('Result Component - Partial Polling', () => {
 
       for (const testCase of testCases) {
         vi.clearAllMocks();
+        // Clear cached results from previous iterations to prevent stale localStorage reads
+        localStorage.clear();
 
         const mockResult = {
           success: true,

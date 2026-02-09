@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import WeeklyChart from "../../components/WeeklyChart";
-import { fetchScreeningHistory, fetchWeeklyChart } from "../../config/api";
+import { fetchScreeningHistory, buildWeeklyChartFromHistory } from "../../config/api";
 import "../css/history.css";
 
 export default function History() {
@@ -68,14 +68,10 @@ export default function History() {
           
           setHistoryData(transformedData);
           
-          // Fetch weekly chart data from API
-          const chartResponse = await fetchWeeklyChart(userId);
-          if (chartResponse.success && chartResponse.data) {
-            setWeeklyData(chartResponse.data);
-          } else {
-            console.warn("⚠️ Weekly chart API not available, using empty data");
-            setWeeklyData([]);
-          }
+          // Build weekly chart from history data
+          // Clamps each score to 0 before averaging (fixes negative raw scores)
+          const chartData = buildWeeklyChartFromHistory(response.data);
+          setWeeklyData(chartData);
         } else {
           console.warn("⚠️ History API not available:", response.error);
           setHistoryData([]);
@@ -164,7 +160,7 @@ export default function History() {
               <span className="stat-label">Rata-rata Score:</span>
               <span className="stat-value">
                 {historyData.length > 0 
-                  ? Math.round(historyData.reduce((sum, item) => sum + item.score, 0) / historyData.length)
+                  ? Math.round(historyData.reduce((sum, item) => sum + Math.max(0, item.score), 0) / historyData.length)
                   : 0}
               </span>
             </div>

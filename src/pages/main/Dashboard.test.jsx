@@ -105,7 +105,8 @@ describe('Dashboard Component', () => {
       
       expect(screen.getByText('Card 1')).toBeInTheDocument();
       expect(screen.getByText('Card 2')).toBeInTheDocument();
-      expect(screen.getByText('Card 3')).toBeInTheDocument();
+      // Third card is the WeeklyChart component (renders chart title, not "Card 3")
+      expect(screen.getByText('Aktivitas Mingguan')).toBeInTheDocument();
     });
 
     it('should render left column with 2 small cards', () => {

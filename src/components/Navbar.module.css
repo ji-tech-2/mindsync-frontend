@@ -1,36 +1,14 @@
 .navbar {
-  background: linear-gradient(180deg, rgba(245, 240, 232, 0.98), rgba(245, 240, 232, 0.95));
-  backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(245, 240, 232, 0.98);
   box-shadow: 
     0 4px 20px rgba(0, 0, 0, 0.08),
-    0 2px 10px rgba(90, 124, 89, 0.05),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+    0 2px 10px rgba(90, 124, 89, 0.05);
   border-bottom: 1px solid rgba(90, 124, 89, 0.1);
   padding: 1rem 2rem;
   position: sticky;
   top: 0;
   z-index: 100;
   width: 100%;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-/* Animated top border */
-.navbar::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #5a7c59, #7db87c, #6b9b6a, #5a7c59);
-  background-size: 300% 100%;
-  animation: navBorderFlow 6s linear infinite;
-}
-
-@keyframes navBorderFlow {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 300% 50%; }
 }
 
 .container {
@@ -43,27 +21,12 @@
 .wordmark {
   font-size: 1.5rem;
   font-weight: bold;
-  background: linear-gradient(135deg, #5a7c59, #6b9b6a, #7db87c);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  background-size: 200% 100%;
-  animation: wordmarkShine 4s ease-in-out infinite;
-}
-
-@keyframes wordmarkShine {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  color: #5a7c59;
 }
 
 .wordmark a {
   text-decoration: none;
   color: inherit;
-  transition: color 0.3s ease;
-}
-
-.wordmark a:hover {
-  color: #6b9b6a;
 }
 
 .navRight {
@@ -76,34 +39,8 @@
   text-decoration: none;
   color: #4a5555;
   font-weight: 500;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   padding: 0.6rem 1.2rem;
   border-radius: 12px;
-  position: relative;
-  overflow: hidden;
-}
-
-.navLink::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #5a7c59, #6b9b6a);
-  transform: translateX(-50%);
-  transition: width 0.4s ease;
-}
-
-.navLink:hover::before {
-  width: 80%;
-}
-
-.navLink:hover {
-  color: #5a7c59;
-  background: linear-gradient(135deg, rgba(232, 220, 200, 0.5), rgba(232, 220, 200, 0.3));
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(90, 124, 89, 0.15);
 }
 
 .profileSection {
