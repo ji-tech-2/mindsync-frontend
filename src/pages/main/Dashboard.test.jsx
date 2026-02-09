@@ -45,7 +45,6 @@ vi.mock('../../components/StreakCard', () => ({
   ),
 }));
 
-// Mock TokenManager for AuthProvider
 vi.mock('../../config/api', () => ({
   TokenManager: {
     getToken: vi.fn(),
@@ -61,6 +60,18 @@ vi.mock('../../config/api', () => ({
 }));
 
 import { TokenManager } from '../../config/api';
+
+const mockEmptyResponse = {
+  json: async () => ({ status: 'success', top_critical_factors: [], advice: {} }),
+};
+
+const mockEmptySuggestion = {
+  json: async () => ({ status: 'success', suggestion: '' }),
+};
+
+const mockEmptyStreak = {
+  json: async () => ({ status: 'success', data: { current_streak: 0, longest_streak: 0 } }),
+};
 
 const mockFactorsResponse = {
   status: 'success',
@@ -88,6 +99,20 @@ const mockStreakResponse = {
   data: { current_streak: 7, longest_streak: 14 },
 };
 
+const setupDefaultFetch = () => {
+  global.fetch = vi.fn()
+    .mockResolvedValueOnce({ json: async () => ({ status: 'success', top_critical_factors: [], advice: {} }) })
+    .mockResolvedValueOnce({ json: async () => ({ status: 'success', suggestion: '' }) })
+    .mockResolvedValueOnce({ json: async () => ({ status: 'success', data: { current_streak: 0, longest_streak: 0 } }) });
+};
+
+const setupFetchWith = (factorsRes, suggestionRes, streakRes) => {
+  global.fetch = vi.fn()
+    .mockResolvedValueOnce({ json: async () => factorsRes })
+    .mockResolvedValueOnce({ json: async () => suggestionRes })
+    .mockResolvedValueOnce({ json: async () => streakRes });
+};
+
 const renderDashboard = (userData = null) => {
   if (userData) {
     TokenManager.getToken.mockReturnValue('mock-token');
@@ -106,21 +131,13 @@ const renderDashboard = (userData = null) => {
   );
 };
 
+const defaultUser = { name: 'John Doe', email: 'john@example.com', userId: '123' };
+
 describe('Dashboard Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
-    // Setup default fetch mock for all three API calls
-    global.fetch = vi.fn()
-      .mockResolvedValueOnce({
-        json: async () => ({ status: 'success', top_critical_factors: [], advice: {} }),
-      })
-      .mockResolvedValueOnce({
-        json: async () => ({ status: 'success', suggestion: '' }),
-      })
-      .mockResolvedValueOnce({
-        json: async () => ({ status: 'success', data: { current_streak: 0, longest_streak: 0 } }),
-      });
+    setupDefaultFetch();
   });
 
   afterEach(() => {
@@ -129,20 +146,17 @@ describe('Dashboard Component', () => {
 
   describe('User Greeting', () => {
     it('should display user name when user is authenticated', () => {
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
+      renderDashboard(defaultUser);
       expect(screen.getByText(/Hello, John Doe!/i)).toBeInTheDocument();
     });
 
     it('should display default greeting when user name is not available', () => {
       renderDashboard({ email: 'john@example.com', userId: '123' });
-      
       expect(screen.getByText(/Hello, Pengguna!/i)).toBeInTheDocument();
     });
 
     it('should display subtitle text', () => {
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
+      renderDashboard(defaultUser);
       expect(screen.getByText(/How are you feeling today?/i)).toBeInTheDocument();
     });
   });
@@ -150,157 +164,130 @@ describe('Dashboard Component', () => {
   describe('Header Section', () => {
     it('should render full-width header with greeting and CTA button', () => {
       renderDashboard({ name: 'Jane Smith', email: 'jane@example.com', userId: '123' });
-      
+
       const header = document.querySelector('.dashboard-header-full');
       expect(header).toBeInTheDocument();
-      
+
       const ctaButton = screen.getByRole('button', { name: /take screening now/i });
       expect(ctaButton).toBeInTheDocument();
     });
 
     it('should navigate to screening page when CTA button clicked', () => {
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
+      renderDashboard(defaultUser);
+
       const ctaButton = screen.getByRole('button', { name: /take screening now/i });
       fireEvent.click(ctaButton);
-      
+
       expect(mockNavigate).toHaveBeenCalledWith('/screening');
     });
   });
 
   describe('Dashboard Layout', () => {
     it('should render upper section structure', () => {
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
-      const upperSection = document.querySelector('.cards-upper-section');
-      expect(upperSection).toBeInTheDocument();
+      renderDashboard(defaultUser);
+      expect(document.querySelector('.cards-upper-section')).toBeInTheDocument();
     });
 
     it('should render left column with streak and suggestion cards', () => {
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
-      const leftColumn = document.querySelector('.cards-left-column');
-      expect(leftColumn).toBeInTheDocument();
-      
-      const smallCards = document.querySelectorAll('.card-small');
-      expect(smallCards.length).toBe(2);
+      renderDashboard(defaultUser);
+
+      expect(document.querySelector('.cards-left-column')).toBeInTheDocument();
+      expect(document.querySelectorAll('.card-small').length).toBe(2);
     });
 
     it('should render StreakCard component', () => {
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
+      renderDashboard(defaultUser);
       expect(screen.getByTestId('streak-card')).toBeInTheDocument();
     });
 
     it('should render DashboardSuggestion component with title', () => {
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
+      renderDashboard(defaultUser);
       expect(screen.getByText('Daily Suggestion')).toBeInTheDocument();
       expect(screen.getByTestId('dashboard-suggestion')).toBeInTheDocument();
     });
 
     it('should render one large card', () => {
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
-      const largeCard = document.querySelector('.card-large');
-      expect(largeCard).toBeInTheDocument();
+      renderDashboard(defaultUser);
+      expect(document.querySelector('.card-large')).toBeInTheDocument();
     });
 
     it('should render Critical Factors section title', () => {
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
+      renderDashboard(defaultUser);
       expect(screen.getByText('Critical Factors')).toBeInTheDocument();
     });
 
-    it('should render lower section', () => {
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
+    it('should render lower section with 3 CriticalFactorCard components', () => {
+      renderDashboard(defaultUser);
+
       const lowerSection = document.querySelector('.cards-lower-section');
       expect(lowerSection).toBeInTheDocument();
+
+      const factorCards = screen.getAllByTestId('critical-factor-card');
+      expect(factorCards).toHaveLength(3);
     });
   });
 
   describe('API Data Loading', () => {
     it('should show loading state for critical factors', () => {
       global.fetch = vi.fn(() => new Promise(() => {}));
-      
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
+
+      renderDashboard(defaultUser);
+
       const factorCards = screen.getAllByTestId('critical-factor-card');
-      expect(factorCards.length).toBeGreaterThan(0);
+      factorCards.forEach(card => {
+        expect(card).toHaveTextContent('Loading factor...');
+      });
     });
 
     it('should fetch and display critical factors data', async () => {
-      global.fetch = vi.fn()
-        .mockResolvedValueOnce({
-          json: async () => mockFactorsResponse,
-        })
-        .mockResolvedValueOnce({
-          json: async () => mockSuggestionResponse,
-        })
-        .mockResolvedValueOnce({
-          json: async () => mockStreakResponse,
-        });
-      
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
+      setupFetchWith(mockFactorsResponse, mockSuggestionResponse, mockStreakResponse);
+
+      renderDashboard(defaultUser);
+
       await waitFor(() => {
         expect(screen.getByText('Sleep Quality')).toBeInTheDocument();
+        expect(screen.getByText('Productivity Score')).toBeInTheDocument();
       });
     });
 
     it('should display empty state when no factors available', async () => {
-      global.fetch = vi.fn()
-        .mockResolvedValueOnce({
-          json: async () => ({ status: 'success', top_critical_factors: [], advice: {} }),
-        })
-        .mockResolvedValueOnce({
-          json: async () => mockSuggestionResponse,
-        })
-        .mockResolvedValueOnce({
-          json: async () => mockStreakResponse,
-        });
-      
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
+      setupFetchWith(
+        { status: 'success', top_critical_factors: [], advice: {} },
+        mockSuggestionResponse,
+        mockStreakResponse
+      );
+
+      renderDashboard(defaultUser);
+
       await waitFor(() => {
-        expect(screen.getByText('No factors found')).toBeInTheDocument();
+        const emptyCards = screen.getAllByText('No factors found');
+        expect(emptyCards).toHaveLength(3);
       });
     });
 
     it('should fetch daily suggestion', async () => {
-      global.fetch = vi.fn()
-        .mockResolvedValueOnce({
-          json: async () => ({ status: 'success', top_critical_factors: [], advice: {} }),
-        })
-        .mockResolvedValueOnce({
-          json: async () => mockSuggestionResponse,
-        })
-        .mockResolvedValueOnce({
-          json: async () => mockStreakResponse,
-        });
-      
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
+      setupFetchWith(
+        { status: 'success', top_critical_factors: [], advice: {} },
+        mockSuggestionResponse,
+        mockStreakResponse
+      );
+
+      renderDashboard(defaultUser);
+
       await waitFor(() => {
         expect(screen.getByText('Try meditation today for better focus.')).toBeInTheDocument();
       });
     });
 
     it('should fetch streak data', async () => {
-      global.fetch = vi.fn()
-        .mockResolvedValueOnce({
-          json: async () => ({ status: 'success', top_critical_factors: [], advice: {} }),
-        })
-        .mockResolvedValueOnce({
-          json: async () => mockSuggestionResponse,
-        })
-        .mockResolvedValueOnce({
-          json: async () => mockStreakResponse,
-        });
-      
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
+      setupFetchWith(
+        { status: 'success', top_critical_factors: [], advice: {} },
+        mockSuggestionResponse,
+        mockStreakResponse
+      );
+
+      renderDashboard(defaultUser);
+
       await waitFor(() => {
         expect(screen.getByText('Streak: 7')).toBeInTheDocument();
       });
@@ -309,17 +296,13 @@ describe('Dashboard Component', () => {
 
   describe('Container Structure', () => {
     it('should render main dashboard container', () => {
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
-      const container = document.querySelector('.dashboard-container');
-      expect(container).toBeInTheDocument();
+      renderDashboard(defaultUser);
+      expect(document.querySelector('.dashboard-container')).toBeInTheDocument();
     });
 
     it('should render dashboard content section', () => {
-      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
-      
-      const content = document.querySelector('.dashboard-content');
-      expect(content).toBeInTheDocument();
+      renderDashboard(defaultUser);
+      expect(document.querySelector('.dashboard-content')).toBeInTheDocument();
     });
   });
 });
