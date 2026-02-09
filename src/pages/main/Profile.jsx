@@ -7,7 +7,8 @@ import EditModal from "../../components/EditModal";
 import FormInput from "../../components/FormInput";
 import FormSelect from "../../components/FormSelect";
 import OTPInput from "../../components/OTPInput";
-import apiClient from "../../config/api";
+import apiClient, { TokenManager } from "../../config/api";
+import useAuth from "../../hooks/useAuth";
 import { getPasswordError } from "../../utils/passwordValidation";
 import { 
   genderOptions, 
@@ -23,6 +24,7 @@ import {
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { updateUser } = useAuth();
   const [user, setUser] = useState({
     name: "",
     email: "",
@@ -142,12 +144,18 @@ export default function Profile() {
         if (response.data.success) {
           // Transform API response to display values
           const apiData = response.data.data;
-          setUser({
+          const updatedUser = {
             ...apiData,
             gender: fromApiGender(apiData.gender),
             occupation: fromApiOccupation(apiData.occupation),
             workRmt: fromApiWorkMode(apiData.workRmt)
-          });
+          };
+          setUser(updatedUser);
+          
+          // Update both localStorage and global auth context
+          TokenManager.setUserData(apiData);
+          updateUser(apiData);
+          
           setMessage({ type: "success", text: response.data.message });
           setTimeout(() => {
             closeModal();
@@ -207,7 +215,7 @@ export default function Profile() {
       ) : (
         <div className="profile-content">
           <div className="profile-card">
-            <ProfileAvatar name={user.name} />
+            <ProfileAvatar name={user.name} size="large" />
 
           <div className="profile-fields">
             <ProfileFieldRow

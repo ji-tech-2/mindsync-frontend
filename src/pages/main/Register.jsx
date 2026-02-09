@@ -163,6 +163,7 @@ export default function Register() {
   // RENDER HALAMAN SUKSES
   if (isRegistered) {
     return (
+      <div className="register-wrapper">
       <div className="register-container success-screen">
         <h2>✅ Registrasi Berhasil!</h2>
 
@@ -177,6 +178,7 @@ export default function Register() {
           Login Sekarang
         </button>
       </div>
+      </div>
     );
   }
 
@@ -188,6 +190,7 @@ export default function Register() {
 
   // RENDER FORM REGISTER
   return (
+    <div className="register-wrapper">
     <div className="register-container">
       <h2>Register</h2>
 
@@ -282,6 +285,7 @@ export default function Register() {
           Masuk di sini.
         </button>
       </div>
+    </div>
     </div>
   );
 }

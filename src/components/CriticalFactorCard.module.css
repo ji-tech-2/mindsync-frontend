@@ -1,0 +1,161 @@
+.cardContainer {
+  background: #F2EDE4; 
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+  height: 100%; /* Agar tinggi card seragam jika dalam grid */
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.cardContainer:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.imageHeader {
+  background: #C4C1B4; 
+  height: 160px;
+  width: 100%;
+}
+
+.factorImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.headerInfo {
+  padding: 24px 24px 12px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.factorName {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #454238;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.content {
+  padding: 0 32px 32px 32px;
+  flex-grow: 1; /* Supaya konten mengisi sisa ruang */
+}
+
+.description {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  text-align: center;
+  color: #454238;
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+
+.noSuggestions {
+  font-size: 0.9rem;
+  color: #8A8678;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.referenceSection {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 16px;
+}
+
+.refTitle {
+  font-weight: 700;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: #454238;
+}
+
+.refList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.refItem {
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.refItem::before {
+  content: "🔗";
+  position: absolute;
+  left: 0;
+  font-size: 0.75rem;
+}
+
+.refLink {
+  color: #5b4cdb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.loadingState {
+  padding: 40px;
+  text-align: center;
+  background: #f9f9f9;
+  border-radius: 30px;
+  color: #999;
+}
+
+
+@media (max-width: 768px) {
+  .cardContainer {
+    border-radius: 24px; 
+  }
+
+  .imageHeader {
+    height: 140px; 
+  }
+
+  .headerInfo {
+    padding: 20px;
+  }
+
+  .factorName {
+    font-size: 1.2rem;
+  }
+
+  .innerContent {
+    padding: 0 24px 24px 24px; 
+  }
+}
+
+@media (max-width: 480px) {
+  .imageHeader {
+    height: 120px;
+  }
+
+  .headerInfo {
+    padding: 16px;
+  }
+
+  .factorName {
+    font-size: 1.1rem;
+  }
+
+  .innerContent {
+    padding: 0 20px 20px 20px; 
+  }
+
+  .description {
+    font-size: 0.9rem; 
+    text-align: left; 
+  }
+
+  .refItem {
+    font-size: 0.85rem;
+  }
+}

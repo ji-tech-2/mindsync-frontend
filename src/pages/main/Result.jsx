@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { pollPredictionResult } from '../helpers/pollingHelper.js';
 import { API_CONFIG } from '../../config/api.js';
 import Advice from '../../components/Advice';
@@ -9,14 +9,14 @@ import '../css/result.css';
 const ResultPage = () => {
   const navigate = useNavigate();
   const { predictionId } = useParams();
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [resultData, setResultData] = useState(null);
   const [adviceData, setAdviceData] = useState(null);
   const [isPolling, setIsPolling] = useState(false);
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
   const [pollingError, setPollingError] = useState(null);
-  const [loadingStage, setLoadingStage] = useState(1); // 1: processing, 2: numeric ready, 3: complete
-  const [hasPartialResult, setHasPartialResult] = useState(false);
+  const [loadingStage, setLoadingStage] = useState(1); 
+  const [setHasPartialResult] = useState(false);
 
   useEffect(() => {
     const loadResult = async () => {
@@ -235,7 +235,7 @@ const ResultPage = () => {
       </div>
 
       {/* Advice Section - Only for authenticated users */}
-      {isAuthenticated ? (
+      {user ? (
         <Advice resultData={resultData} adviceData={adviceData} isLoading={isLoadingAdvice} />
       ) : (
         <div className="advice-locked">
