@@ -27,16 +27,16 @@ export const validatePassword = (password) => {
  */
 export const getPasswordError = (password) => {
   if (!password) {
-    return "Password is required";
+    return 'Password is required';
   }
 
   if (password.length < 8) {
-    return "Password must be at least 8 characters";
+    return 'Password must be at least 8 characters';
   }
 
   if (!validatePassword(password)) {
-    return "Password must contain at least one uppercase, one lowercase, and one number";
+    return 'Password must contain at least one uppercase, one lowercase, and one number';
   }
 
-  return "";
+  return '';
 };

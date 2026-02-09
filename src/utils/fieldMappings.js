@@ -9,22 +9,22 @@
 // ============================================
 const MAPPINGS = {
   gender: {
-    Male: "Male",
-    Female: "Female",
+    Male: 'Male',
+    Female: 'Female',
   },
   occupation: {
-    Employed: "Employed",
-    Unemployed: "Unemployed",
-    Student: "Student",
-    Freelancer: "Self-employed",
-    Retired: "Unemployed",
-    Other: "Self-employed",
+    Employed: 'Employed',
+    Unemployed: 'Unemployed',
+    Student: 'Student',
+    Freelancer: 'Self-employed',
+    Retired: 'Unemployed',
+    Other: 'Self-employed',
   },
   workMode: {
-    Remote: "Remote",
-    Hybrid: "Hybrid",
-    "On-site": "In-person",
-    Unemployed: "Unemployed",
+    Remote: 'Remote',
+    Hybrid: 'Hybrid',
+    'On-site': 'In-person',
+    Unemployed: 'Unemployed',
   },
 };
 
@@ -56,9 +56,9 @@ function createOptions(fieldName) {
   return Object.keys(mapping).map((key) => ({ value: key, label: key }));
 }
 
-export const genderOptions = createOptions("gender");
-export const occupationOptions = createOptions("occupation");
-export const workModeOptions = createOptions("workMode");
+export const genderOptions = createOptions('gender');
+export const occupationOptions = createOptions('occupation');
+export const workModeOptions = createOptions('workMode');
 
 // ============================================
 // PUBLIC API: Transformation Functions

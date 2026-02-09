@@ -9,10 +9,10 @@ describe('EditModal Component', () => {
   const defaultProps = {
     isOpen: true,
     onClose: mockOnClose,
-    title: "Edit Field",
+    title: 'Edit Field',
     onSubmit: mockOnSubmit,
     loading: false,
-    message: { type: "", text: "" }
+    message: { type: '', text: '' },
   };
 
   beforeEach(() => {
@@ -27,7 +27,7 @@ describe('EditModal Component', () => {
       </EditModal>
     );
 
-    expect(screen.queryByText("Edit Field")).not.toBeInTheDocument();
+    expect(screen.queryByText('Edit Field')).not.toBeInTheDocument();
   });
 
   it('should render when isOpen is true', () => {
@@ -37,8 +37,8 @@ describe('EditModal Component', () => {
       </EditModal>
     );
 
-    expect(screen.getByText("Edit Field")).toBeInTheDocument();
-    expect(screen.getByText("Content")).toBeInTheDocument();
+    expect(screen.getByText('Edit Field')).toBeInTheDocument();
+    expect(screen.getByText('Content')).toBeInTheDocument();
   });
 
   it('should display modal title', () => {
@@ -48,7 +48,7 @@ describe('EditModal Component', () => {
       </EditModal>
     );
 
-    expect(screen.getByText("Custom Title")).toBeInTheDocument();
+    expect(screen.getByText('Custom Title')).toBeInTheDocument();
   });
 
   it('should call onClose when close button clicked', () => {
@@ -71,7 +71,9 @@ describe('EditModal Component', () => {
       </EditModal>
     );
 
-    const overlay = screen.getByText("Edit Field").closest('.modal-content').parentElement;
+    const overlay = screen
+      .getByText('Edit Field')
+      .closest('.modal-content').parentElement;
     fireEvent.click(overlay);
 
     expect(mockOnClose).toHaveBeenCalledTimes(1);
@@ -84,7 +86,7 @@ describe('EditModal Component', () => {
       </EditModal>
     );
 
-    const modalContent = screen.getByText("Content").closest('.modal-content');
+    const modalContent = screen.getByText('Content').closest('.modal-content');
     fireEvent.click(modalContent);
 
     expect(mockOnClose).not.toHaveBeenCalled();
@@ -97,51 +99,53 @@ describe('EditModal Component', () => {
       </EditModal>
     );
 
-    const form = screen.getByRole('button', { name: /update/i }).closest('form');
+    const form = screen
+      .getByRole('button', { name: /update/i })
+      .closest('form');
     fireEvent.submit(form);
 
     expect(mockOnSubmit).toHaveBeenCalledTimes(1);
   });
 
   it('should display success message', () => {
-    const message = { type: "success", text: "Update successful!" };
-    
+    const message = { type: 'success', text: 'Update successful!' };
+
     render(
       <EditModal {...defaultProps} message={message}>
         <div>Content</div>
       </EditModal>
     );
 
-    expect(screen.getByText("Update successful!")).toBeInTheDocument();
-    const messageElement = screen.getByText("Update successful!");
+    expect(screen.getByText('Update successful!')).toBeInTheDocument();
+    const messageElement = screen.getByText('Update successful!');
     expect(messageElement).toHaveClass('success');
   });
 
   it('should display error message', () => {
-    const message = { type: "error", text: "Update failed!" };
-    
+    const message = { type: 'error', text: 'Update failed!' };
+
     render(
       <EditModal {...defaultProps} message={message}>
         <div>Content</div>
       </EditModal>
     );
 
-    expect(screen.getByText("Update failed!")).toBeInTheDocument();
-    const messageElement = screen.getByText("Update failed!");
+    expect(screen.getByText('Update failed!')).toBeInTheDocument();
+    const messageElement = screen.getByText('Update failed!');
     expect(messageElement).toHaveClass('error');
   });
 
   it('should display info message', () => {
-    const message = { type: "info", text: "OTP sent!" };
-    
+    const message = { type: 'info', text: 'OTP sent!' };
+
     render(
       <EditModal {...defaultProps} message={message}>
         <div>Content</div>
       </EditModal>
     );
 
-    expect(screen.getByText("OTP sent!")).toBeInTheDocument();
-    const messageElement = screen.getByText("OTP sent!");
+    expect(screen.getByText('OTP sent!')).toBeInTheDocument();
+    const messageElement = screen.getByText('OTP sent!');
     expect(messageElement).toHaveClass('info');
   });
 
@@ -173,7 +177,9 @@ describe('EditModal Component', () => {
       </EditModal>
     );
 
-    expect(screen.getByRole('button', { name: /update name/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /update name/i })
+    ).toBeInTheDocument();
   });
 
   it('should render children correctly', () => {

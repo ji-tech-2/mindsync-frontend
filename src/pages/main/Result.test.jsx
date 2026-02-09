@@ -46,7 +46,9 @@ vi.mock('../../components/Advice', () => ({
   default: ({ adviceData, isLoading }) => (
     <div data-testid="advice-component">
       <div data-testid="advice-loading">{isLoading ? 'true' : 'false'}</div>
-      <div data-testid="advice-data">{adviceData ? 'has-advice' : 'no-advice'}</div>
+      <div data-testid="advice-data">
+        {adviceData ? 'has-advice' : 'no-advice'}
+      </div>
     </div>
   ),
 }));
@@ -63,7 +65,8 @@ vi.mock('react-router-dom', async () => {
 
 // Helper to render Result with predictionId
 const renderResult = (predictionId = 'test-123') => {
-  return render(<AuthProvider>
+  return render(
+    <AuthProvider>
       <MemoryRouter initialEntries={[`/result/${predictionId}`]}>
         <Routes>
           <Route path="/result/:predictionId" element={<Result />} />
@@ -99,8 +102,10 @@ describe('Result Component - Partial Polling', () => {
       };
 
       // Mock for first call (partial result)
-      pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockPartialResult);
-      
+      pollingHelper.pollPredictionResult.mockResolvedValueOnce(
+        mockPartialResult
+      );
+
       // Mock for second call in pollForAdvice (continue polling in background)
       pollingHelper.pollPredictionResult.mockResolvedValueOnce({
         success: true,
@@ -120,11 +125,13 @@ describe('Result Component - Partial Polling', () => {
 
       // Should show score and category
       expect(screen.getByText('Average')).toBeInTheDocument();
-      
+
       // Advice should be in loading state
       await waitFor(() => {
         expect(screen.getByTestId('advice-loading')).toHaveTextContent('true');
-        expect(screen.getByTestId('advice-data')).toHaveTextContent('no-advice');
+        expect(screen.getByTestId('advice-data')).toHaveTextContent(
+          'no-advice'
+        );
       });
     });
 
@@ -175,9 +182,14 @@ describe('Result Component - Partial Polling', () => {
       });
 
       // Eventually advice should load and be displayed
-      await waitFor(() => {
-        expect(screen.getByTestId('advice-data')).toHaveTextContent('has-advice');
-      }, { timeout: 5000 });
+      await waitFor(
+        () => {
+          expect(screen.getByTestId('advice-data')).toHaveTextContent(
+            'has-advice'
+          );
+        },
+        { timeout: 5000 }
+      );
 
       // Should have called pollPredictionResult twice (initial + continue polling)
       expect(pollingHelper.pollPredictionResult).toHaveBeenCalledTimes(2);
@@ -217,10 +229,12 @@ describe('Result Component - Partial Polling', () => {
 
       // Should show full results with advice
       expect(screen.getByText('Healthy')).toBeInTheDocument();
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('advice-loading')).toHaveTextContent('false');
-        expect(screen.getByTestId('advice-data')).toHaveTextContent('has-advice');
+        expect(screen.getByTestId('advice-data')).toHaveTextContent(
+          'has-advice'
+        );
       });
 
       // Should only call pollPredictionResult once
@@ -239,7 +253,7 @@ describe('Result Component - Partial Polling', () => {
       // Should show loading UI
       expect(screen.getByText(/Analyzing Your Data/i)).toBeInTheDocument();
       expect(screen.getByText(/Please wait a moment/i)).toBeInTheDocument();
-      
+
       // Check for loading spinner using container query
       const loadingSpinner = container.querySelector('.loading-spinner');
       expect(loadingSpinner).toBeInTheDocument();
@@ -502,7 +516,10 @@ describe('Result Component - Guest User (Not Authenticated)', () => {
         prediction_score: 70.0,
         health_level: 'average',
         wellness_analysis: 'Test analysis',
-        advice: { description: 'Advice that guest should not see', factors: {} },
+        advice: {
+          description: 'Advice that guest should not see',
+          factors: {},
+        },
       },
       metadata: {
         created_at: '2026-01-21T10:00:00Z',
@@ -550,8 +567,12 @@ describe('Result Component - Guest User (Not Authenticated)', () => {
     });
 
     // Should show login and register buttons
-    expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Register/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Sign In/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Register/i })
+    ).toBeInTheDocument();
   });
 
   it('should navigate to signIn when login button clicked', async () => {
@@ -658,7 +679,7 @@ describe('Result Component - Authenticated User', () => {
         prediction_score: 75.0,
         health_level: 'average',
         wellness_analysis: 'Good mental health',
-        advice: { 
+        advice: {
           description: 'Personalized advice here',
           factors: {
             sleep: { recommendation: 'Improve sleep' },
@@ -682,7 +703,7 @@ describe('Result Component - Authenticated User', () => {
 
     // Should show the Advice component
     expect(screen.getByTestId('advice-component')).toBeInTheDocument();
-    
+
     // Should have advice data
     await waitFor(() => {
       expect(screen.getByTestId('advice-data')).toHaveTextContent('has-advice');
@@ -714,8 +735,10 @@ describe('Result Component - Authenticated User', () => {
     });
 
     // Should NOT show locked message
-    expect(screen.queryByText(/Personal Advice Locked/i)).not.toBeInTheDocument();
-    
+    expect(
+      screen.queryByText(/Personal Advice Locked/i)
+    ).not.toBeInTheDocument();
+
     // Should NOT show login/register buttons in advice section
     const adviceLocked = screen.queryByText(/Sign in or register/i);
     expect(adviceLocked).not.toBeInTheDocument();
@@ -737,7 +760,11 @@ describe('Result Component - Authenticated User', () => {
 
     pollingHelper.pollPredictionResult
       .mockResolvedValueOnce(mockPartialResult)
-      .mockResolvedValueOnce({ success: true, status: 'processing', data: null });
+      .mockResolvedValueOnce({
+        success: true,
+        status: 'processing',
+        data: null,
+      });
 
     renderResult('auth-partial-test');
 

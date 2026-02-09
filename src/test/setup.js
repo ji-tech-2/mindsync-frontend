@@ -1,4 +1,4 @@
-import { expect, afterEach } from 'vitest';
+import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
@@ -11,12 +11,26 @@ import '@testing-library/jest-dom/vitest';
 function createStorageMock() {
   let store = {};
   return {
-    getItem(key) { return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null; },
-    setItem(key, value) { store[key] = String(value); },
-    removeItem(key) { delete store[key]; },
-    clear() { store = {}; },
-    get length() { return Object.keys(store).length; },
-    key(index) { return Object.keys(store)[index] ?? null; },
+    getItem(key) {
+      return Object.prototype.hasOwnProperty.call(store, key)
+        ? store[key]
+        : null;
+    },
+    setItem(key, value) {
+      store[key] = String(value);
+    },
+    removeItem(key) {
+      delete store[key];
+    },
+    clear() {
+      store = {};
+    },
+    get length() {
+      return Object.keys(store).length;
+    },
+    key(index) {
+      return Object.keys(store)[index] ?? null;
+    },
   };
 }
 

@@ -1,15 +1,15 @@
 // login
-import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import apiClient, { API_CONFIG } from "../../config/api";
-import "../css/login.css";
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import apiClient, { API_CONFIG } from '../../config/api';
+import '../css/login.css';
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const [message, setMessage] = useState(""); // untuk tampilkan pesan
+  const [message, setMessage] = useState(''); // untuk tampilkan pesan
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -18,7 +18,7 @@ export default function Login() {
   const { login } = useAuth();
 
   // Get the page they were trying to visit, or default to dashboard
-  const from = location.state?.from?.pathname || "/dashboard";
+  const from = location.state?.from?.pathname || '/dashboard';
 
   // Validation function
   const validateForm = () => {
@@ -26,16 +26,16 @@ export default function Login() {
 
     // Email validation
     if (!email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.email = 'Please enter a valid email address';
     }
 
     // Password validation
     if (!password) {
-      newErrors.password = "Password is required";
+      newErrors.password = 'Password is required';
     } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+      newErrors.password = 'Password must be at least 6 characters';
     }
 
     setErrors(newErrors);
@@ -51,7 +51,7 @@ export default function Login() {
     }
 
     setLoading(true);
-    setMessage("");
+    setMessage('');
     setErrors({});
 
     // Backend response: { success: true, token: "jwt_token", type: "Bearer", user: { email, name, userId } }
@@ -65,7 +65,7 @@ export default function Login() {
       setLoading(false);
 
       if (data.success && data.token) {
-        setMessage("Login successful!");
+        setMessage('Login successful!');
 
         // Use AuthContext login to update global auth state
         login(data.token, data.user);
@@ -73,19 +73,20 @@ export default function Login() {
         // Redirect to the page they were trying to visit, or dashboard
         navigate(from, { replace: true });
       } else {
-        setMessage(data.message || "Login failed");
+        setMessage(data.message || 'Login failed');
       }
     } catch (err) {
       setLoading(false);
-      const errorMessage = err.response?.data?.message || "Server error occurred";
+      const errorMessage =
+        err.response?.data?.message || 'Server error occurred';
       setMessage(errorMessage);
-      console.error("Login error:", err);
+      console.error('Login error:', err);
     }
   };
 
   // Fungsi untuk mengarahkan ke halaman register
   const handleRegisterClick = () => {
-    navigate("/register"); // Ganti dengan path halaman register Anda
+    navigate('/register'); // Ganti dengan path halaman register Anda
   };
 
   return (
@@ -101,9 +102,9 @@ export default function Login() {
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
-                if (errors.email) setErrors({ ...errors, email: "" });
+                if (errors.email) setErrors({ ...errors, email: '' });
               }}
-              className={errors.email ? "input-error" : ""}
+              className={errors.email ? 'input-error' : ''}
             />
             {errors.email && <span className="error-text">{errors.email}</span>}
           </div>
@@ -115,35 +116,43 @@ export default function Login() {
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
-                if (errors.password) setErrors({ ...errors, password: "" });
+                if (errors.password) setErrors({ ...errors, password: '' });
               }}
-              className={errors.password ? "input-error" : ""}
+              className={errors.password ? 'input-error' : ''}
             />
-            {errors.password && <span className="error-text">{errors.password}</span>}
+            {errors.password && (
+              <span className="error-text">{errors.password}</span>
+            )}
           </div>
 
           <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? "Loading..." : "Login"}
+            {loading ? 'Loading...' : 'Login'}
           </button>
         </form>
 
         <button
           type="button"
-          onClick={() => navigate("/forgot-password")}
+          onClick={() => navigate('/forgot-password')}
           className="forgot-password-btn"
         >
           Forgot Password?
         </button>
 
         {message && (
-          <p className={`login-message ${message.includes('successful') || message.includes('berhasil') ? 'success' : 'error'}`}>
+          <p
+            className={`login-message ${message.includes('successful') || message.includes('berhasil') ? 'success' : 'error'}`}
+          >
             {message}
           </p>
         )}
 
         <div className="register-link-container">
           <p>Don't have an account?</p>
-          <button type="button" onClick={handleRegisterClick} className="register-link-btn">
+          <button
+            type="button"
+            onClick={handleRegisterClick}
+            className="register-link-btn"
+          >
             Register here.
           </button>
         </div>

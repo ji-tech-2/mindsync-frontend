@@ -1,11 +1,11 @@
 export default function FormInput({
   label,
-  type = "text",
+  type = 'text',
   name,
   value,
   onChange,
   placeholder,
-  required = false
+  required = false,
 }) {
   return (
     <div className="form-group">

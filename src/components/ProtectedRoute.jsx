@@ -1,9 +1,9 @@
 /**
  * ProtectedRoute - Route Guard Component
- * 
+ *
  * Wraps protected routes to ensure only authenticated users can access them.
  * Redirects unauthenticated users to the login page (or custom path if specified).
- * 
+ *
  * During logout transition, this component does NOT redirect to prevent
  * the flash of /signIn page before the logout overlay completes.
  */
@@ -19,12 +19,14 @@ const ProtectedRoute = ({ children, redirectTo = '/signIn' }) => {
   // Show loading state while checking authentication
   if (isLoading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
         <div>Loading...</div>
       </div>
     );

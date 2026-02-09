@@ -3,7 +3,7 @@ export default function OTPInput({
   onOtpChange,
   onSendOTP,
   emailValue,
-  loading
+  loading,
 }) {
   return (
     <div className="form-group">

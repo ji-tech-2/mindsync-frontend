@@ -1,6 +1,6 @@
 /**
  * LogoutButton Component
- * 
+ *
  * Triggers a graceful logout with visual transition overlay.
  * Uses the logoutWithTransition method from AuthContext.
  */
@@ -16,8 +16,8 @@ const LogoutButton = ({ className, children }) => {
   };
 
   return (
-    <button 
-      onClick={handleLogout} 
+    <button
+      onClick={handleLogout}
       className={className || 'logout-btn'}
       type="button"
     >

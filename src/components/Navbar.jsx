@@ -10,17 +10,23 @@ function Navbar() {
     <nav className={styles.navbar}>
       <div className={styles.container}>
         <div className={styles.wordmark}>
-          <Link to={user ? "/dashboard" : "/"}>MindSync</Link>
+          <Link to={user ? '/dashboard' : '/'}>MindSync</Link>
         </div>
-        
+
         <div className={styles.navRight}>
           {user && (
             <>
-              <Link to="/dashboard" className={styles.navLink}>Dashboard</Link>
-              <Link to="/history" className={styles.navLink}>History</Link>
+              <Link to="/dashboard" className={styles.navLink}>
+                Dashboard
+              </Link>
+              <Link to="/history" className={styles.navLink}>
+                History
+              </Link>
             </>
           )}
-          <Link to="/screening" className={styles.navLink}>Screening</Link>
+          <Link to="/screening" className={styles.navLink}>
+            Screening
+          </Link>
           {user && (
             <div className={styles.profileSection}>
               <ProfileDropdown />

@@ -382,7 +382,11 @@ describe('pollPredictionResult', () => {
     it('should include created_at in partial response metadata', async () => {
       const mockResponse = {
         status: 'partial',
-        result: { prediction_score: 75, health_level: 'average', wellness_analysis: 'Test' },
+        result: {
+          prediction_score: 75,
+          health_level: 'average',
+          wellness_analysis: 'Test',
+        },
         created_at: '2026-01-21T10:00:00Z',
       };
 
@@ -391,7 +395,13 @@ describe('pollPredictionResult', () => {
         json: async () => mockResponse,
       });
 
-      const result = await pollPredictionResult('test-id', 'http://test.com', '/result', 3, 100);
+      const result = await pollPredictionResult(
+        'test-id',
+        'http://test.com',
+        '/result',
+        3,
+        100
+      );
 
       expect(result.metadata).toEqual({
         created_at: '2026-01-21T10:00:00Z',
@@ -416,7 +426,13 @@ describe('pollPredictionResult', () => {
         json: async () => mockResponse,
       });
 
-      const result = await pollPredictionResult('test-id', 'http://test.com', '/result', 3, 100);
+      const result = await pollPredictionResult(
+        'test-id',
+        'http://test.com',
+        '/result',
+        3,
+        100
+      );
 
       expect(result.metadata).toEqual({
         created_at: '2026-01-21T10:00:00Z',

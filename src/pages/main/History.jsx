@@ -1,8 +1,11 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import WeeklyChart from "../../components/WeeklyChart";
-import { fetchScreeningHistory, buildWeeklyChartFromHistory } from "../../config/api";
-import "../css/history.css";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import WeeklyChart from '../../components/WeeklyChart';
+import {
+  fetchScreeningHistory,
+  buildWeeklyChartFromHistory,
+} from '../../config/api';
+import '../css/history.css';
 
 export default function History() {
   const navigate = useNavigate();
@@ -17,36 +20,36 @@ export default function History() {
 
   // Check if user is logged in and fetch data
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user_data"));
-    
+    const user = JSON.parse(localStorage.getItem('user_data'));
+
     if (!user) {
-      navigate("/signIn");
+      navigate('/signIn');
       return;
     }
 
     const fetchHistory = async () => {
       const userId = getUserId(user);
-      
+
       if (!userId) {
-        console.warn("No user ID found in user object:", user);
+        console.warn('No user ID found in user object:', user);
         setIsLoading(false);
         return;
       }
 
       setIsLoading(true);
-      
+
       try {
         const response = await fetchScreeningHistory(userId, 50, 0);
-        
+
         if (response.success && response.data) {
-          console.log("✅ Screening history loaded:", response.data);
-          
+          console.log('✅ Screening history loaded:', response.data);
+
           // Transform API data to match frontend format
-          const transformedData = response.data.map(item => {
+          const transformedData = response.data.map((item) => {
             // Normalize score to 0-100 range
             // Assuming prediction_score can be negative, we need to map it to 0-100
             let normalizedScore = item.prediction_score;
-            
+
             // If score is already in 0-100 range, use it directly
             // Otherwise, normalize from possible negative values
             if (normalizedScore < 0) {
@@ -54,7 +57,7 @@ export default function History() {
             } else if (normalizedScore > 100) {
               normalizedScore = 100;
             }
-            
+
             return {
               id: item.prediction_id,
               predictionId: item.prediction_id,
@@ -62,36 +65,39 @@ export default function History() {
               score: Math.round(normalizedScore), // Round to integer, clamped to 0-100
               category: item.health_level, // 'healthy', 'average', 'not healthy', 'dangerous'
               advice: item.advice,
-              wellness_analysis: item.wellness_analysis
+              wellness_analysis: item.wellness_analysis,
             };
           });
-          
+
           setHistoryData(transformedData);
-          
+
           // Build weekly chart from history data
           // Clamps each score to 0 before averaging (fixes negative raw scores)
           const chartData = buildWeeklyChartFromHistory(response.data);
           setWeeklyData(chartData);
         } else {
-          console.warn("⚠️ History API not available:", response.error);
+          console.warn('⚠️ History API not available:', response.error);
           setHistoryData([]);
         }
       } catch (error) {
-        console.warn("⚠️ History API error (Kong Gateway not configured?):", error.message);
+        console.warn(
+          '⚠️ History API error (Kong Gateway not configured?):',
+          error.message
+        );
         setHistoryData([]);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchHistory().catch(err => {
-      console.warn("⚠️ History loading failed:", err);
+    fetchHistory().catch((err) => {
+      console.warn('⚠️ History loading failed:', err);
       setIsLoading(false);
     });
   }, [navigate]); // ✅ Hanya depend on navigate, bukan user object
 
   const getCategoryColor = (category) => {
-    if(category == null) return '#718096'; // Default gray for null/undefined
+    if (category == null) return '#718096'; // Default gray for null/undefined
     switch (category.toLowerCase()) {
       case 'healthy':
         return '#4CAF50';
@@ -127,7 +133,10 @@ export default function History() {
       {/* Header */}
       <header className="history-header">
         <div className="header-content">
-          <button className="back-button" onClick={() => navigate("/dashboard")}>
+          <button
+            className="back-button"
+            onClick={() => navigate('/dashboard')}
+          >
             ← Back to Dashboard
           </button>
           <div className="header-title">
@@ -154,41 +163,55 @@ export default function History() {
             <div className="empty-state">
               <div className="empty-icon">📋</div>
               <h3>No History Yet</h3>
-              <p>You haven't taken any screenings yet. Start now to see your history.</p>
-              <button className="start-screening-btn" onClick={() => navigate("/screening")}>
+              <p>
+                You haven't taken any screenings yet. Start now to see your
+                history.
+              </p>
+              <button
+                className="start-screening-btn"
+                onClick={() => navigate('/screening')}
+              >
                 Start Screening
               </button>
             </div>
           ) : (
             <div className="history-items">
               {historyData.map((item) => (
-                <div 
-                  key={item.id} 
+                <div
+                  key={item.id}
                   className="history-item"
                   onClick={() => navigate(`/result/${item.predictionId}`)}
                 >
                   <div className="item-date">
                     <span className="date-icon">📅</span>
-                    <span>{new Date(item.date).toLocaleString('id-ID', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      timeZone: 'Asia/Jakarta'
-                    })}</span>
+                    <span>
+                      {new Date(item.date).toLocaleString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        timeZone: 'Asia/Jakarta',
+                      })}
+                    </span>
                   </div>
                   <div className="item-score-badge">
                     <span className="score-label">Score:</span>
-                    <span className="score-number" style={{ color: getCategoryColor(item.category) }}>
+                    <span
+                      className="score-number"
+                      style={{ color: getCategoryColor(item.category) }}
+                    >
                       {item.score}
                     </span>
                     <span className="score-max">/100</span>
                   </div>
-                  <div className="item-category-badge" style={{ 
-                    background: getCategoryColor(item.category),
-                    color: 'white'
-                  }}>
+                  <div
+                    className="item-category-badge"
+                    style={{
+                      background: getCategoryColor(item.category),
+                      color: 'white',
+                    }}
+                  >
                     {getCategoryLabel(item.category)}
                   </div>
                 </div>
@@ -200,7 +223,7 @@ export default function History() {
         {/* Right Side - Chart */}
         <div className="history-chart-section">
           <div className="chart-card">
-            <WeeklyChart 
+            <WeeklyChart
               data={weeklyData}
               title="📊 Last 7 Days Trend"
               dataKey="value"
@@ -218,15 +241,24 @@ export default function History() {
             <div className="stat-item">
               <span className="stat-label">Average Score:</span>
               <span className="stat-value">
-                {historyData.length > 0 
-                  ? Math.round(historyData.reduce((sum, item) => sum + Math.max(0, item.score), 0) / historyData.length)
+                {historyData.length > 0
+                  ? Math.round(
+                      historyData.reduce(
+                        (sum, item) => sum + Math.max(0, item.score),
+                        0
+                      ) / historyData.length
+                    )
                   : 0}
               </span>
             </div>
             <div className="stat-item">
               <span className="stat-label">Last Test:</span>
               <span className="stat-value">
-                {historyData.length > 0 ? new Date(historyData[0].date).toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' }) : '-'}
+                {historyData.length > 0
+                  ? new Date(historyData[0].date).toLocaleDateString('id-ID', {
+                      timeZone: 'Asia/Jakarta',
+                    })
+                  : '-'}
               </span>
             </div>
           </div>

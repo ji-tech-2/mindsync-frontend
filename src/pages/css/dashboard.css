@@ -3,7 +3,7 @@
 /* Interactive & Engaging Design */
 /* ======================================= */
 
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 * {
   margin: 0;
@@ -16,17 +16,15 @@ html {
 }
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  
+
   /* Earth tone gradient background */
   background: linear-gradient(135deg, #f5f0e8 0%, #e8dcc8 50%, #d4c4a8 100%);
 }
-
-
 
 /* ======================================= */
 /* Dashboard Container */
@@ -49,7 +47,7 @@ body {
   margin-left: calc(-50vw + 50%);
   padding: 60px 20px;
   background: linear-gradient(135deg, #5a7c59 0%, #6b9b6a 50%, #7db87c 100%);
-  box-shadow: 
+  box-shadow:
     0 10px 40px rgba(90, 124, 89, 0.3),
     0 4px 20px rgba(0, 0, 0, 0.15),
     inset 0 -2px 10px rgba(255, 255, 255, 0.1);
@@ -78,7 +76,7 @@ body {
   font-weight: 700;
   color: #ffffff;
   margin: 0;
-  text-shadow: 
+  text-shadow:
     0 4px 20px rgba(0, 0, 0, 0.2),
     0 2px 10px rgba(90, 124, 89, 0.4),
     2px 2px 0px rgba(0, 0, 0, 0.1);
@@ -103,13 +101,13 @@ body {
   padding: 18px 45px;
   font-size: 1.1em;
   font-weight: 600;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   background: linear-gradient(145deg, #ffffff, #f5f0e8);
   color: #5a7c59;
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 50px;
   cursor: pointer;
-  box-shadow: 
+  box-shadow:
     0 8px 25px rgba(90, 124, 89, 0.3),
     0 4px 15px rgba(0, 0, 0, 0.1),
     inset 0 -2px 5px rgba(0, 0, 0, 0.05);
@@ -148,7 +146,7 @@ body {
   border-radius: 20px;
   padding: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 
+  box-shadow:
     0 10px 35px rgba(0, 0, 0, 0.1),
     0 4px 15px rgba(90, 124, 89, 0.08),
     inset 0 1px 1px rgba(255, 255, 255, 0.8);
@@ -298,7 +296,7 @@ body {
   padding: 12px 28px;
   font-size: 1em;
   font-weight: 600;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
   color: white;
   border: none;
@@ -319,11 +317,15 @@ body {
 }
 
 .stat-card {
-  background: linear-gradient(135deg, rgba(248, 243, 235, 0.95), rgba(245, 240, 232, 0.9));
+  background: linear-gradient(
+    135deg,
+    rgba(248, 243, 235, 0.95),
+    rgba(245, 240, 232, 0.9)
+  );
   padding: 25px;
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 20px;
-  box-shadow: 
+  box-shadow:
     0 8px 30px rgba(0, 0, 0, 0.1),
     0 4px 15px rgba(90, 124, 89, 0.08),
     inset 0 1px 1px rgba(255, 255, 255, 0.8);
@@ -333,7 +335,7 @@ body {
 }
 
 .stat-card::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -353,7 +355,7 @@ body {
   margin-bottom: 15px;
   background: linear-gradient(135deg, #5a7c59 0%, #6b9b6a 50%, #7db87c 100%);
   color: white;
-  box-shadow: 
+  box-shadow:
     0 8px 20px rgba(90, 124, 89, 0.4),
     0 4px 10px rgba(0, 0, 0, 0.2);
 }
@@ -492,11 +494,11 @@ body {
 }
 
 .cards-lower-section.full-width-layout {
-  grid-template-columns: 1fr; 
+  grid-template-columns: 1fr;
 }
 
 .cards-lower-section.full-width-layout > div {
-  max-width: 100% !important; 
+  max-width: 100% !important;
   width: 100%;
 }
 
@@ -579,7 +581,7 @@ body {
 }
 
 .action-card {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 /* ======================================= */

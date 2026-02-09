@@ -1,10 +1,10 @@
-  /**
+/**
  * Authentication Helper Utilities
- * 
+ *
  * Provides convenient functions for authentication checks and user data access
  * throughout the application.
- * 
- * Note: These are helper functions. For React components, prefer using 
+ *
+ * Note: These are helper functions. For React components, prefer using
  * the useAuth() hook from AuthContext for reactive state updates.
  */
 
@@ -34,7 +34,7 @@ export function getCurrentUser() {
  */
 export function logout() {
   TokenManager.clearToken();
-  
+
   // Dispatch logout event - AuthContext handles state update and navigation
   window.dispatchEvent(new CustomEvent('auth:logout'));
 }
@@ -60,4 +60,3 @@ export function requireAuth() {
   }
   return true;
 }
-

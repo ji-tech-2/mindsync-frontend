@@ -4,7 +4,7 @@ export default function FormSelect({
   value,
   onChange,
   options,
-  required = false
+  required = false,
 }) {
   return (
     <div className="form-group">

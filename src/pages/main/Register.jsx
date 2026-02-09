@@ -1,23 +1,23 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import apiClient, { API_CONFIG } from "../../config/api";
-import { validatePassword } from "../../utils/passwordValidation";
-import "../css/register.css";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import apiClient, { API_CONFIG } from '../../config/api';
+import { validatePassword } from '../../utils/passwordValidation';
+import '../css/register.css';
 
 export default function Register() {
   const navigate = useNavigate();
   const [isRegistered, setIsRegistered] = useState(false);
 
   const [form, setForm] = useState({
-    email: "",
-    password: "",
-    name: "",
-    dob: "",
-    gender: "",
-    occupation: "",
+    email: '',
+    password: '',
+    name: '',
+    dob: '',
+    gender: '',
+    occupation: '',
   });
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -29,7 +29,7 @@ export default function Register() {
     });
     // Clear error for this field when user starts typing
     if (errors[name]) {
-      setErrors({ ...errors, [name]: "" });
+      setErrors({ ...errors, [name]: '' });
     }
   }
 
@@ -50,8 +50,11 @@ export default function Register() {
     const today = new Date();
     const age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       return age - 1;
     }
     return age;
@@ -62,51 +65,53 @@ export default function Register() {
 
     // Email validation
     if (!form.email || !form.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = 'Email is required';
     } else if (!validateEmail(form.email)) {
-      newErrors.email = "Please enter a valid email address (e.g., user@example.com)";
+      newErrors.email =
+        'Please enter a valid email address (e.g., user@example.com)';
     }
 
     // Password validation
     if (!form.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = 'Password is required';
     } else if (form.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
+      newErrors.password = 'Password must be at least 8 characters';
     } else if (!validatePassword(form.password)) {
-      newErrors.password = "Password must contain uppercase, lowercase, and number";
+      newErrors.password =
+        'Password must contain uppercase, lowercase, and number';
     }
 
     // Name validation
     if (!form.name || !form.name.trim()) {
-      newErrors.name = "Full name is required";
+      newErrors.name = 'Full name is required';
     } else if (!validateName(form.name)) {
-      newErrors.name = "Name must be 2-50 characters (letters and spaces only)";
+      newErrors.name = 'Name must be 2-50 characters (letters and spaces only)';
     }
 
     // Date of Birth validation
     if (!form.dob) {
-      newErrors.dob = "Date of birth is required";
+      newErrors.dob = 'Date of birth is required';
     } else {
       const age = validateAge(form.dob);
       if (age < 13) {
-        newErrors.dob = "You must be at least 13 years old";
+        newErrors.dob = 'You must be at least 13 years old';
       } else if (age > 120) {
-        newErrors.dob = "Please enter a valid date of birth";
+        newErrors.dob = 'Please enter a valid date of birth';
       }
     }
 
     // Gender validation
     if (!form.gender) {
-      newErrors.gender = "Gender is required";
+      newErrors.gender = 'Gender is required';
     }
 
     // Occupation validation
     if (!form.occupation || !form.occupation.trim()) {
-      newErrors.occupation = "Occupation is required";
+      newErrors.occupation = 'Occupation is required';
     } else if (form.occupation.length < 2) {
-      newErrors.occupation = "Occupation must be at least 2 characters";
+      newErrors.occupation = 'Occupation must be at least 2 characters';
     } else if (form.occupation.length > 50) {
-      newErrors.occupation = "Occupation must not exceed 50 characters";
+      newErrors.occupation = 'Occupation must not exceed 50 characters';
     }
 
     setErrors(newErrors);
@@ -115,15 +120,15 @@ export default function Register() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    
+
     // Validate form before submitting
     if (!validateForm()) {
-      setMessage("Please fix the errors before submitting");
+      setMessage('Please fix the errors before submitting');
       return;
     }
 
     setLoading(true);
-    setMessage("Processing registration...");
+    setMessage('Processing registration...');
     setErrors({});
 
     // Backend response: { success: true, message: "...", data: { email, name } }
@@ -134,158 +139,181 @@ export default function Register() {
       setLoading(false);
 
       if (result.success) {
-        setMessage("Registration successful! Welcome aboard.");
+        setMessage('Registration successful! Welcome aboard.');
         setIsRegistered(true);
         // Note: User will need to login after successful registration
         // Or you can auto-login here by calling the login endpoint
       } else {
-        setMessage(result.message || "Registration failed. Please check your form data.");
+        setMessage(
+          result.message || 'Registration failed. Please check your form data.'
+        );
         setIsRegistered(false);
       }
     } catch (err) {
       setLoading(false);
-      const errorMessage = err.response?.data?.message || "Error connecting to server. Please ensure your backend is running.";
+      const errorMessage =
+        err.response?.data?.message ||
+        'Error connecting to server. Please ensure your backend is running.';
       setMessage(errorMessage);
       setIsRegistered(false);
-      console.error("Registration error:", err);
+      console.error('Registration error:', err);
     }
   }
 
   const handleContinue = () => {
-    navigate("/signIn"); // Redirect to login after successful registration
+    navigate('/signIn'); // Redirect to login after successful registration
   };
 
   // Fungsi baru untuk navigasi ke Login
   const handleLoginClick = () => {
-    navigate("/signIn");
+    navigate('/signIn');
   };
 
   // RENDER HALAMAN SUKSES
   if (isRegistered) {
     return (
       <div className="register-wrapper">
-      <div className="register-container success-screen">
-        <h2>✅ Registration Successful!</h2>
+        <div className="register-container success-screen">
+          <h2>✅ Registration Successful!</h2>
 
-        <p className="register-message success-message-box">{message}</p>
+          <p className="register-message success-message-box">{message}</p>
 
-        <p>
-          Your account has been successfully created. Please log in to start your
-          mental health journey.
-        </p>
+          <p>
+            Your account has been successfully created. Please log in to start
+            your mental health journey.
+          </p>
 
-        <button type="button" className="register-btn" onClick={handleContinue}>
-          Login Now
-        </button>
-      </div>
+          <button
+            type="button"
+            className="register-btn"
+            onClick={handleContinue}
+          >
+            Login Now
+          </button>
+        </div>
       </div>
     );
   }
 
   // Tentukan class untuk error message
   const messageClass =
-    message && (message.includes("failed") || message.includes("error") || message.includes("Error"))
-      ? "register-message error" // Ubah ke 'error' untuk konsistensi CSS
-      : "register-message success"; // Default ke 'success' atau netral
+    message &&
+    (message.includes('failed') ||
+      message.includes('error') ||
+      message.includes('Error'))
+      ? 'register-message error' // Ubah ke 'error' untuk konsistensi CSS
+      : 'register-message success'; // Default ke 'success' atau netral
 
   // RENDER FORM REGISTER
   return (
     <div className="register-wrapper">
-    <div className="register-container">
-      <h2>Register</h2>
+      <div className="register-container">
+        <h2>Register</h2>
 
-      <form onSubmit={handleSubmit} className="register-form">
-        <div className="form-field">
-          <input 
-            name="email" 
-            type="email" 
-            placeholder="Email (will be used as your username)" 
-            value={form.email} 
-            onChange={handleChange}
-            className={errors.email ? "input-error" : ""}
-          />
-          {errors.email && <span className="error-text">{errors.email}</span>}
-        </div>
+        <form onSubmit={handleSubmit} className="register-form">
+          <div className="form-field">
+            <input
+              name="email"
+              type="email"
+              placeholder="Email (will be used as your username)"
+              value={form.email}
+              onChange={handleChange}
+              className={errors.email ? 'input-error' : ''}
+            />
+            {errors.email && <span className="error-text">{errors.email}</span>}
+          </div>
 
-        <div className="form-field">
-          <input
-            name="password"
-            type="password"
-            placeholder="Password (min 8 chars, include A-Z, a-z, 0-9)"
-            value={form.password}
-            onChange={handleChange}
-            className={errors.password ? "input-error" : ""}
-          />
-          {errors.password && <span className="error-text">{errors.password}</span>}
-        </div>
+          <div className="form-field">
+            <input
+              name="password"
+              type="password"
+              placeholder="Password (min 8 chars, include A-Z, a-z, 0-9)"
+              value={form.password}
+              onChange={handleChange}
+              className={errors.password ? 'input-error' : ''}
+            />
+            {errors.password && (
+              <span className="error-text">{errors.password}</span>
+            )}
+          </div>
 
-        <div className="form-field">
-          <input
-            name="name"
-            placeholder="Full Name"
-            value={form.name}
-            onChange={handleChange}
-            className={errors.name ? "input-error" : ""}
-          />
-          {errors.name && <span className="error-text">{errors.name}</span>}
-        </div>
+          <div className="form-field">
+            <input
+              name="name"
+              placeholder="Full Name"
+              value={form.name}
+              onChange={handleChange}
+              className={errors.name ? 'input-error' : ''}
+            />
+            {errors.name && <span className="error-text">{errors.name}</span>}
+          </div>
 
-        <div className="form-field">
-          <input
-            name="dob"
-            type="date"
-            value={form.dob}
-            onChange={handleChange}
-            className={errors.dob ? "input-error" : ""}
-            max={new Date().toISOString().split('T')[0]}
-          />
-          {errors.dob && <span className="error-text">{errors.dob}</span>}
-        </div>
+          <div className="form-field">
+            <input
+              name="dob"
+              type="date"
+              value={form.dob}
+              onChange={handleChange}
+              className={errors.dob ? 'input-error' : ''}
+              max={new Date().toISOString().split('T')[0]}
+            />
+            {errors.dob && <span className="error-text">{errors.dob}</span>}
+          </div>
 
-        <div className="form-field">
-          <select 
-            name="gender" 
-            value={form.gender} 
-            onChange={handleChange}
-            className={errors.gender ? "input-error" : ""}
+          <div className="form-field">
+            <select
+              name="gender"
+              value={form.gender}
+              onChange={handleChange}
+              className={errors.gender ? 'input-error' : ''}
+            >
+              <option value="" disabled>
+                Select Gender
+              </option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+            {errors.gender && (
+              <span className="error-text">{errors.gender}</span>
+            )}
+          </div>
+
+          <div className="form-field">
+            <input
+              name="occupation"
+              placeholder="Occupation"
+              value={form.occupation}
+              onChange={handleChange}
+              className={errors.occupation ? 'input-error' : ''}
+            />
+            {errors.occupation && (
+              <span className="error-text">{errors.occupation}</span>
+            )}
+          </div>
+
+          <button type="submit" className="register-btn" disabled={loading}>
+            {loading ? 'Processing...' : 'Register'}
+          </button>
+        </form>
+
+        {message && (
+          <div className="register-message-wrapper">
+            <p className={messageClass}>{message}</p>
+          </div>
+        )}
+
+        {/* Opsi Navigasi ke Login */}
+        <div className="login-link-container">
+          <p>Sudah punya akun?</p>
+          <button
+            type="button"
+            onClick={handleLoginClick}
+            className="login-link-btn"
           >
-            <option value="" disabled>Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
-          {errors.gender && <span className="error-text">{errors.gender}</span>}
+            Masuk di sini.
+          </button>
         </div>
-
-        <div className="form-field">
-          <input
-            name="occupation"
-            placeholder="Occupation"
-            value={form.occupation}
-            onChange={handleChange}
-            className={errors.occupation ? "input-error" : ""}
-          />
-          {errors.occupation && <span className="error-text">{errors.occupation}</span>}
-        </div>
-
-        <button type="submit" className="register-btn" disabled={loading}>
-          {loading ? "Processing..." : "Register"}
-        </button>
-      </form>
-
-      {message && (
-        <div className="register-message-wrapper">
-          <p className={messageClass}>{message}</p>
-        </div>
-      )}
-
-      {/* Opsi Navigasi ke Login */}
-      <div className="login-link-container">
-        <p>Sudah punya akun?</p>
-        <button type="button" onClick={handleLoginClick} className="login-link-btn">
-          Masuk di sini.
-        </button>
       </div>
-    </div>
     </div>
   );
 }

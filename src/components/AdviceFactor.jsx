@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './AdviceFactor.module.css'; 
+import styles from './AdviceFactor.module.css';
 
 const AdviceFactor = ({ factorKey, factorData }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -8,7 +8,7 @@ const AdviceFactor = ({ factorKey, factorData }) => {
     return key
       .replace('num__', '')
       .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')
       .replace('0 100', '')
       .replace('1 5^2', '');
@@ -25,18 +25,20 @@ const AdviceFactor = ({ factorKey, factorData }) => {
         <div className={styles.content}>
           <ul className={styles.list}>
             {factorData.advices.map((item, index) => (
-              <li key={index} className={styles.listItem}>{item}</li>
+              <li key={index} className={styles.listItem}>
+                {item}
+              </li>
             ))}
           </ul>
 
           <div className={styles.refSection}>
             <p className={styles.refTitle}>Sources & References</p>
             {factorData.references.map((ref, index) => (
-              <a 
-                key={index} 
-                href={ref} 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                key={index}
+                href={ref}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={styles.refLink}
               >
                 Resource {index + 1}

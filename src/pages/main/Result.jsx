@@ -15,13 +15,13 @@ const ResultPage = () => {
   const [isPolling, setIsPolling] = useState(false);
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
   const [pollingError, setPollingError] = useState(null);
-  const [loadingStage, setLoadingStage] = useState(1); 
-  const [setHasPartialResult] = useState(false);
+  const [loadingStage, setLoadingStage] = useState(1);
+  const [, setHasPartialResult] = useState(false);
 
   useEffect(() => {
     const loadResult = async () => {
       if (!predictionId) {
-        alert("Data not found. Please take the screening again.");
+        alert('Data not found. Please take the screening again.');
         navigate('/screening');
         return;
       }
@@ -31,7 +31,7 @@ const ResultPage = () => {
       if (cachedResult) {
         try {
           const cached = JSON.parse(cachedResult);
-          console.log("✅ Using cached result from localStorage:", cached);
+          console.log('✅ Using cached result from localStorage:', cached);
           setResultData(cached.resultData);
           if (cached.adviceData) {
             setAdviceData(cached.adviceData);
@@ -40,8 +40,10 @@ const ResultPage = () => {
           setIsLoadingAdvice(false);
           setLoadingStage(3);
           return; // Skip polling, use cached data
-        } catch (e) {
-          console.warn("⚠️ Failed to parse cached result, will fetch fresh data");
+        } catch {
+          console.warn(
+            '⚠️ Failed to parse cached result, will fetch fresh data'
+          );
         }
       }
 
@@ -52,16 +54,19 @@ const ResultPage = () => {
       try {
         // Callback for partial results (Stage 1: Numeric model ready)
         const handlePartialResult = (partialData) => {
-          console.log("📊 Partial result received:", partialData);
+          console.log('📊 Partial result received:', partialData);
           setLoadingStage(2);
           setHasPartialResult(true);
-          
+
           // Display numeric results immediately
           setResultData({
-            mentalWellnessScore: Math.max(0, parseFloat(partialData.data.prediction_score)),
+            mentalWellnessScore: Math.max(
+              0,
+              parseFloat(partialData.data.prediction_score)
+            ),
             category: partialData.data.health_level,
             wellnessAnalysis: null, // Advisory model still processing
-            isPartial: true
+            isPartial: true,
           });
         };
 
@@ -74,61 +79,72 @@ const ResultPage = () => {
           API_CONFIG.POLLING.INTERVAL_MS,
           handlePartialResult
         );
-        
+
         if (pollResult.success) {
-          console.log("✅ Complete result received:", pollResult);
+          console.log('✅ Complete result received:', pollResult);
           setLoadingStage(3);
-          
+
           const prediction = pollResult.data;
-          
+
           // Set prediction data (always available)
           const resultDataToSave = {
-            mentalWellnessScore: Math.max(0, parseFloat(prediction.prediction_score)),
+            mentalWellnessScore: Math.max(
+              0,
+              parseFloat(prediction.prediction_score)
+            ),
             category: prediction.health_level,
             wellnessAnalysis: prediction.wellness_analysis,
-            isPartial: false
+            isPartial: false,
           };
-          
+
           setResultData(resultDataToSave);
-          
+
           // If partial, show results but continue polling for advice
-          if (pollResult.status === "partial") {
-            console.log("📊 Showing partial results, continuing to poll for advice...");
+          if (pollResult.status === 'partial') {
+            console.log(
+              '📊 Showing partial results, continuing to poll for advice...'
+            );
             setIsPolling(false);
             setIsLoadingAdvice(true);
-            
+
             // Save partial result to localStorage
-            localStorage.setItem(`result_${predictionId}`, JSON.stringify({
-              resultData: resultDataToSave,
-              adviceData: null,
-              timestamp: new Date().toISOString()
-            }));
-            
+            localStorage.setItem(
+              `result_${predictionId}`,
+              JSON.stringify({
+                resultData: resultDataToSave,
+                adviceData: null,
+                timestamp: new Date().toISOString(),
+              })
+            );
+
             // Continue polling for full result with advice
             pollForAdvice(predictionId);
-          } 
+          }
           // If ready, set advice data
-          else if (pollResult.status === "ready") {
-            console.log("✅ Full results with advice ready");
+          else if (pollResult.status === 'ready') {
+            console.log('✅ Full results with advice ready');
             let adviceToSave = null;
             if (prediction.advice) {
               setAdviceData(prediction.advice);
               adviceToSave = prediction.advice;
             }
-            
+
             // Save complete result to localStorage
-            localStorage.setItem(`result_${predictionId}`, JSON.stringify({
-              resultData: resultDataToSave,
-              adviceData: adviceToSave,
-              timestamp: new Date().toISOString()
-            }));
-            
+            localStorage.setItem(
+              `result_${predictionId}`,
+              JSON.stringify({
+                resultData: resultDataToSave,
+                adviceData: adviceToSave,
+                timestamp: new Date().toISOString(),
+              })
+            );
+
             setIsPolling(false);
             setIsLoadingAdvice(false);
           }
         }
       } catch (error) {
-        console.error("❌ Polling error:", error);
+        console.error('❌ Polling error:', error);
         setPollingError(error.message);
         setIsPolling(false);
         setIsLoadingAdvice(false);
@@ -143,7 +159,9 @@ const ResultPage = () => {
 
       const pollUntilReady = async () => {
         adviceAttempts++;
-        console.log(`🔄 Polling for advice attempt ${adviceAttempts}/${maxAdviceAttempts}`);
+        console.log(
+          `🔄 Polling for advice attempt ${adviceAttempts}/${maxAdviceAttempts}`
+        );
 
         try {
           const pollResult = await pollPredictionResult(
@@ -153,19 +171,22 @@ const ResultPage = () => {
             1, // Only 1 attempt per call, we handle retries here
             pollInterval
           );
-          
-          if (pollResult.success && pollResult.status === "ready") {
+
+          if (pollResult.success && pollResult.status === 'ready') {
             const prediction = pollResult.data;
             if (prediction.advice) {
-              console.log("✅ Advice data received:", prediction.advice);
+              console.log('✅ Advice data received:', prediction.advice);
               setAdviceData(prediction.advice);
-              
+
               // Update localStorage with complete advice
               const cachedData = localStorage.getItem(`result_${predictionId}`);
               if (cachedData) {
                 const parsed = JSON.parse(cachedData);
                 parsed.adviceData = prediction.advice;
-                localStorage.setItem(`result_${predictionId}`, JSON.stringify(parsed));
+                localStorage.setItem(
+                  `result_${predictionId}`,
+                  JSON.stringify(parsed)
+                );
               }
             }
             setIsLoadingAdvice(false);
@@ -173,19 +194,22 @@ const ResultPage = () => {
           }
 
           // Still partial or processing, continue polling
-          if (pollResult.status === "partial" || pollResult.status === "processing") {
+          if (
+            pollResult.status === 'partial' ||
+            pollResult.status === 'processing'
+          ) {
             if (adviceAttempts >= maxAdviceAttempts) {
-              console.warn("⚠️ Timeout waiting for advice");
+              console.warn('⚠️ Timeout waiting for advice');
               setIsLoadingAdvice(false);
               return;
             }
-            
+
             // Wait and poll again
-            await new Promise(resolve => setTimeout(resolve, pollInterval));
+            await new Promise((resolve) => setTimeout(resolve, pollInterval));
             return pollUntilReady();
           }
         } catch (error) {
-          console.error("⚠️ Failed to load advice:", error);
+          console.error('⚠️ Failed to load advice:', error);
           setIsLoadingAdvice(false);
         }
       };
@@ -241,7 +265,10 @@ const ResultPage = () => {
           <h2>⚠️ An Error Occurred</h2>
           <p>{pollingError}</p>
           <div className="result-footer">
-            <button className="btn btn-primary" onClick={() => navigate('/screening')}>
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate('/screening')}
+            >
               Try Again
             </button>
             <button className="btn btn-outline" onClick={() => navigate('/')}>
@@ -271,7 +298,10 @@ const ResultPage = () => {
 
       {/* Score Circle - Always Shown */}
       <div className="score-section">
-        <div className="score-circle" style={{ borderColor: scoreColor, color: scoreColor }}>
+        <div
+          className="score-circle"
+          style={{ borderColor: scoreColor, color: scoreColor }}
+        >
           <div className="score-value">{score.toFixed(1)}</div>
           <div className="score-max">/100</div>
         </div>
@@ -282,25 +312,41 @@ const ResultPage = () => {
 
       {/* Advice Section - Only for authenticated users */}
       {user ? (
-        <Advice resultData={resultData} adviceData={adviceData} isLoading={isLoadingAdvice} />
+        <Advice
+          resultData={resultData}
+          adviceData={adviceData}
+          isLoading={isLoadingAdvice}
+        />
       ) : (
         <div className="advice-locked">
           <h3>🔒 Personal Advice Locked</h3>
-          <p>Sign in or register to view personalized mental health advice based on your results.</p>
+          <p>
+            Sign in or register to view personalized mental health advice based
+            on your results.
+          </p>
           <div className="auth-buttons">
-            <button className="btn btn-primary" onClick={() => navigate('/signIn')}>
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate('/signIn')}
+            >
               Sign In
             </button>
-            <button className="btn btn-outline" onClick={() => navigate('/register')}>
+            <button
+              className="btn btn-outline"
+              onClick={() => navigate('/register')}
+            >
               Register
             </button>
           </div>
         </div>
       )}
- 
+
       {/* Footer Action */}
       <div className="result-footer">
-        <button className="btn btn-primary" onClick={() => navigate('/screening')}>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate('/screening')}
+        >
           Retake Test
         </button>
         <button className="btn btn-outline" onClick={() => navigate('/')}>

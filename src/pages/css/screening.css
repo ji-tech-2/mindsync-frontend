@@ -6,7 +6,10 @@
   box-sizing: border-box;
 }
 
-html, body, #root, .screening-wrapper {
+html,
+body,
+#root,
+.screening-wrapper {
   font-family: 'Poppins', sans-serif;
   margin: 0;
   display: flex;
@@ -26,7 +29,11 @@ html, body, #root, .screening-wrapper {
   border-radius: 30px;
   position: relative;
   z-index: 1;
-  background: linear-gradient(145deg, rgba(248, 243, 235, 0.95), rgba(245, 240, 232, 0.9));
+  background: linear-gradient(
+    145deg,
+    rgba(248, 243, 235, 0.95),
+    rgba(245, 240, 232, 0.9)
+  );
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
   box-shadow:
@@ -95,7 +102,7 @@ html, body, #root, .screening-wrapper {
   gap: 20px;
 }
 
-.input-container input[type="number"],
+.input-container input[type='number'],
 .input-container select {
   padding: 16px 20px;
   border: 2px solid #e2e8f0;
@@ -110,11 +117,11 @@ html, body, #root, .screening-wrapper {
   cursor: pointer;
 }
 
-.input-container input[type="number"] {
+.input-container input[type='number'] {
   cursor: text;
 }
 
-.input-container input[type="number"]:focus,
+.input-container input[type='number']:focus,
 .input-container select:focus {
   border-color: #5a7c59;
   box-shadow:
@@ -124,7 +131,7 @@ html, body, #root, .screening-wrapper {
   background-color: #ffffff;
 }
 
-.input-container input[type="number"]::placeholder {
+.input-container input[type='number']::placeholder {
   color: #a0aec0;
   font-weight: 300;
 }
@@ -223,14 +230,17 @@ html, body, #root, .screening-wrapper {
     font-size: 1.35em;
     min-height: 60px;
   }
-  .input-container input[type="number"],
+  .input-container input[type='number'],
   .input-container select {
     padding: 15px 18px;
   }
 }
 
 @media (max-width: 480px) {
-  html, body, #root, .screening-wrapper {
+  html,
+  body,
+  #root,
+  .screening-wrapper {
     padding: 15px 0;
   }
   .screening-container {
@@ -254,7 +264,7 @@ html, body, #root, .screening-wrapper {
   .input-container {
     gap: 16px;
   }
-  .input-container input[type="number"],
+  .input-container input[type='number'],
   .input-container select {
     padding: 14px 16px;
     font-size: 1em;
@@ -280,7 +290,7 @@ html, body, #root, .screening-wrapper {
     font-size: 1.1em;
     min-height: 50px;
   }
-  .input-container input[type="number"],
+  .input-container input[type='number'],
   .input-container select {
     padding: 13px 15px;
     font-size: 0.95em;
@@ -301,7 +311,7 @@ html, body, #root, .screening-wrapper {
     font-size: 1.65em;
     min-height: 70px;
   }
-  .input-container input[type="number"],
+  .input-container input[type='number'],
   .input-container select {
     padding: 17px 22px;
     font-size: 1.1em;

@@ -5,19 +5,21 @@ const CriticalFactorCard = ({ data, loading }) => {
   const getFactorImage = (rawName) => {
     // ini hanya contoh sementara
     const images = {
-      "num__sleep_quality_1_5^2": "/assets/factors/sleep.png",
-      "num__stress_level": "/assets/factors/stress.png",
-      "num__productivity_0_100": "/assets/factors/productivity.png",
+      'num__sleep_quality_1_5^2': '/assets/factors/sleep.png',
+      num__stress_level: '/assets/factors/stress.png',
+      num__productivity_0_100: '/assets/factors/productivity.png',
     };
-    return images[rawName] || "/assets/factors/default-factor.png";
+    return images[rawName] || '/assets/factors/default-factor.png';
   };
 
   // 1. Cek loading dulu
   if (loading) {
-    return <div className={styles.loadingState}>Menganalisis Faktor Kritis...</div>;
+    return (
+      <div className={styles.loadingState}>Menganalisis Faktor Kritis...</div>
+    );
   }
 
-  // 2. Cek apakah data ada 
+  // 2. Cek apakah data ada
   if (!data) {
     return (
       <div className={`${styles.cardContainer} ${styles.emptyCardState}`}>
@@ -29,7 +31,8 @@ const CriticalFactorCard = ({ data, loading }) => {
         </div>
         <div className={styles.content}>
           <p className={styles.description}>
-            Please take the assessment first to discover and analyze your critical wellness factors.
+            Please take the assessment first to discover and analyze your
+            critical wellness factors.
           </p>
         </div>
       </div>
@@ -40,10 +43,10 @@ const CriticalFactorCard = ({ data, loading }) => {
   return (
     <div className={styles.cardContainer}>
       <div className={styles.imageHeader}>
-        <img 
-          src={getFactorImage(data.raw_name)} 
-          alt={data.factor_name} 
-          className={styles.factorImg} 
+        <img
+          src={getFactorImage(data.raw_name)}
+          alt={data.factor_name}
+          className={styles.factorImg}
         />
       </div>
 
@@ -64,7 +67,12 @@ const CriticalFactorCard = ({ data, loading }) => {
             <ul className={styles.refList}>
               {data.references.map((ref, idx) => (
                 <li key={idx} className={styles.refItem}>
-                  <a href={typeof ref === 'object' ? ref.url : ref} target="_blank" rel="noopener noreferrer" className={styles.refLink}>
+                  <a
+                    href={typeof ref === 'object' ? ref.url : ref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.refLink}
+                  >
                     Resource {idx + 1}
                   </a>
                 </li>

@@ -1,6 +1,6 @@
 /**
  * ProtectedRoute Component Tests
- * 
+ *
  * Tests for route protection and authentication guards
  */
 
@@ -24,7 +24,9 @@ vi.mock('../config/api', () => ({
 }));
 
 // Protected content component
-const ProtectedContent = () => <div data-testid="protected-content">Protected Content</div>;
+const ProtectedContent = () => (
+  <div data-testid="protected-content">Protected Content</div>
+);
 
 // Login page component
 const LoginPage = () => <div data-testid="login-page">Login Page</div>;
@@ -36,23 +38,26 @@ const renderProtectedRoute = (initialRoute = '/protected') => {
       <AuthProvider>
         <Routes>
           <Route path="/signIn" element={<LoginPage />} />
-          <Route 
-            path="/protected" 
+          <Route
+            path="/protected"
             element={
               <ProtectedRoute>
                 <ProtectedContent />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/custom-redirect" 
+          <Route
+            path="/custom-redirect"
             element={
               <ProtectedRoute redirectTo="/custom-login">
                 <ProtectedContent />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route path="/custom-login" element={<div data-testid="custom-login">Custom Login</div>} />
+          <Route
+            path="/custom-login"
+            element={<div data-testid="custom-login">Custom Login</div>}
+          />
         </Routes>
       </AuthProvider>
     </MemoryRouter>
@@ -70,17 +75,17 @@ describe('ProtectedRoute Component', () => {
   describe('Unauthenticated User', () => {
     it('should redirect to signIn when not authenticated', async () => {
       renderProtectedRoute('/protected');
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('login-page')).toBeInTheDocument();
       });
-      
+
       expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
     });
 
     it('should redirect to custom path when specified', async () => {
       renderProtectedRoute('/custom-redirect');
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('custom-login')).toBeInTheDocument();
       });
@@ -95,11 +100,11 @@ describe('ProtectedRoute Component', () => {
 
     it('should render protected content when authenticated', async () => {
       renderProtectedRoute('/protected');
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('protected-content')).toBeInTheDocument();
       });
-      
+
       expect(screen.queryByTestId('login-page')).not.toBeInTheDocument();
     });
   });
