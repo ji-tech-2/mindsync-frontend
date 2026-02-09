@@ -84,10 +84,10 @@ export default function Dashboard() {
   // State untuk API data
   const [factors, setFactors] = useState([]);
   const [dailySuggestion, setDailySuggestion] = useState('');
-  const [loading, setLoading] = useState(!!userId);
-  const [loadingSuggestion, setLoadingSuggestion] = useState(!!userId);
+  const [loading, setLoading] = useState(true);
+  const [loadingSuggestion, setLoadingSuggestion] = useState(true);
   const [streakData, setStreakData] = useState(null);
-  const [loadingStreak, setLoadingStreak] = useState(!!userId);
+  const [loadingStreak, setLoadingStreak] = useState(true);
   const [errorStreak, setErrorStreak] = useState(null);
 
   // Fetch critical factors dari API

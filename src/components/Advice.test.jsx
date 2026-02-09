@@ -1,7 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Advice from './Advice';
-import vi from 'vitest';
 
 // Mock AdviceFactor component
 vi.mock('./AdviceFactor', () => ({
