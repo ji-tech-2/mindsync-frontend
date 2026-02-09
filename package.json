@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint . && npm run lint:css",
+    "lint:fix": "eslint . --fix && npm run lint:css:fix",
+    "lint:css": "stylelint \"src/**/*.css\"",
+    "lint:css:fix": "stylelint \"src/**/*.css\" --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,css,html}\"",
     "format:check": "prettier --check \"src/**/*.{js,jsx,css,html}\"",
     "preview": "vite preview",
@@ -21,7 +23,11 @@
       "eslint --fix",
       "prettier --write"
     ],
-    "src/**/*.{css,html}": [
+    "src/**/*.css": [
+      "stylelint --fix",
+      "prettier --write"
+    ],
+    "src/**/*.html": [
       "prettier --write"
     ]
   },
@@ -51,6 +57,9 @@
     "jsdom": "^27.4.0",
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
+    "stylelint": "^17.1.1",
+    "stylelint-config-standard": "^40.0.0",
+    "stylelint-prettier": "^5.0.3",
     "vite": "^7.2.4",
     "vitest": "^4.0.17"
   }
