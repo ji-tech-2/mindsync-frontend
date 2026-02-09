@@ -152,7 +152,8 @@ describe('Dashboard Component', () => {
 
     it('should display default greeting when user name is not available', () => {
       renderDashboard({ email: 'john@example.com', userId: '123' });
-      expect(screen.getByText(/Hello, Pengguna!/i)).toBeInTheDocument();
+      
+      expect(screen.getByText(/Hello, User!/i)).toBeInTheDocument();
     });
 
     it('should display subtitle text', () => {
@@ -184,8 +185,13 @@ describe('Dashboard Component', () => {
 
   describe('Dashboard Layout', () => {
     it('should render upper section structure', () => {
-      renderDashboard(defaultUser);
-      expect(document.querySelector('.cards-upper-section')).toBeInTheDocument();
+      renderDashboard({ name: 'John Doe', email: 'john@example.com', userId: '123' });
+      
+      const upperSection = document.querySelector('.cards-upper-section');
+      expect(upperSection).toBeInTheDocument();
+      
+      // Third card is the WeeklyChart component (renders chart title, not "Card 3")
+      expect(screen.getByText('Last 7 Days Trend')).toBeInTheDocument();
     });
 
     it('should render left column with streak and suggestion cards', () => {

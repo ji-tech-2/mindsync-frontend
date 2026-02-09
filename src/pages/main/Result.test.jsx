@@ -111,7 +111,7 @@ describe('Result Component - Partial Polling', () => {
       renderResult('test-123');
 
       // Should show loading initially
-      expect(screen.getByText(/Menganalisis Data Anda/i)).toBeInTheDocument();
+      expect(screen.getByText(/Analyzing Your Data/i)).toBeInTheDocument();
 
       // Wait for partial result to load
       await waitFor(() => {
@@ -237,8 +237,8 @@ describe('Result Component - Partial Polling', () => {
       const { container } = renderResult('test-123');
 
       // Should show loading UI
-      expect(screen.getByText(/Menganalisis Data Anda/i)).toBeInTheDocument();
-      expect(screen.getByText(/Mohon tunggu sebentar/i)).toBeInTheDocument();
+      expect(screen.getByText(/Analyzing Your Data/i)).toBeInTheDocument();
+      expect(screen.getByText(/Please wait a moment/i)).toBeInTheDocument();
       
       // Check for loading spinner using container query
       const loadingSpinner = container.querySelector('.loading-spinner');
@@ -255,13 +255,13 @@ describe('Result Component - Partial Polling', () => {
       renderResult('test-123');
 
       await waitFor(() => {
-        expect(screen.getByText(/Terjadi Kesalahan/i)).toBeInTheDocument();
+        expect(screen.getByText(/An Error Occurred/i)).toBeInTheDocument();
         expect(screen.getByText(/Network error occurred/i)).toBeInTheDocument();
       });
 
       // Should show retry buttons
-      expect(screen.getByText('Coba Lagi')).toBeInTheDocument();
-      expect(screen.getByText('Kembali ke Beranda')).toBeInTheDocument();
+      expect(screen.getByText('Try Again')).toBeInTheDocument();
+      expect(screen.getByText('Back to Home')).toBeInTheDocument();
     });
 
     it('should redirect to screening when no predictionId', async () => {
@@ -278,7 +278,7 @@ describe('Result Component - Partial Polling', () => {
 
       await waitFor(() => {
         expect(alertMock).toHaveBeenCalledWith(
-          'Data tidak ditemukan. Silakan lakukan screening ulang.'
+          'Data not found. Please take the screening again.'
         );
         expect(mockNavigate).toHaveBeenCalledWith('/screening');
       });
@@ -298,6 +298,8 @@ describe('Result Component - Partial Polling', () => {
 
       for (const testCase of testCases) {
         vi.clearAllMocks();
+        // Clear cached results from previous iterations to prevent stale localStorage reads
+        localStorage.clear();
 
         const mockResult = {
           success: true,
@@ -332,7 +334,7 @@ describe('Result Component - Partial Polling', () => {
   });
 
   describe('Navigation', () => {
-    it('should navigate to screening when "Ambil Tes Lagi" clicked', async () => {
+    it('should navigate to screening when "Retake Test" clicked', async () => {
       const mockResult = {
         success: true,
         status: 'ready',
@@ -356,13 +358,13 @@ describe('Result Component - Partial Polling', () => {
         expect(screen.getByText('75.0')).toBeInTheDocument();
       });
 
-      const retakeButton = screen.getByText('Ambil Tes Lagi');
+      const retakeButton = screen.getByText('Retake Test');
       retakeButton.click();
 
       expect(mockNavigate).toHaveBeenCalledWith('/screening');
     });
 
-    it('should navigate to home when "Kembali ke Beranda" clicked', async () => {
+    it('should navigate to home when "Back to Home" clicked', async () => {
       const mockResult = {
         success: true,
         status: 'ready',
@@ -386,7 +388,7 @@ describe('Result Component - Partial Polling', () => {
         expect(screen.getByText('75.0')).toBeInTheDocument();
       });
 
-      const homeButton = screen.getByText('Kembali ke Beranda');
+      const homeButton = screen.getByText('Back to Home');
       homeButton.click();
 
       expect(mockNavigate).toHaveBeenCalledWith('/');
@@ -520,7 +522,7 @@ describe('Result Component - Guest User (Not Authenticated)', () => {
     expect(screen.queryByTestId('advice-component')).not.toBeInTheDocument();
 
     // Should show locked advice message
-    expect(screen.getByText(/Saran Personal Terkunci/i)).toBeInTheDocument();
+    expect(screen.getByText(/Personal Advice Locked/i)).toBeInTheDocument();
   });
 
   it('should show login and register buttons for guest users', async () => {
@@ -548,8 +550,8 @@ describe('Result Component - Guest User (Not Authenticated)', () => {
     });
 
     // Should show login and register buttons
-    expect(screen.getByRole('button', { name: /Masuk/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Daftar/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Register/i })).toBeInTheDocument();
   });
 
   it('should navigate to signIn when login button clicked', async () => {
@@ -576,7 +578,7 @@ describe('Result Component - Guest User (Not Authenticated)', () => {
       expect(screen.getByText('60.0')).toBeInTheDocument();
     });
 
-    const loginButton = screen.getByRole('button', { name: /Masuk/i });
+    const loginButton = screen.getByRole('button', { name: /Sign In/i });
     loginButton.click();
 
     expect(mockNavigate).toHaveBeenCalledWith('/signIn');
@@ -606,7 +608,7 @@ describe('Result Component - Guest User (Not Authenticated)', () => {
       expect(screen.getByText('60.0')).toBeInTheDocument();
     });
 
-    const registerButton = screen.getByRole('button', { name: /Daftar/i });
+    const registerButton = screen.getByRole('button', { name: /Register/i });
     registerButton.click();
 
     expect(mockNavigate).toHaveBeenCalledWith('/register');
@@ -712,10 +714,10 @@ describe('Result Component - Authenticated User', () => {
     });
 
     // Should NOT show locked message
-    expect(screen.queryByText(/Saran Personal Terkunci/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Personal Advice Locked/i)).not.toBeInTheDocument();
     
     // Should NOT show login/register buttons in advice section
-    const adviceLocked = screen.queryByText(/Masuk atau daftar/i);
+    const adviceLocked = screen.queryByText(/Sign in or register/i);
     expect(adviceLocked).not.toBeInTheDocument();
   });
 

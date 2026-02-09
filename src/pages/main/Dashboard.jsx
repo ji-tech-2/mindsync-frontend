@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react"; 
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import "../css/dashboard.css";
+import WeeklyChart from "../../components/WeeklyChart";
+import { fetchScreeningHistory, buildWeeklyChartFromHistory } from "../../config/api"; 
 import { useAuth } from "../../hooks/useAuth";
 import { API_CONFIG, API_URLS } from "../../config/api";
 import CriticalFactorCard from "../../components/CriticalFactorCard"; 
@@ -10,8 +14,25 @@ import "../css/dashboard.css";
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const userName = user?.name || "User";
+  const [weeklyData, setWeeklyData] = useState([]);
+
+  useEffect(() => {
+    const loadWeeklyData = async () => {
+      const userId = user?.userId || user?.id || user?.user_id;
+      if (!userId) return;
+      try {
+        const response = await fetchScreeningHistory(userId, 50, 0);
+        if (response.success && response.data) {
+          setWeeklyData(buildWeeklyChartFromHistory(response.data));
+        }
+      } catch (err) {
+        console.error("Failed to fetch weekly chart:", err);
+      }
+    };
+    loadWeeklyData();
+  }, [user]);
   
-  const userName = user?.name || "Pengguna";
   const userId = user?.userId || user?.id || JSON.parse(localStorage.getItem("user") || "{}")?.userId;
 
   // State untuk API data
@@ -182,7 +203,14 @@ export default function Dashboard() {
               />
             </div>
           </div>
-          <div className="card card-large">Card 3</div>
+          <div className="card card-large card-chart">
+            <WeeklyChart
+              data={weeklyData}
+              title="Last 7 Days Trend"
+              navigate={navigate}
+              compact
+            />
+          </div>
         </div>
 
         <h2 className="section-title">Critical Factors</h2>

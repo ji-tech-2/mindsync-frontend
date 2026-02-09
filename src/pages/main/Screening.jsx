@@ -102,27 +102,27 @@ export default function Screening() {
   const questions = [
     {
       key: "age",
-      question: "Berapa usia Anda?",
+      question: "How old are you?",
       type: "number",
-      placeholder: "Masukkan usia Anda",
+      placeholder: "Enter your age",
       min: 16,
       max: 100
     },
     {
       key: "gender",
-      question: "Apa jenis kelamin Anda?",
+      question: "What is your gender?",
       type: "select",
       options: ["Male", "Female"]
     },
     {
       key: "occupation",
-      question: "Apa status pekerjaan Anda saat ini?",
+      question: "What is your current employment status?",
       type: "select",
       options: ["Employed", "Unemployed", "Student", "Freelancer", "Retired"]
     },
     {
       key: "work_mode",
-      question: "Bagaimana mode kerja Anda?",
+      question: "What is your work mode?",
       type: "select",
       options: ["Remote", "Hybrid", "On-site", "Unemployed"]
     },
@@ -136,63 +136,63 @@ export default function Screening() {
     // },
     {
       key: "work_screen_hours",
-      question: "Berapa jam screen time Anda untuk keperluan pekerjaan?",
+      question: "How many hours of screen time for work?",
       type: "number",
-      placeholder: "Contoh: 6",
+      placeholder: "e.g. 6",
       min: 0,
       max: 24
     },
     {
       key: "leisure_screen_hours",
-      question: "Berapa jam screen time Anda untuk hiburan?",
+      question: "How many hours of screen time for leisure?",
       type: "number",
-      placeholder: "Contoh: 2",
+      placeholder: "e.g. 2",
       min: 0,
       max: 24
     },
     {
       key: "sleep_hours",
-      question: "Berapa jam rata-rata waktu tidur Anda setiap hari?",
+      question: "How many hours of sleep do you get on average per day?",
       type: "number",
-      placeholder: "Contoh: 7",
+      placeholder: "e.g. 7",
       min: 0,
       max: 24
     },
     {
       key: "sleep_quality_1_5",
-      question: "Bagaimana kualitas tidur Anda (skala 1–5)?",
+      question: "How is your sleep quality (scale 1–5)?",
       type: "select",
       options: [1, 2, 3, 4, 5]
     },
     {
       key: "stress_level_0_10",
-      question: "Seberapa tinggi tingkat stres Anda (skala 0–10)?",
+      question: "How high is your stress level (scale 0–10)?",
       type: "number",
-      placeholder: "0 = tidak stres, 10 = sangat stres",
+      placeholder: "0 = no stress, 10 = very stressed",
       min: 0,
       max: 10
     },
     {
       key: "productivity_0_100",
-      question: "Bagaimana tingkat produktivitas Anda (0–100)?",
+      question: "What is your productivity level (0–100)?",
       type: "number",
-      placeholder: "Contoh: 75",
+      placeholder: "e.g. 75",
       min: 0,
       max: 100
     },
     {
       key: "exercise_minutes_per_week",
-      question: "Berapa menit Anda berolahraga per minggu?",
+      question: "How many minutes do you exercise per week?",
       type: "number",
-      placeholder: "Contoh: 150",
+      placeholder: "e.g. 150",
       min: 0,
       max: 10080
     },
     {
       key: "social_hours_per_week",
-      question: "Berapa jam Anda bersosialisasi per minggu?",
+      question: "How many hours do you socialize per week?",
       type: "number",
-      placeholder: "Contoh: 10",
+      placeholder: "e.g. 10",
       min: 0,
       max: 168
     }
@@ -229,18 +229,18 @@ export default function Screening() {
 
   const validateInput = (value, question) => {
     if (!value) {
-      return "Jawaban tidak boleh kosong!";
+      return "Answer cannot be empty!";
     }
 
     if (question.type === "number") {
       const num = Number(value);
 
       if (question.min !== undefined && num < question.min) {
-        return `Nilai minimal adalah ${question.min}`;
+        return `Minimum value is ${question.min}`;
       }
 
       if (question.max !== undefined && num > question.max) {
-        return `Nilai maksimal adalah ${question.max}`;
+        return `Maximum value is ${question.max}`;
       }
     }
 
@@ -295,25 +295,38 @@ export default function Screening() {
       setIsLoading(true);
 
       try {
-        // 1. Transform data dengan user_id
-        const transformedData = transformToJSON(updatedAnswers, userId);
+        // 1. Transform data
+        const transformedData = transformToJSON(updatedAnswers);
+        
+        // 2. Add user_id if user is logged in
+        const userData = JSON.parse(localStorage.getItem("user_data"));
+        if (userData) {
+          const userId = userData?.userId || userData?.id || userData?.user_id;
+          if (userId) {
+            transformedData.user_id = userId;
+            console.log("✅ User logged in, adding user_id:", userId);
+          }
+        } else {
+          console.log("⚠️ User not logged in, screening will be anonymous");
+        }
+        
         console.log("📤 Data yang dikirim ke Flask:", transformedData);
         console.log("👤 User ID:", userId || "[Guest - No user_id]");
 
-        // 2. Kirim ke Flask API via API Gateway
+        // 3. Kirim ke Flask API
         const result = await sendToFlask(transformedData, API_URLS.predict);
 
         if (result.success) {
           navigate(`/result/${result.data.prediction_id}`);
         } else {
           // Gagal kirim ke Flask
-          setErrorMsg("Gagal mengirim data ke server: " + result.error);
+          setErrorMsg("Failed to send data to server: " + result.error);
           setIsLoading(false);
         }
 
       } catch (error) {
         console.error("Error:", error);
-        setErrorMsg("Terjadi kesalahan: " + error.message);
+        setErrorMsg("An error occurred: " + error.message);
         setIsLoading(false);
       }
 
@@ -369,7 +382,7 @@ export default function Screening() {
               className={errorMsg ? "input-error" : ""}
               disabled={isLoading}
             >
-              <option value="">-- Pilih salah satu --</option>
+              <option value="">-- Select one --</option>
               {currentQ.options.map((opt) => (
                 <option key={opt} value={opt}>
                   {opt}
@@ -387,7 +400,7 @@ export default function Screening() {
         <div className="button-container">
           {currentIndex > 0 && !isLoading && (
             <button className="btn-back" onClick={onBack}>
-              Kembali
+              Back
             </button>
           )}
 
@@ -396,7 +409,7 @@ export default function Screening() {
             onClick={onNext}
             disabled={isLoading}
           >
-            {isLoading ? 'Memproses...' : (isLastQuestion ? 'Selesai' : 'Lanjut')}
+            {isLoading ? 'Processing...' : (isLastQuestion ? 'Finish' : 'Next')}
           </button>
         </div>
         

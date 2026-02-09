@@ -30,7 +30,12 @@ export const AuthProvider = ({ children }) => {
       const userData = TokenManager.getUserData();
 
       if (token && userData) {
-        setUser(userData);
+        // Ensure user has userId field
+        const normalizedUser = {
+          ...userData,
+          userId: userData.userId || userData.id || userData.user_id || `temp_${Date.now()}`
+        };
+        setUser(normalizedUser);
       } else {
         setUser(null);
       }
@@ -52,9 +57,16 @@ export const AuthProvider = ({ children }) => {
 
   // Login function
   const login = useCallback((token, userData) => {
+    // Ensure user has an ID field for consistency
+    const normalizedUser = {
+      ...userData,
+      // If userId doesn't exist, try id, or generate a temporary one
+      userId: userData.userId || userData.id || userData.user_id || `temp_${Date.now()}`
+    };
+    
     TokenManager.setToken(token);
-    TokenManager.setUserData(userData);
-    setUser(userData);
+    TokenManager.setUserData(normalizedUser);
+    setUser(normalizedUser);
   }, []);
 
   // Simple logout function - just clears state (for programmatic use)
@@ -86,8 +98,26 @@ export const AuthProvider = ({ children }) => {
 
   // Update user data
   const updateUser = useCallback((userData) => {
-    TokenManager.setUserData(userData);
-    setUser(userData);
+      // Merge with existing stored user data to avoid dropping fields/identifiers
+    const existingUserData = TokenManager.getUserData() || {};
+    const mergedUser = {
+      ...existingUserData,
+      ...userData,
+    };
+    // Ensure user has a stable userId, consistent with login/initializeAuth
+    const normalizedUser = {
+      ...mergedUser,
+      userId:
+        mergedUser.userId ||
+        mergedUser.id ||
+        mergedUser.user_id ||
+        existingUserData.userId ||
+        existingUserData.id ||
+        existingUserData.user_id ||
+        `temp_${Date.now()}`,
+    };
+    TokenManager.setUserData(normalizedUser);
+    setUser(normalizedUser);
   }, []);
 
   const value = {

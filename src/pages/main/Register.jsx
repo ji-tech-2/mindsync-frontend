@@ -165,17 +165,17 @@ export default function Register() {
     return (
       <div className="register-wrapper">
       <div className="register-container success-screen">
-        <h2>✅ Registrasi Berhasil!</h2>
+        <h2>✅ Registration Successful!</h2>
 
         <p className="register-message success-message-box">{message}</p>
 
         <p>
-          Akun Anda telah berhasil dibuat. Silakan login untuk memulai perjalanan
-          kesehatan mental Anda.
+          Your account has been successfully created. Please log in to start your
+          mental health journey.
         </p>
 
         <button type="button" className="register-btn" onClick={handleContinue}>
-          Login Sekarang
+          Login Now
         </button>
       </div>
       </div>

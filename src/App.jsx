@@ -9,6 +9,7 @@ import Dashboard from "./pages/main/Dashboard";
 import Register from "./pages/main/Register";
 import Screening from "./pages/main/Screening";
 import Result from "./pages/main/Result";
+import History from "./pages/main/History";
 import Profile from "./pages/main/Profile";
 import "./App.css";
 
@@ -42,6 +43,7 @@ function AppContent() {
             >
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/history" element={<History />} />
             </Route>
 
             {/* Semi-public routes - accessible to all, but full features require auth */}

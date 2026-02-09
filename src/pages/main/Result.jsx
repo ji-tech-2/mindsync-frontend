@@ -21,9 +21,28 @@ const ResultPage = () => {
   useEffect(() => {
     const loadResult = async () => {
       if (!predictionId) {
-        alert("Data tidak ditemukan. Silakan lakukan screening ulang.");
+        alert("Data not found. Please take the screening again.");
         navigate('/screening');
         return;
+      }
+
+      // Check localStorage first for cached result
+      const cachedResult = localStorage.getItem(`result_${predictionId}`);
+      if (cachedResult) {
+        try {
+          const cached = JSON.parse(cachedResult);
+          console.log("✅ Using cached result from localStorage:", cached);
+          setResultData(cached.resultData);
+          if (cached.adviceData) {
+            setAdviceData(cached.adviceData);
+          }
+          setIsPolling(false);
+          setIsLoadingAdvice(false);
+          setLoadingStage(3);
+          return; // Skip polling, use cached data
+        } catch (e) {
+          console.warn("⚠️ Failed to parse cached result, will fetch fresh data");
+        }
       }
 
       setIsPolling(true);
@@ -63,12 +82,14 @@ const ResultPage = () => {
           const prediction = pollResult.data;
           
           // Set prediction data (always available)
-          setResultData({
+          const resultDataToSave = {
             mentalWellnessScore: Math.max(0, parseFloat(prediction.prediction_score)),
             category: prediction.health_level,
             wellnessAnalysis: prediction.wellness_analysis,
             isPartial: false
-          });
+          };
+          
+          setResultData(resultDataToSave);
           
           // If partial, show results but continue polling for advice
           if (pollResult.status === "partial") {
@@ -76,15 +97,32 @@ const ResultPage = () => {
             setIsPolling(false);
             setIsLoadingAdvice(true);
             
+            // Save partial result to localStorage
+            localStorage.setItem(`result_${predictionId}`, JSON.stringify({
+              resultData: resultDataToSave,
+              adviceData: null,
+              timestamp: new Date().toISOString()
+            }));
+            
             // Continue polling for full result with advice
             pollForAdvice(predictionId);
           } 
           // If ready, set advice data
           else if (pollResult.status === "ready") {
             console.log("✅ Full results with advice ready");
+            let adviceToSave = null;
             if (prediction.advice) {
               setAdviceData(prediction.advice);
+              adviceToSave = prediction.advice;
             }
+            
+            // Save complete result to localStorage
+            localStorage.setItem(`result_${predictionId}`, JSON.stringify({
+              resultData: resultDataToSave,
+              adviceData: adviceToSave,
+              timestamp: new Date().toISOString()
+            }));
+            
             setIsPolling(false);
             setIsLoadingAdvice(false);
           }
@@ -121,6 +159,14 @@ const ResultPage = () => {
             if (prediction.advice) {
               console.log("✅ Advice data received:", prediction.advice);
               setAdviceData(prediction.advice);
+              
+              // Update localStorage with complete advice
+              const cachedData = localStorage.getItem(`result_${predictionId}`);
+              if (cachedData) {
+                const parsed = JSON.parse(cachedData);
+                parsed.adviceData = prediction.advice;
+                localStorage.setItem(`result_${predictionId}`, JSON.stringify(parsed));
+              }
             }
             setIsLoadingAdvice(false);
             return;
@@ -164,22 +210,22 @@ const ResultPage = () => {
     return 'Healthy';
   };
 
-  // Tampilkan Loading jika data belum siap atau sedang polling
+  // Show loading if data is not ready or still polling
   if (isPolling && loadingStage === 1) {
     return (
       <div className="result-container">
         <div className="result-loading">
           <div className="loading-spinner"></div>
-          <h2>Menganalisis Data Anda...</h2>
-          <p>Mohon tunggu sebentar, kami sedang memproses hasil screening Anda</p>
+          <h2>Analyzing Your Data...</h2>
+          <p>Please wait a moment, we are processing your screening results</p>
           <div className="loading-progress">
             <div className="progress-step active">
               <span className="step-number">1</span>
-              <span className="step-label">Menghitung Skor Mental</span>
+              <span className="step-label">Calculating Mental Score</span>
             </div>
             <div className="progress-step">
               <span className="step-number">2</span>
-              <span className="step-label">Menganalisis Hasil</span>
+              <span className="step-label">Analyzing Results</span>
             </div>
           </div>
         </div>
@@ -187,19 +233,19 @@ const ResultPage = () => {
     );
   }
 
-  // Tampilkan Error jika polling gagal
+  // Show error if polling failed
   if (pollingError) {
     return (
       <div className="result-container">
         <div className="result-error">
-          <h2>⚠️ Terjadi Kesalahan</h2>
+          <h2>⚠️ An Error Occurred</h2>
           <p>{pollingError}</p>
           <div className="result-footer">
             <button className="btn btn-primary" onClick={() => navigate('/screening')}>
-              Coba Lagi
+              Try Again
             </button>
             <button className="btn btn-outline" onClick={() => navigate('/')}>
-              Kembali ke Beranda
+              Back to Home
             </button>
           </div>
         </div>
@@ -207,9 +253,9 @@ const ResultPage = () => {
     );
   }
 
-  // Tampilkan Loading jika data belum siap
+  // Show loading if data is not ready yet
   if (!resultData) {
-    return <div className="result-loading">Memuat hasil analisis...</div>;
+    return <div className="result-loading">Loading analysis results...</div>;
   }
 
   const score = resultData.mentalWellnessScore;
@@ -219,8 +265,8 @@ const ResultPage = () => {
     <div className="result-container">
       {/* Header */}
       <div className="result-header">
-        <h1>Skor Kesehatan Mental Anda</h1>
-        <p>Berdasarkan jawaban screening Anda</p>
+        <h1>Your Mental Health Score</h1>
+        <p>Based on your screening answers</p>
       </div>
 
       {/* Score Circle - Always Shown */}
@@ -239,14 +285,14 @@ const ResultPage = () => {
         <Advice resultData={resultData} adviceData={adviceData} isLoading={isLoadingAdvice} />
       ) : (
         <div className="advice-locked">
-          <h3>🔒 Saran Personal Terkunci</h3>
-          <p>Masuk atau daftar untuk melihat saran kesehatan mental yang dipersonalisasi berdasarkan hasil Anda.</p>
+          <h3>🔒 Personal Advice Locked</h3>
+          <p>Sign in or register to view personalized mental health advice based on your results.</p>
           <div className="auth-buttons">
             <button className="btn btn-primary" onClick={() => navigate('/signIn')}>
-              Masuk
+              Sign In
             </button>
             <button className="btn btn-outline" onClick={() => navigate('/register')}>
-              Daftar
+              Register
             </button>
           </div>
         </div>
@@ -255,10 +301,10 @@ const ResultPage = () => {
       {/* Footer Action */}
       <div className="result-footer">
         <button className="btn btn-primary" onClick={() => navigate('/screening')}>
-          Ambil Tes Lagi
+          Retake Test
         </button>
         <button className="btn btn-outline" onClick={() => navigate('/')}>
-          Kembali ke Beranda
+          Back to Home
         </button>
       </div>
     </div>

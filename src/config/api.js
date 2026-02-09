@@ -42,6 +42,15 @@ export const API_CONFIG = {
 
   // Advice endpoint
   ADVICE_ENDPOINT: "/v0-1/model-advice",
+  
+  // Screening history endpoint
+  // TODO: Configure Kong Gateway route: GET /v0-1/model-screening-history → Flask /screening-history
+  SCREENING_HISTORY_ENDPOINT: "/v0-1/model-history",
+  
+  // Weekly chart endpoint
+  // Kong route: /v0-1/model-weekly-chart/{user_id} → Flask /chart/weekly?user_id={user_id}
+  WEEKLY_CHART_ENDPOINT: "/v0-1/model-weekly-chart",
+  
 
   // Streak endpoint
   STREAK_ENDPOINT: "/v0-1/model-streak",
@@ -209,9 +218,10 @@ export function getApiUrl(endpoint) {
 // Specific API URLs
 export const API_URLS = {
   predict: getApiUrl(API_CONFIG.PREDICT_ENDPOINT),
-  result: (predictionId) =>
-    getApiUrl(`${API_CONFIG.RESULT_ENDPOINT}/${predictionId}`),
+  result: (predictionId) => getApiUrl(`${API_CONFIG.RESULT_ENDPOINT}/${predictionId}`),
   advice: getApiUrl(API_CONFIG.ADVICE_ENDPOINT),
+  screeningHistory: (userId) => getApiUrl(`${API_CONFIG.SCREENING_HISTORY_ENDPOINT}/${userId}`),
+  weeklyChart: (userId) => getApiUrl(`${API_CONFIG.WEEKLY_CHART_ENDPOINT}/${userId}`)
   streak: (userId) =>
     getApiUrl(`${API_CONFIG.STREAK_ENDPOINT}/${userId}`),
   weeklyCriticalFactors: (userId, days = 7) =>
@@ -219,3 +229,122 @@ export const API_URLS = {
   dailySuggestion: (userId) =>
     getApiUrl(`${API_CONFIG.DAILY_SUGGESTION}?user_id=${userId}`),
 };
+
+// ====================================
+// API HELPER FUNCTIONS
+// ====================================
+
+/**
+ * Fetch user's screening history
+ * @param {string} userId - User ID (UUID)
+ * @param {number} limit - Maximum number of results (default: 50)
+ * @param {number} offset - Pagination offset (default: 0)
+ * @returns {Promise} - Array of screening history
+ */
+export async function fetchScreeningHistory(userId, limit = 50, offset = 0) {
+  try {
+    // Kong strips /v0-1/model-history, Flask expects /history/<user_id>
+    const url = `${API_CONFIG.SCREENING_HISTORY_ENDPOINT}/${userId}`;
+    const response = await apiClient.get(url);
+    
+    if (response.data.status === 'success') {
+      return {
+        success: true,
+        data: response.data.data,
+        total: response.data.total
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || 'Failed to fetch history'
+      };
+    }
+  } catch (error) {
+    console.error('Error fetching screening history:', error);
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Network error'
+    };
+  }
+}
+
+/**
+ * Build weekly chart data from screening history.
+ * Clamps each score to [0, 100] BEFORE averaging per day.
+ * This avoids the issue where Flask averages raw negative scores.
+ */
+export function buildWeeklyChartFromHistory(historyItems) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Group clamped scores by date
+  const scoresByDate = {};
+  historyItems.forEach(item => {
+    const d = new Date(item.created_at || item.date);
+    const key = d.toISOString().split('T')[0];
+    const raw = item.prediction_score ?? item.score ?? 0;
+    const clamped = Math.max(0, Math.min(100, raw));
+    if (!scoresByDate[key]) scoresByDate[key] = [];
+    scoresByDate[key].push(clamped);
+  });
+
+  const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const chart = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    const scores = scoresByDate[key];
+    const hasData = !!scores;
+    const avg = scores
+      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+      : 0;
+    chart.push({ day: dayLabels[d.getDay()], date: key, value: avg, hasData });
+  }
+  return chart;
+}
+
+/**
+ * Fetch weekly chart data (last 7 days)
+ * @param {string} userId - User ID (UUID)
+ * @param {number} days - Number of days to look back (default: 7)
+ * @returns {Promise} - Array of daily chart data
+ */
+export async function fetchWeeklyChart(userId) {
+  try {
+    // Kong expects path param: /v0-1/model-weekly-chart/{userId}
+    // Kong converts to query param for Flask: /chart/weekly?user_id={userId}
+    const url = `${API_CONFIG.WEEKLY_CHART_ENDPOINT}/${userId}`;
+    console.log("📡 Fetching weekly chart from:", url);
+    const response = await apiClient.get(url);
+    console.log("📡 Weekly chart raw response:", response.data);
+    
+    if (response.data.status === 'success') {
+      // Map Flask fields to WeeklyChart component format
+      // Flask: { label, date, mental_health_index, ... }
+      // WeeklyChart: { day, date, value }
+      const mappedData = response.data.data.map(item => ({
+        day: item.label,
+        date: item.date,
+        value: Math.max(0, item.mental_health_index ?? 0)
+      }));
+
+      return {
+        success: true,
+        data: mappedData,
+        days: mappedData.length
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || 'Failed to fetch chart data'
+      };
+    }
+  } catch (error) {
+    console.error('Error fetching weekly chart:', error);
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Network error'
+    };
+  }
+}

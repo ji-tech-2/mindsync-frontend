@@ -60,8 +60,8 @@ describe('Login Component', () => {
     it('should render register link', () => {
       renderLogin();
       
-      expect(screen.getByText('Belum punya akun?')).toBeInTheDocument();
-      expect(screen.getByText('Daftar di sini.')).toBeInTheDocument();
+      expect(screen.getByText('Don\'t have an account?')).toBeInTheDocument();
+      expect(screen.getByText('Register here.')).toBeInTheDocument();
     });
   });
 
@@ -201,7 +201,7 @@ describe('Login Component', () => {
       fireEvent.click(submitButton);
       
       await waitFor(() => {
-        expect(screen.getByText('Login berhasil!')).toBeInTheDocument();
+        expect(screen.getByText('Login successful!')).toBeInTheDocument();
       });
       
       // Verify navigation
@@ -250,7 +250,7 @@ describe('Login Component', () => {
       fireEvent.click(submitButton);
       
       await waitFor(() => {
-        expect(screen.getByText('Terjadi kesalahan server')).toBeInTheDocument();
+        expect(screen.getByText('Server error occurred')).toBeInTheDocument();
       });
     });
   });
@@ -278,7 +278,7 @@ describe('Login Component', () => {
     it('should navigate to register page when clicking register link', () => {
       renderLogin();
       
-      const registerButton = screen.getByText('Daftar di sini.');
+      const registerButton = screen.getByText('Register here.');
       fireEvent.click(registerButton);
       
       expect(mockNavigate).toHaveBeenCalledWith('/register');
