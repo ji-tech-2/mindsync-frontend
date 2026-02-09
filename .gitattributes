@@ -1,0 +1,32 @@
+# Auto detect text files and normalize line endings to LF
+* text=auto eol=lf
+
+# Explicitly set LF for source code files
+*.js eol=lf
+*.jsx eol=lf
+*.json eol=lf
+*.css eol=lf
+*.md eol=lf
+*.html eol=lf
+*.yml eol=lf
+*.yaml eol=lf
+*.sh eol=lf
+
+# Keep CRLF on Windows-specific files (if any)
+*.bat eol=crlf
+*.cmd eol=crlf
+*.exe -text
+*.png -text
+*.jpg -text
+*.jpeg -text
+*.gif -text
+*.ico -text
+*.mov -text
+*.mp4 -text
+*.mp3 -text
+*.gz -text
+*.zip -text
+*.7z -text
+*.ttf -text
+*.otf -text
+*.pdf -text
