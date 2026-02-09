@@ -221,7 +221,7 @@ export const API_URLS = {
   result: (predictionId) => getApiUrl(`${API_CONFIG.RESULT_ENDPOINT}/${predictionId}`),
   advice: getApiUrl(API_CONFIG.ADVICE_ENDPOINT),
   screeningHistory: (userId) => getApiUrl(`${API_CONFIG.SCREENING_HISTORY_ENDPOINT}/${userId}`),
-  weeklyChart: (userId) => getApiUrl(`${API_CONFIG.WEEKLY_CHART_ENDPOINT}/${userId}`)
+  weeklyChart: (userId) => getApiUrl(`${API_CONFIG.WEEKLY_CHART_ENDPOINT}/${userId}`),
   streak: (userId) =>
     getApiUrl(`${API_CONFIG.STREAK_ENDPOINT}/${userId}`),
   weeklyCriticalFactors: (userId, days = 7) =>
