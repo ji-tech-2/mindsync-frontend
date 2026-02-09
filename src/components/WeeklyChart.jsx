@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
 import styles from './WeeklyChart.module.css';
 
 /**
@@ -18,18 +18,23 @@ export default function WeeklyChart({
   navigate = null
 }) {
   
-  // Fungsi untuk menentukan warna berdasarkan nilai mental health
+  // Batas kategori dari model Flask (model.py categorize_mental_health_score)
+  const THRESHOLDS = { DANGEROUS: 12, NOT_HEALTHY: 28.6, AVERAGE: 61.4 };
+
+  // Fungsi untuk menentukan warna berdasarkan kategori model
   const getBarColor = (value) => {
-    if (value >= 70) return '#4CAF50'; // Healthy - Hijau
-    if (value >= 40) return '#FFC107'; // Average - Kuning
-    return '#F44336'; // Unhealthy - Merah
+    if (value > THRESHOLDS.AVERAGE) return '#4CAF50';    // Healthy - Hijau
+    if (value > THRESHOLDS.NOT_HEALTHY) return '#FFC107'; // Average - Kuning
+    if (value > THRESHOLDS.DANGEROUS) return '#FF9800';   // Not Healthy - Oranye
+    return '#F44336';                                     // Dangerous - Merah
   };
 
   // Fungsi untuk menentukan status
   const getHealthStatus = (value) => {
-    if (value >= 70) return 'Healthy';
-    if (value >= 40) return 'Average';
-    return 'Perlu Perhatian';
+    if (value > THRESHOLDS.AVERAGE) return 'Healthy';
+    if (value > THRESHOLDS.NOT_HEALTHY) return 'Average';
+    if (value > THRESHOLDS.DANGEROUS) return 'Not Healthy';
+    return 'Dangerous';
   };
   
   // Custom Tooltip dengan status mental health
@@ -97,15 +102,19 @@ export default function WeeklyChart({
       <div className={styles['chart-legend']}>
         <div className={styles['legend-item']}>
           <span className={styles['legend-color']} style={{ background: '#4CAF50' }}></span>
-          <span>Healthy (70-100)</span>
+          <span>Healthy (&gt;61.4)</span>
         </div>
         <div className={styles['legend-item']}>
           <span className={styles['legend-color']} style={{ background: '#FFC107' }}></span>
-          <span>Average (40-69)</span>
+          <span>Average (28.6-61.4)</span>
+        </div>
+        <div className={styles['legend-item']}>
+          <span className={styles['legend-color']} style={{ background: '#FF9800' }}></span>
+          <span>Not Healthy (12-28.6)</span>
         </div>
         <div className={styles['legend-item']}>
           <span className={styles['legend-color']} style={{ background: '#F44336' }}></span>
-          <span>Perlu Perhatian (0-39)</span>
+          <span>Dangerous (≤12)</span>
         </div>
       </div>
 
@@ -133,6 +142,9 @@ export default function WeeklyChart({
             content={<CustomTooltip />}
             cursor={{ fill: 'rgba(0, 0, 0, 0.05)', radius: 8 }}
           />
+          <ReferenceLine y={THRESHOLDS.DANGEROUS} stroke="#F44336" strokeDasharray="4 4" strokeOpacity={0.6} />
+          <ReferenceLine y={THRESHOLDS.NOT_HEALTHY} stroke="#FF9800" strokeDasharray="4 4" strokeOpacity={0.6} />
+          <ReferenceLine y={THRESHOLDS.AVERAGE} stroke="#4CAF50" strokeDasharray="4 4" strokeOpacity={0.6} />
           <Bar 
             dataKey={dataKey} 
             radius={[8, 8, 0, 0]}
