@@ -30,7 +30,6 @@ const DashboardSuggestion = ({ data, loading }) => {
         </ul>
       ) : isObject ? (
         <ul className={styles.suggestionList}>
-          {/* Mengambil semua value dari object saran AI */}
           {Object.values(data).map((item, index) => (
             <li key={index} className={styles.suggestionItem}>{item}</li>
           ))}

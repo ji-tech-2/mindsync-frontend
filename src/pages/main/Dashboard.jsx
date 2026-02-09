@@ -30,7 +30,8 @@ export default function Dashboard() {
     "num__age sleep_hours": "Sleep Duration",
     "num__physical_activity": "Physical Activity",
     "num__stress_level": "Stress Level",
-    "num__social_interaction": "Social Interaction"
+    "num__social_interaction": "Social Interaction",
+    "num__stress_level_0_10^2": "Stress Level",
   };
 
   // Fungsi helper untuk membersihkan nama jika tidak ada di mapping
@@ -185,19 +186,14 @@ export default function Dashboard() {
         </div>
 
         <h2 className="section-title">Critical Factors</h2>
-        <div className={`cards-lower-section ${!loading && factors.length === 0 ? "full-width-layout" : ""}`}>
-        {loading ? (
-          [0, 1, 2].map((index) => (
-            <CriticalFactorCard key={index} loading={true} />
-          ))
-        ) : factors.length > 0 ? (
-          factors.map((factor, index) => (
-            <CriticalFactorCard key={index} data={factor} />
-          ))
-        ) : (
-          // Saat kosong, hanya satu kartu yang dirender
-          <CriticalFactorCard data={null} />
-        )}
+        <div className="cards-lower-section">
+          {[0, 1, 2].map((index) => (
+            <CriticalFactorCard 
+              key={index} 
+              data={factors[index]} 
+              loading={loading} 
+            />
+          ))}
         </div>
       </div>
     </div>
