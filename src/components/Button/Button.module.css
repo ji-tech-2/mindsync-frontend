@@ -48,13 +48,13 @@
 }
 
 .button:focus-visible {
-  outline: var(--border-md) var(--color-primary);
+  outline: var(--border-md) solid var(--color-primary);
   outline-offset: 2px;
 }
 
 /* Stroked variant */
 .stroked {
-  border: var(--border-md) var(--color-primary);
+  border: var(--border-md) solid var(--color-primary);
   background-color: transparent;
   color: var(--color-primary-dark);
 }
@@ -67,7 +67,7 @@
 .filled {
   background-color: var(--color-primary);
   color: var(--color-text-dark);
-  border: var(--border-md) var(--color-primary);
+  border: var(--border-md) solid var(--color-primary);
 }
 
 .filled:is(:hover, :active):not(:disabled) {

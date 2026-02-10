@@ -87,8 +87,9 @@
     0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%);
 
   /* --- BORDERS --- */
-  --border-sm: 1px solid;
-  --border-md: 2px solid;
+  --border-sm: 1px;
+  --border-md: 2px;
+  --border-lg: 3px;
 
   /* --- TRANSITIONS --- */
   --transition-fast: 150ms ease-in-out;
@@ -230,7 +231,7 @@ a:hover {
     0 8px 32px rgb(0 0 0 / 10%),
     0 2px 8px rgb(0 0 0 / 5%),
     inset 0 1px 0 rgb(255 255 255 / 80%);
-  border: var(--border-md) rgb(255 255 255 / 30%);
+  border: var(--border-md) solid rgb(255 255 255 / 30%);
   color: var(--color-text-light);
   text-align: center;
 }
@@ -290,7 +291,7 @@ a:hover {
 .register-form input,
 .register-form select {
   padding: 15px 18px;
-  border: var(--border-lg) #d1d1d1;
+  border: var(--border-lg) solid #d1d1d1;
   border-radius: var(--radius-lg);
   font-size: var(--font-size-md);
   font-family: var(--font-body);
