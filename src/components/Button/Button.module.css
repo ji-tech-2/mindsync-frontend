@@ -76,6 +76,16 @@
   color: var(--color-text-dark);
 }
 
+/* Light variant */
+.light {
+  background-color: var(--color-bg-light);
+  color: var(--color-primary-dark);
+}
+
+.light:is(:hover, :active):not(:disabled) {
+  background-color: var(--color-primary-light);
+}
+
 /* Ghost variant - text/icon only with padding */
 .ghost {
   background-color: transparent;

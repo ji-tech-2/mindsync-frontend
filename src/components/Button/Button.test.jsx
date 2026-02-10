@@ -33,27 +33,22 @@ describe('Button Component', () => {
       expect(button.className).toMatch(/outlined/);
     });
 
-    it('renders filled variant when filled={true}', () => {
-      const { container } = render(<Button filled>Click</Button>);
+    it('renders filled variant when variant="filled"', () => {
+      const { container } = render(<Button variant="filled">Click</Button>);
       const button = container.querySelector('button');
       expect(button.className).toMatch(/filled/);
     });
 
-    it('renders ghost variant when ghost={true}', () => {
-      const { container } = render(<Button ghost>Click</Button>);
+    it('renders light variant when variant="light"', () => {
+      const { container } = render(<Button variant="light">Click</Button>);
       const button = container.querySelector('button');
-      expect(button.className).toMatch(/ghost/);
+      expect(button.className).toMatch(/light/);
     });
 
-    it('ghost takes priority over filled', () => {
-      const { container } = render(
-        <Button ghost filled>
-          Click
-        </Button>
-      );
+    it('renders ghost variant when variant="ghost"', () => {
+      const { container } = render(<Button variant="ghost">Click</Button>);
       const button = container.querySelector('button');
       expect(button.className).toMatch(/ghost/);
-      expect(button.className).not.toMatch(/filled/);
     });
   });
 
@@ -296,7 +291,13 @@ describe('Button Component', () => {
 
     it('combines all classes correctly', () => {
       const { container } = render(
-        <Button filled size="lg" fullWidth align="left" className="extra">
+        <Button
+          variant="filled"
+          size="lg"
+          fullWidth
+          align="left"
+          className="extra"
+        >
           Click
         </Button>
       );
@@ -313,7 +314,7 @@ describe('Button Component', () => {
   describe('Complex Scenarios', () => {
     it('renders icon-only filled button', () => {
       const { container } = render(
-        <Button filled iconOnly icon={<span>⚙️</span>} />
+        <Button variant="filled" iconOnly icon={<span>⚙️</span>} />
       );
       const button = container.querySelector('button');
       expect(button.className).toMatch(/filled/);
@@ -323,7 +324,7 @@ describe('Button Component', () => {
     it('renders large ghost button with right-aligned icon', () => {
       const { container } = render(
         <Button
-          ghost
+          variant="ghost"
           size="lg"
           align="left"
           iconPosition="right"
@@ -341,7 +342,7 @@ describe('Button Component', () => {
 
     it('renders full width filled link button', () => {
       const { container } = render(
-        <Button href="/submit" filled fullWidth type="submit">
+        <Button href="/submit" variant="filled" fullWidth type="submit">
           Submit
         </Button>
       );

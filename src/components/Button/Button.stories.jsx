@@ -8,13 +8,10 @@ export default {
   },
   tags: ['autodocs'],
   argTypes: {
-    filled: {
-      control: 'boolean',
-      description: 'Use filled variant (default: false, uses outlined)',
-    },
-    ghost: {
-      control: 'boolean',
-      description: 'Use ghost variant - text only with padding',
+    variant: {
+      control: { type: 'select' },
+      options: ['outlined', 'filled', 'light', 'ghost'],
+      description: 'Button variant',
     },
     size: {
       control: { type: 'select' },
@@ -60,8 +57,7 @@ export default {
 export const Outlined = {
   args: {
     children: 'Outlined Button',
-    filled: false,
-    ghost: false,
+    variant: 'outlined',
   },
 };
 
@@ -69,7 +65,15 @@ export const Outlined = {
 export const Filled = {
   args: {
     children: 'Filled Button',
-    filled: true,
+    variant: 'filled',
+  },
+};
+
+// Light button
+export const Light = {
+  args: {
+    children: 'Light Button',
+    variant: 'light',
   },
 };
 
@@ -77,7 +81,7 @@ export const Filled = {
 export const Ghost = {
   args: {
     children: 'Ghost Button',
-    ghost: true,
+    variant: 'ghost',
   },
 };
 
@@ -85,7 +89,7 @@ export const Ghost = {
 export const Large = {
   args: {
     children: 'Large Button',
-    filled: true,
+    variant: 'filled',
     size: 'lg',
   },
 };
@@ -94,7 +98,7 @@ export const Large = {
 export const FullWidth = {
   args: {
     children: 'Full Width Button',
-    filled: true,
+    variant: 'filled',
     fullWidth: true,
   },
   parameters: {
@@ -106,7 +110,7 @@ export const FullWidth = {
 export const Disabled = {
   args: {
     children: 'Disabled Button',
-    filled: true,
+    variant: 'filled',
     disabled: true,
   },
 };
@@ -115,7 +119,7 @@ export const Disabled = {
 export const WithIconLeft = {
   args: {
     children: 'Button with Icon',
-    filled: true,
+    variant: 'filled',
     icon: (
       <svg
         width="16"
@@ -135,7 +139,7 @@ export const WithIconLeft = {
 export const WithIconRight = {
   args: {
     children: 'Button with Icon',
-    filled: true,
+    variant: 'filled',
     icon: (
       <svg
         width="16"
@@ -154,7 +158,7 @@ export const WithIconRight = {
 // Icon only
 export const IconOnly = {
   args: {
-    filled: true,
+    variant: 'filled',
     iconOnly: true,
     icon: (
       <svg
@@ -174,7 +178,7 @@ export const IconOnly = {
 export const LeftAligned = {
   args: {
     children: 'Left Aligned Button',
-    filled: true,
+    variant: 'filled',
     align: 'left',
     fullWidth: true,
   },
@@ -187,7 +191,7 @@ export const LeftAligned = {
 export const AsLink = {
   args: {
     children: 'Button as Link',
-    filled: true,
+    variant: 'filled',
     href: 'https://example.com',
   },
   render: (args) => <Button {...args} />,
@@ -204,13 +208,14 @@ export const AllVariants = {
         alignItems: 'flex-start',
       }}
     >
-      <Button>Outlined Button</Button>
-      <Button filled>Filled Button</Button>
-      <Button ghost>Ghost Button</Button>
-      <Button filled disabled>
+      <Button variant="outlined">Outlined Button</Button>
+      <Button variant="filled">Filled Button</Button>
+      <Button variant="light">Light Button</Button>
+      <Button variant="ghost">Ghost Button</Button>
+      <Button variant="filled" disabled>
         Disabled Button
       </Button>
-      <Button filled size="lg">
+      <Button variant="filled" size="lg">
         Large Button
       </Button>
     </div>

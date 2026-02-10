@@ -3,8 +3,7 @@ import styles from './Button.module.css';
 /**
  * Button Component (renders as <button> or <a> tag)
  * @param {Object} props
- * @param {boolean} props.filled - Use filled variant (default: false, uses outlined)
- * @param {boolean} props.ghost - Use ghost variant - text only with padding (default: false)
+ * @param {string} props.variant - 'outlined', 'filled', 'light', 'ghost' (default: 'outlined')
  * @param {string} props.size - 'lg' for large (default: normal)
  * @param {boolean} props.fullWidth - Fill container width (default: false)
  * @param {React.ReactNode} props.children - Button content/text
@@ -19,8 +18,7 @@ import styles from './Button.module.css';
  * @param {string} props.type - Button type: 'button', 'submit', 'reset' (only for button)
  */
 function Button({
-  filled = false,
-  ghost = false,
+  variant = 'outlined',
   size = '',
   fullWidth = false,
   children,
@@ -35,7 +33,6 @@ function Button({
   type = 'button',
   ...rest
 }) {
-  const variant = ghost ? 'ghost' : filled ? 'filled' : 'outlined';
   const buttonClass = [
     styles.button,
     styles[variant],
