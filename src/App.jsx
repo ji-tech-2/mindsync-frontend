@@ -1,17 +1,17 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import Login from './pages/main/Login';
-import Home from './pages/main/Home';
-import Dashboard from './pages/main/Dashboard';
-import Register from './pages/main/Register';
-import Screening from './pages/main/Screening';
-import Result from './pages/main/Result';
-import History from './pages/main/History';
-import Profile from './pages/main/Profile';
-import ForgotPassword from './pages/main/ForgotPassword';
+import {
+  AuthProvider,
+  ProtectedRoute,
+  Login,
+  Register,
+  ForgotPassword,
+} from './features/auth';
+import { Navbar, Footer } from './layouts';
+import { Home } from './features/home';
+import { Dashboard } from './features/dashboard';
+import { Screening, Result } from './features/screening';
+import { History } from './features/history';
+import { Profile } from './features/profile';
 import './App.css';
 
 // Inner App component that can use AuthContext
