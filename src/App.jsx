@@ -6,7 +6,7 @@ import {
   Register,
   ForgotPassword,
 } from '@/features/auth';
-import { Navbar, Footer } from '@/layouts';
+import { Navbar, Footer } from '@/components';
 import { Home } from '@/features/home';
 import { Dashboard } from '@/features/dashboard';
 import { Screening, Result } from '@/features/screening';
