@@ -1,0 +1,109 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 3rem;
+  transition: all var(--transition-fast);
+}
+
+.input {
+  /* Base input styles - similar to stroked button */
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-xl);
+  border: none;
+  background-color: transparent;
+  color: var(--color-text-light);
+  width: 100%;
+  outline: 2px solid var(--color-primary);
+  transition: all var(--transition-fast);
+  line-height: var(--line-height-normal);
+}
+
+.input::placeholder {
+  color: transparent;
+}
+
+/* Hover state - similar to stroked button */
+.input:hover:not(:disabled) {
+  outline-color: var(--color-primary-dark);
+}
+
+/* Focus state - thicker outline and primary-dark color */
+.input:focus {
+  outline-color: var(--color-primary-dark);
+  outline-width: var(--border-lg);
+}
+
+/* Disabled state */
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.container.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Floating label */
+.label {
+  position: absolute;
+  left: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-primary-dark);
+  background-color: transparent;
+  padding: 0 var(--space-xs);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+/* Active/focused label - moves to top */
+.labelActive {
+  top: 0;
+  left: var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-primary-dark);
+  background-color: var(--color-bg-light);
+  padding: 0 var(--space-xs);
+}
+
+/* Error state */
+.container.error .input {
+  border-color: var(--color-error);
+}
+
+.container.error.focused .input {
+  border-color: var(--color-error);
+}
+
+.errorMessage {
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  color: var(--color-error);
+  padding-left: var(--space-lg);
+}
+
+/* Full width variant */
+.fullWidth {
+  width: 100%;
+}
+
+.fullWidth .input {
+  width: 100%;
+}
