@@ -3,7 +3,7 @@ import styles from './Button.module.css';
 /**
  * Button Component (renders as <button> or <a> tag)
  * @param {Object} props
- * @param {boolean} props.filled - Use filled variant (default: false, uses stroked)
+ * @param {boolean} props.filled - Use filled variant (default: false, uses outlined)
  * @param {boolean} props.ghost - Use ghost variant - text only with padding (default: false)
  * @param {string} props.size - 'lg' for large (default: normal)
  * @param {boolean} props.fullWidth - Fill container width (default: false)
@@ -35,7 +35,7 @@ function Button({
   type = 'button',
   ...rest
 }) {
-  const variant = ghost ? 'ghost' : filled ? 'filled' : 'stroked';
+  const variant = ghost ? 'ghost' : filled ? 'filled' : 'outlined';
   const buttonClass = [
     styles.button,
     styles[variant],

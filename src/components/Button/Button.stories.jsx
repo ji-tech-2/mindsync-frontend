@@ -10,7 +10,7 @@ export default {
   argTypes: {
     filled: {
       control: 'boolean',
-      description: 'Use filled variant (default: false, uses stroked)',
+      description: 'Use filled variant (default: false, uses outlined)',
     },
     ghost: {
       control: 'boolean',
@@ -56,10 +56,10 @@ export default {
   },
 };
 
-// Default stroked button
-export const Stroked = {
+// Default outlined button
+export const Outlined = {
   args: {
-    children: 'Stroked Button',
+    children: 'Outlined Button',
     filled: false,
     ghost: false,
   },
@@ -204,7 +204,7 @@ export const AllVariants = {
         alignItems: 'flex-start',
       }}
     >
-      <Button>Stroked Button</Button>
+      <Button>Outlined Button</Button>
       <Button filled>Filled Button</Button>
       <Button ghost>Ghost Button</Button>
       <Button filled disabled>

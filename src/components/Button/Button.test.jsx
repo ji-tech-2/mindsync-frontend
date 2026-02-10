@@ -27,10 +27,10 @@ describe('Button Component', () => {
 
   // ==================== Variants ====================
   describe('Variants', () => {
-    it('renders stroked variant by default', () => {
+    it('renders outlined variant by default', () => {
       const { container } = render(<Button>Click</Button>);
       const button = container.querySelector('button');
-      expect(button.className).toMatch(/stroked/);
+      expect(button.className).toMatch(/outlined/);
     });
 
     it('renders filled variant when filled={true}', () => {

@@ -52,14 +52,14 @@
   outline-offset: 2px;
 }
 
-/* Stroked variant */
-.stroked {
+/* Outlined variant */
+.outlined {
   border: var(--border-md) solid var(--color-primary);
   background-color: transparent;
   color: var(--color-primary-dark);
 }
 
-.stroked:is(:hover, :active):not(:disabled) {
+.outlined:is(:hover, :active):not(:disabled) {
   background-color: var(--color-primary-light);
 }
 
