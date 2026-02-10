@@ -1,0 +1,36 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: [Artifact]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to Droplet
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Deploy to Droplet
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script_stop: true
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/mindsync-frontend:latest
+
+            docker stop frontend || true
+            docker rm frontend || true
+
+            docker run -d \
+              --name frontend \
+              -p 80:80 \
+              --restart unless-stopped \
+              ${{ secrets.DOCKER_USERNAME }}/mindsync-frontend:latest
+
+            # Clean up old images
+            docker image prune -f
