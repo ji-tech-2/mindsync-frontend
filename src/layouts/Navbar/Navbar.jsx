@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../features/auth';
-import { ProfileDropdown } from '../../features/profile';
+import { useAuth } from '@/features/auth';
+import { ProfileDropdown } from '@/features/profile';
 import styles from './Navbar.module.css';
 
 function Navbar() {

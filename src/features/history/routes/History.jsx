@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { WeeklyChart } from '../../../components';
+import { WeeklyChart } from '@/components';
 import {
   fetchScreeningHistory,
   buildWeeklyChartFromHistory,
-} from '../../../config/api';
+} from '@/config/api';
 import '../assets/history.css';
 
 export default function History() {

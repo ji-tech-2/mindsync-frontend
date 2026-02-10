@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../assets/dashboard.css';
-import { WeeklyChart } from '../../../components';
+import { WeeklyChart } from '@/components';
 import {
   fetchScreeningHistory,
   buildWeeklyChartFromHistory,
   API_CONFIG,
   API_URLS,
-} from '../../../config/api';
-import { useAuth } from '../../auth';
+} from '@/config/api';
+import { useAuth } from '@/features/auth';
 import CriticalFactorCard from '../components/CriticalFactorCard';
 import DashboardSuggestion from '../components/DashboardSuggestion';
-import StreakCard from '../../screening/components/StreakCard';
+import StreakCard from '@/features/screening/components/StreakCard';
 
 // Mapping untuk nama faktor yang lebih bersahabat
 const FACTOR_MAP = {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient, { API_CONFIG } from '../../../config/api';
-import { validatePassword } from '../../../utils/passwordValidation';
+import apiClient, { API_CONFIG } from '@/config/api';
+import { validatePassword } from '@/utils/passwordValidation';
 import '../assets/register.css';
 
 export default function Register() {

@@ -2,11 +2,11 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
 import Result from './Result';
-import { AuthProvider } from '../../auth';
+import { AuthProvider } from '@/features/auth';
 import * as pollingHelper from '../api/pollingHelper';
 
 // Mock the API config
-vi.mock('../../../config/api.js', () => ({
+vi.mock('@/config/api.js', () => ({
   API_CONFIG: {
     BASE_URL: 'http://test-api.com',
     RESULT_ENDPOINT: '/v0-1/result',
@@ -24,7 +24,7 @@ vi.mock('../api/pollingHelper', () => ({
 
 // Mock the useAuth hook with configurable auth state
 let mockIsAuthenticated = true;
-vi.mock('../../auth', () => {
+vi.mock('@/features/auth', () => {
   const mockUseAuth = () => ({
     user: mockIsAuthenticated ? { email: 'test@example.com' } : null,
     isLoading: false,
@@ -36,7 +36,7 @@ vi.mock('../../auth', () => {
 });
 
 // Mock the Advice component
-vi.mock('../../../components', () => ({
+vi.mock('@/components', () => ({
   Advice: ({ adviceData, isLoading }) => (
     <div data-testid="advice-component">
       <div data-testid="advice-loading">{isLoading ? 'true' : 'false'}</div>

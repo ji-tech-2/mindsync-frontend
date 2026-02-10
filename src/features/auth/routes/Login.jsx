@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import apiClient, { API_CONFIG } from '../../../config/api';
+import apiClient, { API_CONFIG } from '@/config/api';
 import '../assets/login.css';
 
 export default function Login() {

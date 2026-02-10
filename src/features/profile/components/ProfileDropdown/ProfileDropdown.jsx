@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth, LogoutButton } from '../../../auth';
+import { useAuth, LogoutButton } from '@/features/auth';
 import ProfileAvatar from '../ProfileAvatar';
 import styles from './ProfileDropdown.module.css';
 

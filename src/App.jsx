@@ -5,13 +5,13 @@ import {
   Login,
   Register,
   ForgotPassword,
-} from './features/auth';
-import { Navbar, Footer } from './layouts';
-import { Home } from './features/home';
-import { Dashboard } from './features/dashboard';
-import { Screening, Result } from './features/screening';
-import { History } from './features/history';
-import { Profile } from './features/profile';
+} from '@/features/auth';
+import { Navbar, Footer } from '@/layouts';
+import { Home } from '@/features/home';
+import { Dashboard } from '@/features/dashboard';
+import { Screening, Result } from '@/features/screening';
+import { History } from '@/features/history';
+import { Profile } from '@/features/profile';
 import './App.css';
 
 // Inner App component that can use AuthContext

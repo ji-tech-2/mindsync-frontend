@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useAuth } from '../../auth';
-import '../../dashboard/assets/dashboard.css';
+import { useAuth } from '@/features/auth';
+import '@/features/dashboard/assets/dashboard.css';
 
 export default function Home() {
   const navigate = useNavigate();

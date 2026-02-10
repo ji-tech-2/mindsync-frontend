@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../../auth';
+import { useAuth } from '@/features/auth';
 import { pollPredictionResult } from '../api/pollingHelper.js';
-import { API_CONFIG } from '../../../config/api.js';
-import { Advice } from '../../../components';
+import { API_CONFIG } from '@/config/api.js';
+import { Advice } from '@/components';
 import '../assets/result.css';
 
 const ResultPage = () => {

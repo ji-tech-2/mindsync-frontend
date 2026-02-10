@@ -12,10 +12,10 @@ import {
   getAuthToken,
   requireAuth,
 } from './authHelper';
-import { TokenManager } from '../../../config/api';
+import { TokenManager } from '@/config/api';
 
 // Mock TokenManager
-vi.mock('../../../config/api', () => ({
+vi.mock('@/config/api', () => ({
   TokenManager: {
     getToken: vi.fn(),
     getUserData: vi.fn(),

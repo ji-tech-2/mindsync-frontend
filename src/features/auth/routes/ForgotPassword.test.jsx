@@ -8,10 +8,10 @@ import {
 } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import ForgotPassword from './ForgotPassword';
-import apiClient from '../../../config/api';
+import apiClient from '@/config/api';
 
 // Mock axios apiClient
-vi.mock('../../../config/api', async () => {
+vi.mock('@/config/api', async () => {
   const actual = await vi.importActual('../../../config/api');
   return {
     ...actual,

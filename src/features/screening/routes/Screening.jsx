@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth';
+import { useAuth } from '@/features/auth';
 import '../assets/screening.css';
-import { API_CONFIG, API_URLS } from '../../../config/api';
+import { API_CONFIG, API_URLS } from '@/config/api';
 import {
   toApiGender,
   toApiOccupation,
   toApiWorkMode,
-} from '../../../utils/fieldMappings';
+} from '@/utils/fieldMappings';
 
 // ============= FUNGSI TRANSFORM & KIRIM =============
 

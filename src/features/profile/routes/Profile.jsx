@@ -3,15 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import '../assets/profile.css';
 import ProfileAvatar from '../components/ProfileAvatar';
 import ProfileFieldRow from '../components/ProfileFieldRow';
-import {
-  EditModal,
-  FormInput,
-  FormSelect,
-  OTPInput,
-} from '../../../components';
-import apiClient, { TokenManager } from '../../../config/api';
-import { useAuth } from '../../auth';
-import { getPasswordError } from '../../../utils/passwordValidation';
+import { EditModal, FormInput, FormSelect, OTPInput } from '@/components';
+import apiClient, { TokenManager } from '@/config/api';
+import { useAuth } from '@/features/auth';
+import { getPasswordError } from '@/utils/passwordValidation';
 import {
   genderOptions,
   occupationOptions,
@@ -22,7 +17,7 @@ import {
   fromApiGender,
   fromApiOccupation,
   fromApiWorkMode,
-} from '../../../utils/fieldMappings';
+} from '@/utils/fieldMappings';
 
 export default function Profile() {
   const navigate = useNavigate();

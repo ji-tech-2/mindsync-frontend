@@ -9,10 +9,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import { AuthProvider } from '../../stores/AuthContext';
-import { TokenManager } from '../../../../config/api';
+import { TokenManager } from '@/config/api';
 
 // Mock TokenManager
-vi.mock('../../../../config/api', () => ({
+vi.mock('@/config/api', () => ({
   TokenManager: {
     getToken: vi.fn(),
     getUserData: vi.fn(),

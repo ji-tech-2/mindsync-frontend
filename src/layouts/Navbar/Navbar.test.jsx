@@ -8,10 +8,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Navbar from './Navbar';
-import { AuthProvider } from '../../features/auth';
+import { AuthProvider } from '@/features/auth';
 
 // Mock TokenManager for AuthProvider
-vi.mock('../../config/api', () => ({
+vi.mock('@/config/api', () => ({
   TokenManager: {
     getToken: vi.fn(),
     getUserData: vi.fn(),

@@ -2,11 +2,11 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Login from './Login';
-import apiClient from '../../../config/api';
+import apiClient from '@/config/api';
 import { AuthProvider } from '../stores/AuthContext';
 
 // Mock axios apiClient
-vi.mock('../../../config/api', async () => {
+vi.mock('@/config/api', async () => {
   const actual = await vi.importActual('../../../config/api');
   return {
     ...actual,

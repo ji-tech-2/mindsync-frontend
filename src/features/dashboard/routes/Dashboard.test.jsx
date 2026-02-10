@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Dashboard from './Dashboard';
-import { AuthProvider } from '../../auth';
+import { AuthProvider } from '@/features/auth';
 
 // Mock navigate
 const mockNavigate = vi.fn();
@@ -53,7 +53,7 @@ vi.mock('../../screening/components/StreakCard', () => ({
   ),
 }));
 
-vi.mock('../../../config/api', () => ({
+vi.mock('@/config/api', () => ({
   TokenManager: {
     getToken: vi.fn(),
     getUserData: vi.fn(),
@@ -69,7 +69,7 @@ vi.mock('../../../config/api', () => ({
   },
 }));
 
-import { TokenManager } from '../../../config/api';
+import { TokenManager } from '@/config/api';
 
 const mockFactorsResponse = {
   status: 'success',

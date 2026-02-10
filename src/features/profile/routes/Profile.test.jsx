@@ -2,11 +2,11 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Profile from './Profile';
-import { AuthProvider } from '../../auth';
-import apiClient from '../../../config/api';
+import { AuthProvider } from '@/features/auth';
+import apiClient from '@/config/api';
 
 // Mock apiClient
-vi.mock('../../../config/api', () => ({
+vi.mock('@/config/api', () => ({
   default: {
     get: vi.fn(),
     put: vi.fn(),
