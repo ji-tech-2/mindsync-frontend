@@ -8,11 +8,11 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
-import { AuthProvider } from '../contexts/AuthContext';
-import { TokenManager } from '../config/api';
+import { AuthProvider } from '../../contexts/AuthContext';
+import { TokenManager } from '../../config/api';
 
 // Mock TokenManager
-vi.mock('../config/api', () => ({
+vi.mock('../../config/api', () => ({
   TokenManager: {
     getToken: vi.fn(),
     getUserData: vi.fn(),

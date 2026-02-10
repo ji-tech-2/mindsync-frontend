@@ -1,0 +1,121 @@
+.wrapper {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-body);
+  width: fit-content;
+}
+
+.fullWidth {
+  width: 100%;
+  display: block;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  outline: none;
+  min-height: 3rem;
+  gap: var(--space-md);
+  border-radius: var(--radius-xl);
+  line-height: var(--line-height-normal);
+  user-select: none;
+}
+
+/* Closed state - like outlined button */
+.headerClosed {
+  border: var(--border-md) solid var(--color-primary);
+  background-color: transparent;
+  color: var(--color-primary-dark);
+}
+
+.headerClosed:hover:not(.disabled) {
+  background-color: var(--color-primary-light);
+}
+
+/* Open state - like filled button */
+.headerOpen {
+  background-color: var(--color-primary);
+  color: var(--color-text-dark);
+  border: var(--border-md) solid var(--color-primary);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arrow {
+  transition: transform var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.arrowUp {
+  transform: rotate(180deg);
+}
+
+.menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--color-bg-light);
+  border: var(--border-md) solid var(--color-primary);
+  border-top: none;
+  border-bottom-left-radius: var(--radius-xl);
+  border-bottom-right-radius: var(--radius-xl);
+  z-index: 10;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transform-origin: top;
+  animation: slide-down var(--transition-fast) forwards;
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.option {
+  display: block;
+  width: 100%;
+  padding: var(--space-sm) var(--space-lg);
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  color: var(--color-text-light);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.option:not(:last-child) {
+  border-bottom: 1px solid var(--color-primary-light);
+}
+
+.option:hover {
+  background-color: var(--color-primary-light);
+}

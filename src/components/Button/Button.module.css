@@ -1,0 +1,120 @@
+.button {
+  /* Base button styles */
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  white-space: nowrap;
+  user-select: none;
+  line-height: var(--line-height-normal);
+  text-decoration: none;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+.iconOnly {
+  padding: var(--space-sm);
+  border-radius: var(--radius-full);
+  aspect-ratio: 1 / 1;
+  min-height: var(--space-2xl);
+  min-width: var(--space-2xl);
+}
+
+.alignLeft {
+  justify-content: flex-start;
+}
+
+.spaceBetween {
+  justify-content: space-between;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button:focus-visible {
+  outline: var(--border-md) solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Outlined variant */
+.outlined {
+  border: var(--border-md) solid var(--color-primary);
+  background-color: transparent;
+  color: var(--color-primary-dark);
+}
+
+.outlined:is(:hover, :active):not(:disabled) {
+  background-color: var(--color-primary-light);
+}
+
+/* Filled variant */
+.filled {
+  background-color: var(--color-primary);
+  color: var(--color-text-dark);
+  border: var(--border-md) solid var(--color-primary);
+}
+
+.filled:is(:hover, :active):not(:disabled) {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  color: var(--color-text-dark);
+}
+
+/* Light variant */
+.light {
+  background-color: var(--color-bg-light);
+  color: var(--color-primary-dark);
+}
+
+.light:is(:hover, :active):not(:disabled) {
+  background-color: var(--color-primary-light);
+}
+
+/* Ghost variant - text/icon only with padding */
+.ghost {
+  background-color: transparent;
+  border: none;
+  color: var(--color-primary-dark);
+}
+
+.ghost:is(:hover, :active):not(:disabled) {
+  background-color: rgb(90 124 89 / 10%);
+}
+
+/* Icon styling - color inherits from button text color */
+.hasIcon .icon {
+  color: currentcolor;
+}
+
+/* Size variants */
+.lg {
+  font-size: var(--font-size-lg);
+  padding: var(--space-md) var(--space-xl);
+}
+
+.lg.iconOnly {
+  padding: var(--space-md);
+  min-height: var(--space-3xl);
+  min-width: var(--space-3xl);
+}
+
+/* Full width variant */
+.fullWidth {
+  width: 100%;
+}

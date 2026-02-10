@@ -1,5 +1,5 @@
 import React from 'react';
-import AdviceFactor from './AdviceFactor';
+import AdviceFactor from '../AdviceFactor';
 import styles from './Advice.module.css';
 
 const Advice = ({ adviceData, isLoading }) => {

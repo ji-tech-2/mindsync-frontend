@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import Advice from './Advice';
 
 // Mock AdviceFactor component
-vi.mock('./AdviceFactor', () => ({
+vi.mock('../AdviceFactor', () => ({
   default: ({ factorKey, factorData }) => (
     <div data-testid={`advice-factor-${factorKey}`}>
       {factorData.recommendation}
