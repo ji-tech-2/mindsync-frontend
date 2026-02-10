@@ -1,8 +1,8 @@
 import { useState, forwardRef } from 'react';
-import styles from './TextInput.module.css';
+import styles from './TextField.module.css';
 
 /**
- * TextInput Component with floating label
+ * TextField Component with floating label
  * @param {Object} props
  * @param {string} props.label - Label text (acts as placeholder)
  * @param {string} props.value - Input value
@@ -13,7 +13,7 @@ import styles from './TextInput.module.css';
  * @param {string} props.error - Error message
  * @param {boolean} props.fullWidth - Fill container width (default: false)
  */
-const TextInput = forwardRef(function TextInput(
+const TextField = forwardRef(function TextField(
   {
     label,
     value = '',
@@ -86,4 +86,4 @@ const TextInput = forwardRef(function TextInput(
   );
 });
 
-export default TextInput;
+export default TextField;

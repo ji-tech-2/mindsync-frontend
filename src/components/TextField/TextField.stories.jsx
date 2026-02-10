@@ -1,9 +1,9 @@
-import TextInput from './TextInput';
+import TextField from './TextField';
 import { useState } from 'react';
 
 export default {
-  title: 'Components/TextInput',
-  component: TextInput,
+  title: 'Components/TextField',
+  component: TextField,
   parameters: {
     layout: 'centered',
   },
@@ -46,7 +46,7 @@ const Template = (args) => {
     if (args.onChange) args.onChange(e);
   };
 
-  return <TextInput {...args} value={value} onChange={handleChange} />;
+  return <TextField {...args} value={value} onChange={handleChange} />;
 };
 
 export const Default = {
