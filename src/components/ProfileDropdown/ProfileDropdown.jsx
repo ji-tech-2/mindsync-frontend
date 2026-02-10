@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import ProfileAvatar from './ProfileAvatar';
-import LogoutButton from './LogoutButton';
+import { useAuth } from '../../hooks/useAuth';
+import ProfileAvatar from '../ProfileAvatar';
+import LogoutButton from '../LogoutButton';
 import styles from './ProfileDropdown.module.css';
 
 function ProfileDropdown() {
