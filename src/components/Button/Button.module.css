@@ -52,6 +52,11 @@
   outline-offset: 2px;
 }
 
+/* Bold text weight */
+.bold {
+  font-weight: var(--font-weight-bold);
+}
+
 /* Outlined variant */
 .outlined {
   border: var(--border-md) solid var(--color-primary);
