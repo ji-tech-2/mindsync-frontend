@@ -44,8 +44,8 @@ function Navbar() {
               <Link to="/screening" className={styles.navLink}>
                 Screening
               </Link>
-              <Link to="/signIn" className={styles.buttonLink}>
-                <Button variant="outlined">Log In</Button>
+              <Link to="/signIn" className={styles.navLink}>
+                Log In
               </Link>
               <Link to="/register" className={styles.buttonLink}>
                 <Button variant="light" bold>

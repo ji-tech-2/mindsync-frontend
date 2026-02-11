@@ -1,10 +1,11 @@
 .navbar {
   background-color: var(--color-primary);
   padding: var(--space-sm) var(--space-xl);
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
-  width: 100%;
   box-shadow: var(--shadow-md);
 }
 

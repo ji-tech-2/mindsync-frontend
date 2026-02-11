@@ -5,7 +5,7 @@ import { Navbar, Footer } from '@/components';
  * MainLayout Component
  *
  * Full application layout with:
- * - Navbar at the top (sticky)
+ * - Fixed navbar at the top
  * - Main content area for route components (via Outlet)
  * - Footer at the bottom
  *
@@ -13,28 +13,22 @@ import { Navbar, Footer } from '@/components';
  */
 export function MainLayout() {
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100vh',
-        width: '100%',
-        overflow: 'hidden',
-      }}
-    >
+    <>
       <Navbar />
 
       <main
         style={{
-          flex: 1,
-          overflowY: 'auto',
-          overflowX: 'hidden',
+          minHeight: '100vh',
+          paddingTop: '4.5rem',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        <Outlet />
+        <div style={{ flex: 1 }}>
+          <Outlet />
+        </div>
+        <Footer />
       </main>
-
-      <Footer />
-    </div>
+    </>
   );
 }
