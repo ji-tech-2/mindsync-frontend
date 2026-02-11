@@ -1,5 +1,6 @@
 .profileDropdown {
   position: relative;
+  height: 100%;
 }
 
 .avatarButton {
@@ -10,6 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;
 }
 
 .dropdown {

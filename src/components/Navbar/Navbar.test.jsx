@@ -20,10 +20,8 @@ vi.mock('@/config/api', () => ({
 }));
 
 // Mock ProfileDropdown component
-vi.mock('../../features/profile', () => ({
-  ProfileDropdown: () => (
-    <div data-testid="profile-dropdown">Profile Dropdown</div>
-  ),
+vi.mock('../ProfileDropdown', () => ({
+  default: () => <div data-testid="profile-dropdown">Profile Dropdown</div>,
 }));
 
 import { TokenManager } from '../../config/api';

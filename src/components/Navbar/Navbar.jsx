@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
-import { ProfileDropdown } from '@/features/profile';
-import { Button } from '@/components';
+import { ProfileDropdown, Button } from '@/components';
 import logoPrimaryAlt from '@/assets/logo-primary-alt.svg';
 import styles from './Navbar.module.css';
 

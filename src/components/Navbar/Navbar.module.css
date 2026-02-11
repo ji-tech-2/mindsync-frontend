@@ -15,6 +15,7 @@
   justify-content: space-between;
   align-items: center;
   gap: var(--space-lg);
+  height: 100%;
 }
 
 /* Logo Button */
@@ -38,7 +39,7 @@
 .navActions {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   flex-wrap: wrap;
   justify-content: flex-end;
 }
@@ -50,7 +51,7 @@
   font-family: var(--font-body);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-sm) var(--space-sm);
   border-radius: var(--radius-xl);
   transition: all var(--transition-fast);
   white-space: nowrap;
@@ -69,7 +70,7 @@
 
 /* Profile Section */
 .profileSection {
-  margin-left: var(--space-md);
+  margin-left: var(--space-sm);
   display: flex;
   align-items: center;
 }
