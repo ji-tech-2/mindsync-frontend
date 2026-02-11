@@ -20,10 +20,8 @@ vi.mock('@/config/api', () => ({
 }));
 
 // Mock ProfileDropdown component
-vi.mock('../../features/profile', () => ({
-  ProfileDropdown: () => (
-    <div data-testid="profile-dropdown">Profile Dropdown</div>
-  ),
+vi.mock('../ProfileDropdown', () => ({
+  default: () => <div data-testid="profile-dropdown">Profile Dropdown</div>,
 }));
 
 import { TokenManager } from '../../config/api';
@@ -55,20 +53,20 @@ describe('Navbar Component', () => {
     it('should display MindSync wordmark', () => {
       renderNavbar();
 
-      expect(screen.getByText('MindSync')).toBeInTheDocument();
+      expect(screen.getByAltText('MindSync')).toBeInTheDocument();
     });
 
     it('should link to home page when user is not authenticated', () => {
       renderNavbar();
 
-      const wordmark = screen.getByText('MindSync').closest('a');
+      const wordmark = screen.getByAltText('MindSync').closest('a');
       expect(wordmark).toHaveAttribute('href', '/');
     });
 
     it('should link to dashboard when user is authenticated', () => {
       renderNavbar({ name: 'John Doe', email: 'john@example.com' });
 
-      const wordmark = screen.getByText('MindSync').closest('a');
+      const wordmark = screen.getByAltText('MindSync').closest('a');
       expect(wordmark).toHaveAttribute('href', '/dashboard');
     });
   });
