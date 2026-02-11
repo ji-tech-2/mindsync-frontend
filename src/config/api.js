@@ -4,11 +4,15 @@
  * IMPORTANT SETUP NOTES:
  * ====================
  *
- * Current Kong Gateway Routes (http://139.59.109.5:8000):
+ * Current Kong Gateway Routes (https://api.mindsync.my):
  * ✅ POST /v0-1/model-predict → Flask /predict (WORKING)
  * ✅ GET  /v0-1/model-result/{id} → Flask /result/{id} (CONFIGURED)
  * ✅ POST /v0-1/auth-login → Authentication endpoint
  * ✅ POST /v0-1/auth-register → Registration endpoint
+ *
+ * HTTPS Configuration:
+ * - All API calls use HTTPS for security
+ * - Self-signed certificates allowed in development (secure: false in vite.config.js)
  *
  * Security Implementation:
  * - JWT token stored in memory (not localStorage)
@@ -21,8 +25,8 @@ import axios from 'axios';
 export const API_CONFIG = {
   // Base URL for the API
   // In development: uses Vite proxy (/api) to bypass CORS
-  // In production: uses direct URL
-  BASE_URL: import.meta.env.DEV ? '/api' : 'http://139.59.109.5:8000',
+  // In production: uses direct HTTPS URL
+  BASE_URL: import.meta.env.DEV ? '/api' : 'https://api.mindsync.my',
 
   // Authentication endpoints
   AUTH_LOGIN: '/v0-1/auth-login',

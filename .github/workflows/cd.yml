@@ -29,6 +29,9 @@ jobs:
             docker run -d \
               --name frontend \
               -p 80:80 \
+              -p 443:443 \
+              -v /etc/letsencrypt/live/mindsync.my/fullchain.pem:/etc/nginx/ssl/cert.pem:ro \
+              -v /etc/letsencrypt/live/mindsync.my/privkey.pem:/etc/nginx/ssl/key.pem:ro \
               --restart unless-stopped \
               ${{ secrets.DOCKER_USERNAME }}/mindsync-frontend:latest
 
