@@ -1,0 +1,45 @@
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.avatarCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--color-primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  color: var(--color-text-dark);
+  font-weight: var(--font-weight-bold);
+}
+
+.avatarCircleMedium {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--color-primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--color-text-dark);
+  font-weight: var(--font-weight-bold);
+}
+
+.avatarCircleLarge {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: var(--color-primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.75rem;
+  color: var(--color-text-dark);
+  font-weight: var(--font-weight-bold);
+}

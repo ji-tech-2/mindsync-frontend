@@ -1,14 +1,12 @@
 .navbar {
-  background: rgb(245 240 232 / 98%);
-  box-shadow:
-    0 4px 20px rgb(0 0 0 / 8%),
-    0 2px 10px rgb(90 124 89 / 5%);
-  border-bottom: 1px solid rgb(90 124 89 / 10%);
-  padding: 1rem 2rem;
-  position: sticky;
+  background-color: var(--color-primary);
+  padding: var(--space-sm) var(--space-xl);
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
-  width: 100%;
+  box-shadow: var(--shadow-md);
 }
 
 .container {
@@ -16,33 +14,116 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-lg);
+  height: 100%;
 }
 
-.wordmark {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #5a7c59;
-}
-
-.wordmark a {
-  text-decoration: none;
-  color: inherit;
-}
-
-.navRight {
+/* Logo Button */
+.logoButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  transition: transform var(--transition-fast);
+  flex-shrink: 0;
 }
 
+.logo {
+  height: 2.5rem;
+  width: auto;
+}
+
+/* Navigation Actions */
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Navigation Links */
 .navLink {
   text-decoration: none;
-  color: #4a5555;
-  font-weight: 500;
-  padding: 0.6rem 1.2rem;
-  border-radius: 12px;
+  color: var(--color-text-dark);
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  padding: var(--space-sm) var(--space-sm);
+  border-radius: var(--radius-xl);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
 }
 
+.navLink:hover {
+  color: var(--color-primary-light);
+}
+
+/* Button Link - wraps Button component */
+.buttonLink {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Profile Section */
 .profileSection {
-  margin-left: 1rem;
+  margin-left: var(--space-sm);
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* Responsive */
+@media (width <= 768px) {
+  .navbar {
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .container {
+    gap: var(--space-md);
+  }
+
+  .logo {
+    height: 2rem;
+  }
+
+  .navActions {
+    gap: var(--space-sm);
+  }
+
+  .navLink {
+    padding: var(--space-xs) var(--space-md);
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (width <= 480px) {
+  .navbar {
+    padding: var(--space-md);
+  }
+
+  .container {
+    flex-wrap: wrap;
+  }
+
+  .navActions {
+    width: 100%;
+    order: 3;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .logo {
+    height: 1.75rem;
+  }
+
+  .navLink {
+    flex: 1;
+    min-width: 100px;
+    text-align: center;
+    padding: var(--space-xs) var(--space-sm);
+  }
 }
