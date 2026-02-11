@@ -1,11 +1,20 @@
 import styles from './Footer.module.css';
 
+/**
+ * Footer Component
+ *
+ * Displays:
+ * - Social media links with icon-only style
+ * - Copyright information
+ * - Dark theme with system colors
+ */
 function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
+        {/* Social Media Links */}
         <div className={styles.socialIcons}>
           <a
             href="https://twitter.com"
@@ -16,8 +25,8 @@ function Footer() {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="currentColor"
             >
@@ -33,8 +42,8 @@ function Footer() {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -56,8 +65,8 @@ function Footer() {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="currentColor"
             >
@@ -65,8 +74,10 @@ function Footer() {
             </svg>
           </a>
         </div>
+
+        {/* Copyright */}
         <div className={styles.copyright}>
-          © {currentYear} MindSync. All rights reserved.
+          Copyright © {currentYear} JI-TECH. All rights reserved.
         </div>
       </div>
     </footer>
