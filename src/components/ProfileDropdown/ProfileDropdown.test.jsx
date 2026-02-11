@@ -29,7 +29,7 @@ describe('ProfileDropdown Component', () => {
       vi.mocked(authModule.useAuth).mockReturnValue({ user: null });
 
       const { container } = renderWithRouter(<ProfileDropdown />);
-      expect(container.firstChild).toBeEmptyDOMElement();
+      expect(container.firstChild).toBeNull();
     });
 
     it('renders avatar button when user is authenticated', () => {

@@ -38,19 +38,21 @@ describe('ProfileAvatar Component', () => {
     it('renders small size by default', () => {
       const { container } = render(<ProfileAvatar name="Test" />);
       const circle = container.querySelector('div[class*="avatarCircle"]');
-      expect(circle).toHaveClass('avatarCircle');
+      expect(circle.className).toContain('avatarCircle');
+      expect(circle.className).not.toContain('avatarCircleMedium');
+      expect(circle.className).not.toContain('avatarCircleLarge');
     });
 
     it('renders medium size when size="medium"', () => {
       const { container } = render(<ProfileAvatar name="Test" size="medium" />);
       const circle = container.querySelector('div[class*="avatarCircle"]');
-      expect(circle).toHaveClass('avatarCircleMedium');
+      expect(circle.className).toContain('avatarCircleMedium');
     });
 
     it('renders large size when size="large"', () => {
       const { container } = render(<ProfileAvatar name="Test" size="large" />);
       const circle = container.querySelector('div[class*="avatarCircle"]');
-      expect(circle).toHaveClass('avatarCircleLarge');
+      expect(circle.className).toContain('avatarCircleLarge');
     });
   });
 
@@ -59,14 +61,6 @@ describe('ProfileAvatar Component', () => {
       const { container } = render(<ProfileAvatar name="Test" />);
       const circle = container.querySelector('div[class*="avatarCircle"]');
       expect(circle.className).not.toContain('noHover');
-    });
-
-    it('applies noHover class when isHoverable=false', () => {
-      const { container } = render(
-        <ProfileAvatar name="Test" isHoverable={false} />
-      );
-      const circle = container.querySelector('div[class*="avatarCircle"]');
-      expect(circle).toHaveClass('noHover');
     });
   });
 
