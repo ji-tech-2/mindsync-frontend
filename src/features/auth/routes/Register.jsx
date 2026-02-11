@@ -6,8 +6,10 @@ import { FormSelect } from '@/components';
 import {
   genderOptions,
   occupationOptions,
+  workModeOptions,
   toApiGender,
   toApiOccupation,
+  toApiWorkMode,
 } from '@/utils/fieldMappings';
 import '../assets/register.css';
 
@@ -22,6 +24,7 @@ export default function Register() {
     dob: '',
     gender: '',
     occupation: '',
+    workRmt: '',
   });
 
   const [message, setMessage] = useState('');
@@ -132,6 +135,7 @@ export default function Register() {
         ...form,
         gender: toApiGender(form.gender),
         occupation: toApiOccupation(form.occupation),
+        workRmt: toApiWorkMode(form.workRmt),
       };
       const response = await apiClient.post(
         API_CONFIG.AUTH_REGISTER,
@@ -279,6 +283,16 @@ export default function Register() {
               value={form.occupation}
               onChange={handleChange}
               options={occupationOptions}
+            />
+          </div>
+
+          <div className="form-field">
+            <FormSelect
+              label="Work Mode"
+              name="workRmt"
+              value={form.workRmt}
+              onChange={handleChange}
+              options={workModeOptions}
             />
           </div>
 
