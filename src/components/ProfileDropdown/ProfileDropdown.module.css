@@ -20,6 +20,20 @@
   right: 0;
   min-width: 240px;
   z-index: 1000;
+  transform-origin: top;
+  animation: slide-down var(--transition-fast) forwards;
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropdownContent {

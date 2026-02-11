@@ -9,3 +9,16 @@
 .padded {
   padding: var(--space-xl);
 }
+
+/* Elevation / Shadow Levels */
+.elevationMd {
+  box-shadow: var(--shadow-md);
+}
+
+.elevationLg {
+  box-shadow: var(--shadow-lg);
+}
+
+.elevationNone {
+  box-shadow: none;
+}

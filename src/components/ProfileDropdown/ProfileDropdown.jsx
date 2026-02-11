@@ -56,7 +56,7 @@ function ProfileDropdown() {
       </button>
 
       {isOpen && (
-        <Card className={styles.dropdown} padded={false}>
+        <Card className={styles.dropdown} padded={false} elevation="lg">
           <div className={styles.dropdownContent}>
             {/* Avatar and Greeting */}
             <div className={styles.header}>
