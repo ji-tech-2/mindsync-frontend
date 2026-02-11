@@ -96,7 +96,7 @@ mindsync-frontend/
 
 - **Node.js**: 18.x or higher
 - **npm**: 9.x or higher
-- **Backend**: Spring Boot backend running on `http://139.59.109.5:8000` (or configure in `api.js`)
+- **Backend**: Spring Boot backend running on `https://api.mindsync.my` (or configure in `api.js`)
 
 ### Installation
 
@@ -151,7 +151,7 @@ npm run test:coverage # Generate test coverage report
 Create a `.env` file in the root directory (optional):
 
 ```env
-VITE_API_URL=http://139.59.109.5:8000
+VITE_API_URL=https://api.mindsync.my
 ```
 
 Access in code:
@@ -429,7 +429,7 @@ docker run -p 80:80 -p 443:443 \
 The backend API URL is configured in `src/config/api.js`:
 
 - **Development**: Uses Vite proxy at `/api` to bypass CORS
-- **Production**: Uses direct HTTPS URL to backend (`https://139.59.109.5:8000`)
+- **Production**: Uses direct HTTPS URL to backend (`https://api.mindsync.my`)
 
 To change the API endpoint, modify `src/config/api.js`:
 

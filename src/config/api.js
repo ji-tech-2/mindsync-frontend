@@ -4,7 +4,7 @@
  * IMPORTANT SETUP NOTES:
  * ====================
  *
- * Current Kong Gateway Routes (https://139.59.109.5:8000):
+ * Current Kong Gateway Routes (https://api.mindsync.my):
  * ✅ POST /v0-1/model-predict → Flask /predict (WORKING)
  * ✅ GET  /v0-1/model-result/{id} → Flask /result/{id} (CONFIGURED)
  * ✅ POST /v0-1/auth-login → Authentication endpoint
@@ -26,7 +26,7 @@ export const API_CONFIG = {
   // Base URL for the API
   // In development: uses Vite proxy (/api) to bypass CORS
   // In production: uses direct HTTPS URL
-  BASE_URL: import.meta.env.DEV ? '/api' : 'https://139.59.109.5:8000',
+  BASE_URL: import.meta.env.DEV ? '/api' : 'https://api.mindsync.my',
 
   // Authentication endpoints
   AUTH_LOGIN: '/v0-1/auth-login',

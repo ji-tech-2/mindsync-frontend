@@ -24,7 +24,7 @@
  */
 export async function pollPredictionResult(
   predictionId,
-  baseURL = 'http://139.59.109.5:8000',
+  baseURL = 'https://api.mindsync.my',
   resultPath = '/v0-1/result',
   maxAttempts = 60,
   interval = 2000
