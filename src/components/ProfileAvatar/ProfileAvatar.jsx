@@ -1,0 +1,21 @@
+import styles from './ProfileAvatar.module.css';
+
+export default function ProfileAvatar({ name, size = 'small' }) {
+  let sizeClass = styles.avatarCircle;
+
+  if (size === 'medium') {
+    sizeClass = styles.avatarCircleMedium;
+  } else if (size === 'large') {
+    sizeClass = styles.avatarCircleLarge;
+  }
+
+  const combinedClass = `${sizeClass}`.trim();
+
+  return (
+    <div className={styles.avatar}>
+      <div className={combinedClass}>
+        {(name || '').trim().charAt(0).toUpperCase()}
+      </div>
+    </div>
+  );
+}

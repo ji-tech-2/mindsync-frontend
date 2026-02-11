@@ -1,0 +1,71 @@
+.profileDropdown {
+  position: relative;
+  height: 100%;
+}
+
+.avatarButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-xl));
+  right: 0;
+  min-width: 240px;
+  z-index: 1000;
+  transform-origin: top;
+  animation: slide-down var(--transition-fast) forwards;
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.header,
+.actions {
+  padding: var(--space-md) var(--space-lg);
+  gap: var(--space-sm);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.greeting {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-light);
+  text-align: center;
+}
+
+.divider {
+  height: 1px;
+  background-color: rgb(134 153 89 / 20%);
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+}

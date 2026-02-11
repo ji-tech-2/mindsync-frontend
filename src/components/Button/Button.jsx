@@ -6,6 +6,7 @@ import styles from './Button.module.css';
  * @param {string} props.variant - 'outlined', 'filled', 'light', 'ghost' (default: 'outlined')
  * @param {string} props.size - 'lg' for large (default: normal)
  * @param {boolean} props.fullWidth - Fill container width (default: false)
+ * @param {boolean} props.bold - Use bold font weight (default: false)
  * @param {React.ReactNode} props.children - Button content/text
  * @param {React.ReactNode} props.icon - Icon element
  * @param {string} props.iconPosition - 'left' or 'right' (default: 'left')
@@ -21,6 +22,7 @@ function Button({
   variant = 'outlined',
   size = '',
   fullWidth = false,
+  bold = false,
   children,
   icon,
   iconPosition = 'left',
@@ -38,6 +40,7 @@ function Button({
     styles[variant],
     size && styles[size],
     fullWidth && styles.fullWidth,
+    bold && styles.bold,
     disabled && styles.disabled,
     icon && styles.hasIcon,
     iconPosition === 'right' && styles.iconRight,

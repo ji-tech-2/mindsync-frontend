@@ -6,10 +6,25 @@ import styles from './Card.module.css';
  * @param {Object} props
  * @param {React.ReactNode} props.children - Card content
  * @param {boolean} props.padded - Whether the card has padding (default: true)
+ * @param {string} props.elevation - Shadow elevation level: 'md' (default), 'lg', or 'none' for no shadow
  * @param {string} props.className - Additional CSS classes
  */
-const Card = ({ children, padded = true, className = '', ...rest }) => {
-  const cardClass = [styles.card, padded && styles.padded, className]
+const Card = ({
+  children,
+  padded = true,
+  elevation = 'md',
+  className = '',
+  ...rest
+}) => {
+  const cardClass = [
+    styles.card,
+    padded && styles.padded,
+    elevation &&
+      styles[
+        `elevation${elevation.charAt(0).toUpperCase() + elevation.slice(1)}`
+      ],
+    className,
+  ]
     .filter(Boolean)
     .join(' ');
 

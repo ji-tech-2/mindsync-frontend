@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
-import { ProfileDropdown } from '@/features/profile';
+import { ProfileDropdown, Button } from '@/components';
+import logoPrimaryAlt from '@/assets/logo-primary-alt.svg';
 import styles from './Navbar.module.css';
 
 function Navbar() {
@@ -9,12 +10,19 @@ function Navbar() {
   return (
     <nav className={styles.navbar}>
       <div className={styles.container}>
-        <div className={styles.wordmark}>
-          <Link to={user ? '/dashboard' : '/'}>MindSync</Link>
-        </div>
+        {/* Logo/Branding */}
+        <Link
+          to={user ? '/dashboard' : '/'}
+          className={styles.logoButton}
+          aria-label="Home"
+        >
+          <img src={logoPrimaryAlt} alt="MindSync" className={styles.logo} />
+        </Link>
 
-        <div className={styles.navRight}>
-          {user && (
+        {/* Navigation Items */}
+        <div className={styles.navActions}>
+          {user ? (
+            /* Authenticated User Navigation */
             <>
               <Link to="/dashboard" className={styles.navLink}>
                 Dashboard
@@ -22,15 +30,28 @@ function Navbar() {
               <Link to="/history" className={styles.navLink}>
                 History
               </Link>
+              <Link to="/screening" className={styles.navLink}>
+                Screening
+              </Link>
+              <div className={styles.profileSection}>
+                <ProfileDropdown />
+              </div>
             </>
-          )}
-          <Link to="/screening" className={styles.navLink}>
-            Screening
-          </Link>
-          {user && (
-            <div className={styles.profileSection}>
-              <ProfileDropdown />
-            </div>
+          ) : (
+            /* Unauthenticated Navigation */
+            <>
+              <Link to="/screening" className={styles.navLink}>
+                Screening
+              </Link>
+              <Link to="/signIn" className={styles.navLink}>
+                Log In
+              </Link>
+              <Link to="/register" className={styles.buttonLink}>
+                <Button variant="light" bold>
+                  Try for Free
+                </Button>
+              </Link>
+            </>
           )}
         </div>
       </div>

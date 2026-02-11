@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../assets/profile.css';
-import ProfileAvatar from '../components/ProfileAvatar';
+import { ProfileAvatar } from '@/components';
 import ProfileFieldRow from '../components/ProfileFieldRow';
 import { EditModal, FormInput, FormSelect, OTPInput } from '@/components';
 import apiClient, { TokenManager } from '@/config/api';

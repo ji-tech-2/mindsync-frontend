@@ -20,7 +20,7 @@
   /* Text Colors */
   --color-text-light: #423e36; /* Dark text for light backgrounds */
   --color-text-dark: #fffdf7; /* Light text for dark backgrounds */
-  --color-text-muted: #718096; /* Muted text color (between light and dark) */
+  --color-text-muted: #9d9586; /* Muted text color (between light and dark) */
 
   /* Status Colors */
   --color-success: #93c9bf;
