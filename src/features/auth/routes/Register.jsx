@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient, { API_CONFIG } from '@/config/api';
 import { validatePassword } from '@/utils/passwordValidation';
+import { FormSelect } from '@/components';
+import {
+  genderOptions,
+  occupationOptions,
+  toApiGender,
+  toApiOccupation,
+} from '@/utils/fieldMappings';
 import '../assets/register.css';
 
 export default function Register() {
@@ -100,20 +107,6 @@ export default function Register() {
       }
     }
 
-    // Gender validation
-    if (!form.gender) {
-      newErrors.gender = 'Gender is required';
-    }
-
-    // Occupation validation
-    if (!form.occupation || !form.occupation.trim()) {
-      newErrors.occupation = 'Occupation is required';
-    } else if (form.occupation.length < 2) {
-      newErrors.occupation = 'Occupation must be at least 2 characters';
-    } else if (form.occupation.length > 50) {
-      newErrors.occupation = 'Occupation must not exceed 50 characters';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -134,7 +127,16 @@ export default function Register() {
     // Backend response: { success: true, message: "...", data: { email, name } }
     // Note: Backend doesn't return token on register, user needs to login after
     try {
-      const response = await apiClient.post(API_CONFIG.AUTH_REGISTER, form);
+      // Transform gender and occupation values to API format
+      const formDataToSubmit = {
+        ...form,
+        gender: toApiGender(form.gender),
+        occupation: toApiOccupation(form.occupation),
+      };
+      const response = await apiClient.post(
+        API_CONFIG.AUTH_REGISTER,
+        formDataToSubmit
+      );
       const result = response.data;
       setLoading(false);
 
@@ -261,34 +263,23 @@ export default function Register() {
           </div>
 
           <div className="form-field">
-            <select
+            <FormSelect
+              label="Gender"
               name="gender"
               value={form.gender}
               onChange={handleChange}
-              className={errors.gender ? 'input-error' : ''}
-            >
-              <option value="" disabled>
-                Select Gender
-              </option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
-            {errors.gender && (
-              <span className="error-text">{errors.gender}</span>
-            )}
+              options={genderOptions}
+            />
           </div>
 
           <div className="form-field">
-            <input
+            <FormSelect
+              label="Occupation"
               name="occupation"
-              placeholder="Occupation"
               value={form.occupation}
               onChange={handleChange}
-              className={errors.occupation ? 'input-error' : ''}
+              options={occupationOptions}
             />
-            {errors.occupation && (
-              <span className="error-text">{errors.occupation}</span>
-            )}
           </div>
 
           <button type="submit" className="register-btn" disabled={loading}>
