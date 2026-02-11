@@ -380,47 +380,41 @@ git commit -m "test: add tests for login"
 
 Build and run with Docker:
 
-```bash
-# Build image
-docker build -t mindsync-frontend .
+**Development** (accepts localhost, 127.0.0.1, or any hostname):
 
-# Run container (simplest - uses auto-generated self-signed certificate)
+```bash
+# Build image with development configuration
+docker build --build-arg ENV=dev -t mindsync-frontend .
+
+# Run container
 docker run -p 80:80 -p 443:443 mindsync-frontend
 ```
 
-### HTTPS Configuration
+Access at `https://localhost` (accept the self-signed certificate warning)
 
-The application uses HTTPS (port 443) with automatic HTTP to HTTPS redirects.
-
-**Self-Signed Certificates (Auto-Generated)**
-
-By default, the Dockerfile generates a self-signed certificate during build. This allows the container to start immediately without additional setup—perfect for development and testing.
+**Production** (mindsync.my only):
 
 ```bash
-docker run -p 80:80 -p 443:443 mindsync-frontend
-```
+# Build image with production configuration
+docker build --build-arg ENV=prod -t mindsync-frontend .
 
-**Production Certificates (Let's Encrypt)**
-
-For production, mount your actual certificates to override the self-signed ones:
-
-```bash
+# Run container with Let's Encrypt certificates
 docker run -p 80:80 -p 443:443 \
   -v /etc/letsencrypt/live/mindsync.my/fullchain.pem:/etc/nginx/ssl/cert.pem:ro \
   -v /etc/letsencrypt/live/mindsync.my/privkey.pem:/etc/nginx/ssl/key.pem:ro \
   mindsync-frontend
 ```
 
-**Custom Certificates**
+### HTTPS Configuration
 
-You can also mount your own certificate files:
+**Development**: Auto-generates self-signed certificate, accepts any hostname for local testing
 
-```bash
-docker run -p 80:80 -p 443:443 \
-  -v /path/to/cert.pem:/etc/nginx/ssl/cert.pem:ro \
-  -v /path/to/key.pem:/etc/nginx/ssl/key.pem:ro \
-  mindsync-frontend
-```
+**Production**:
+
+- Specific to `mindsync.my` domain only
+- Redirects `www.mindsync.my` to `mindsync.my`
+- Uses Let's Encrypt certificates mounted at runtime
+- No www redirects for other domains (security)
 
 ## Environment Configuration
 

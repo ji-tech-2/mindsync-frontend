@@ -15,11 +15,16 @@ RUN npm run build
 
 # Serve using NGINX
 FROM nginx:alpine
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+ARG ENV=prod
+
+COPY nginx.${ENV}.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Create SSL directory
 RUN mkdir -p /etc/nginx/ssl
+
+# Install openssl for certificate generation
+RUN apk add --no-cache openssl
 
 # Generate self-signed certificate if not provided
 # This allows the container to start immediately in development

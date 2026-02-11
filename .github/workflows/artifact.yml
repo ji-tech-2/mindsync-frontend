@@ -57,6 +57,8 @@ jobs:
         with:
           context: .
           push: true
+          build-args: |
+            ENV=prod
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/mindsync-frontend:latest
             ${{ secrets.DOCKER_USERNAME }}/mindsync-frontend:${{ needs.version.outputs.version }}
