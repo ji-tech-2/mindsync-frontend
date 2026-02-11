@@ -48,11 +48,11 @@ mindsync-frontend/
 │   │   ├── Advice.module.css
 │   │   ├── AdviceFactor.jsx        # Individual advice factor component
 │   │   ├── LogoutButton.jsx        # Example logout component
-│   │   └── ProtectedRoute.jsx      # Route guard component 
+│   │   └── ProtectedRoute.jsx      # Route guard component
 │   ├── config/
-│   │   └── api.js                  # Axios instance, interceptors, token manager 
+│   │   └── api.js                  # Axios instance, interceptors, token manager
 │   ├── contexts/
-│   │   └── AuthContext.jsx         # Global authentication state 
+│   │   └── AuthContext.jsx         # Global authentication state
 │   ├── pages/
 │   │   ├── css/                    # Page-specific styles
 │   │   │   ├── dashboard.css
@@ -62,8 +62,8 @@ mindsync-frontend/
 │   │   │   └── screening.css
 │   │   ├── main/
 │   │   │   ├── Dashboard.jsx       # Home/Dashboard page
-│   │   │   ├── Login.jsx           # Login page 
-│   │   │   ├── Register.jsx        # Registration page 
+│   │   │   ├── Login.jsx           # Login page
+│   │   │   ├── Register.jsx        # Registration page
 │   │   │   ├── Result.jsx          # Test results page
 │   │   │   └── Screening.jsx       # Mental health screening form
 │   │   └── utils/
@@ -72,8 +72,8 @@ mindsync-frontend/
 │   ├── test/
 │   │   └── setup.js                # Test environment setup
 │   ├── utils/
-│   │   └── authHelper.js           # Authentication helper functions 
-│   ├── App.jsx                     # Root component with routes 
+│   │   └── authHelper.js           # Authentication helper functions
+│   ├── App.jsx                     # Root component with routes
 │   ├── App.css                     # Global styles
 │   ├── index.css                   # Base styles
 │   └── main.jsx                    # Application entry point
@@ -101,31 +101,35 @@ mindsync-frontend/
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd mindsync-frontend
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Configure API endpoint** (optional)
-   
+
    Edit `src/config/api.js` if your backend is on a different URL:
+
    ```javascript
    export const API_CONFIG = {
-     BASE_URL: import.meta.env.DEV ? "/api" : "http://your-backend-url:8000",
+     BASE_URL: import.meta.env.DEV ? '/api' : 'http://your-backend-url:8000',
      // ...
    };
    ```
 
 4. **Start development server**
+
    ```bash
    npm run dev
    ```
-   
+
    Application will be available at `http://localhost:5173`
 
 ## Development
@@ -151,6 +155,7 @@ VITE_API_URL=http://139.59.109.5:8000
 ```
 
 Access in code:
+
 ```javascript
 const apiUrl = import.meta.env.VITE_API_URL;
 ```
@@ -174,6 +179,7 @@ npm run test:coverage
 ```
 
 **Test Coverage**: 76 tests covering:
+
 - Authentication flows (Login/Register)
 - Protected routes
 - API interceptors
@@ -205,12 +211,13 @@ The application uses **JWT (JSON Web Tokens)** for authentication with the Sprin
 ### Usage Examples
 
 **Check authentication status:**
+
 ```jsx
 import { useAuth } from './contexts/AuthContext';
 
 function MyComponent() {
   const { user, isAuthenticated, logout } = useAuth();
-  
+
   return (
     <div>
       {isAuthenticated && <p>Welcome, {user.name}!</p>}
@@ -221,6 +228,7 @@ function MyComponent() {
 ```
 
 **Make authenticated API calls:**
+
 ```jsx
 import apiClient from './config/api';
 
@@ -229,34 +237,34 @@ const response = await apiClient.get('/user/profile');
 ```
 
 **Protect routes:**
+
 ```jsx
-<Route 
-  path="/dashboard" 
+<Route
+  path="/dashboard"
   element={
     <ProtectedRoute>
       <Dashboard />
     </ProtectedRoute>
-  } 
+  }
 />
 ```
-
-
 
 ## API Integration
 
 ### Backend Endpoints
 
-| Endpoint | Method | Auth Required | Description |
-|----------|--------|---------------|-------------|
-| `/login` | POST | No | User login, returns JWT token |
-| `/register` | POST | No | User registration |
-| `/v0-1/model-predict` | POST | Yes | Submit screening data for prediction |
-| `/v0-1/model-result/{id}` | GET | Yes | Poll for prediction results |
-| `/v0-1/model-advice` | GET | Yes | Get AI-generated health advice |
+| Endpoint                  | Method | Auth Required | Description                          |
+| ------------------------- | ------ | ------------- | ------------------------------------ |
+| `/login`                  | POST   | No            | User login, returns JWT token        |
+| `/register`               | POST   | No            | User registration                    |
+| `/v0-1/model-predict`     | POST   | Yes           | Submit screening data for prediction |
+| `/v0-1/model-result/{id}` | GET    | Yes           | Poll for prediction results          |
+| `/v0-1/model-advice`      | GET    | Yes           | Get AI-generated health advice       |
 
 ### Request/Response Format
 
 **Login Request:**
+
 ```json
 {
   "email": "user@example.com",
@@ -265,6 +273,7 @@ const response = await apiClient.get('/user/profile');
 ```
 
 **Login Response:**
+
 ```json
 {
   "success": true,
@@ -279,6 +288,7 @@ const response = await apiClient.get('/user/profile');
 ```
 
 **Protected Requests:**
+
 ```
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
@@ -303,23 +313,24 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   5. Styles
 
 - **Component Structure**:
+
   ```jsx
   // 1. Imports
   import { useState } from 'react';
   import { useAuth } from '../contexts/AuthContext';
-  
+
   // 2. Component definition
   export default function ComponentName() {
     // 3. Hooks
     const { user } = useAuth();
     const [state, setState] = useState();
-    
+
     // 4. Event handlers
     const handleClick = () => { };
-    
+
     // 5. Effects
     useEffect(() => { }, []);
-    
+
     // 6. JSX return
     return ( );
   }
@@ -373,8 +384,73 @@ Build and run with Docker:
 # Build image
 docker build -t mindsync-frontend .
 
-# Run container
-docker run -p 3000:3000 mindsync-frontend
+# Run container (simplest - uses auto-generated self-signed certificate)
+docker run -p 80:80 -p 443:443 mindsync-frontend
+```
+
+### HTTPS Configuration
+
+The application uses HTTPS (port 443) with automatic HTTP to HTTPS redirects.
+
+**Self-Signed Certificates (Auto-Generated)**
+
+By default, the Dockerfile generates a self-signed certificate during build. This allows the container to start immediately without additional setup—perfect for development and testing.
+
+```bash
+docker run -p 80:80 -p 443:443 mindsync-frontend
+```
+
+**Production Certificates (Let's Encrypt)**
+
+For production, mount your actual certificates to override the self-signed ones:
+
+```bash
+docker run -p 80:80 -p 443:443 \
+  -v /etc/letsencrypt/live/mindsync.my/fullchain.pem:/etc/nginx/ssl/cert.pem:ro \
+  -v /etc/letsencrypt/live/mindsync.my/privkey.pem:/etc/nginx/ssl/key.pem:ro \
+  mindsync-frontend
+```
+
+**Custom Certificates**
+
+You can also mount your own certificate files:
+
+```bash
+docker run -p 80:80 -p 443:443 \
+  -v /path/to/cert.pem:/etc/nginx/ssl/cert.pem:ro \
+  -v /path/to/key.pem:/etc/nginx/ssl/key.pem:ro \
+  mindsync-frontend
+```
+
+## Environment Configuration
+
+### API Endpoint Configuration
+
+The backend API URL is configured in `src/config/api.js`:
+
+- **Development**: Uses Vite proxy at `/api` to bypass CORS
+- **Production**: Uses direct HTTPS URL to backend (`https://139.59.109.5:8000`)
+
+To change the API endpoint, modify `src/config/api.js`:
+
+```javascript
+export const API_CONFIG = {
+  BASE_URL: import.meta.env.DEV ? '/api' : 'https://your-api-domain.com',
+  // ... rest of config
+};
+```
+
+And update the Vite proxy target in `vite.config.js`:
+
+```javascript
+server: {
+  proxy: {
+    '/api': {
+      target: 'https://your-api-domain.com',
+      // ... rest of proxy config
+    },
+  },
+},
 ```
 
 ## Contributing
@@ -397,22 +473,26 @@ docker run -p 3000:3000 mindsync-frontend
 ### Common Issues
 
 **Port already in use:**
+
 ```bash
 # Kill process on port 5173
 npx kill-port 5173
 ```
 
 **CORS errors:**
+
 - Verify backend is running
 - Check CORS configuration in Spring Boot backend
 - Ensure `withCredentials: true` in `api.js`
 
 **401 Unauthorized:**
+
 - Check token is being sent (DevTools → Network → Headers)
 - Verify backend JWT validation
 - Token may have expired
 
 **Tests failing:**
+
 ```bash
 # Clear test cache
 npm test -- --clearCache
@@ -420,5 +500,3 @@ npm test -- --clearCache
 # Run with verbose output
 npm test -- --run --reporter=verbose
 ```
-
-
