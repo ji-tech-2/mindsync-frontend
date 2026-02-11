@@ -1,13 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth, LogoutButton } from '@/features/auth';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/features/auth';
+import Card from '../Card';
+import Button from '../Button';
 import ProfileAvatar from '../ProfileAvatar';
 import styles from './ProfileDropdown.module.css';
 
 function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -30,8 +33,14 @@ function ProfileDropdown() {
     setIsOpen(!isOpen);
   };
 
-  const closeDropdown = () => {
+  const handleEditProfile = () => {
     setIsOpen(false);
+    navigate('/profile');
+  };
+
+  const handleLogout = () => {
+    setIsOpen(false);
+    logout();
   };
 
   if (!user) return null;
@@ -43,33 +52,32 @@ function ProfileDropdown() {
         onClick={toggleDropdown}
         aria-label="Profile menu"
       >
-        <ProfileAvatar name={user.name} size="small" isHoverable={true} />
+        <ProfileAvatar name={user.name} size="small" />
       </button>
 
       {isOpen && (
-        <div className={styles.dropdown}>
-          <div className={styles.dropdownHeader}>
-            <div className={styles.email}>{user.email}</div>
-          </div>
+        <Card className={styles.dropdown} padded={false}>
+          <div className={styles.dropdownContent}>
+            {/* Avatar and Greeting */}
+            <div className={styles.header}>
+              <ProfileAvatar name={user.name} size="medium" />
+              <div className={styles.greeting}>Hi, {user.name}!</div>
+            </div>
 
-          <div className={styles.dropdownBody}>
-            <ProfileAvatar name={user.name} size="medium" isHoverable={false} />
-            <div className={styles.greeting}>Hello, {user.name}!</div>
-          </div>
+            {/* Divider */}
+            <div className={styles.divider} />
 
-          <div className={styles.dropdownActions}>
-            <Link
-              to="/profile"
-              className={styles.actionButton}
-              onClick={closeDropdown}
-            >
-              Edit Profile
-            </Link>
-            <div className={styles.logoutWrapper}>
-              <LogoutButton />
+            {/* Action Buttons */}
+            <div className={styles.actions}>
+              <Button variant="outlined" fullWidth onClick={handleEditProfile}>
+                Edit Profile
+              </Button>
+              <Button variant="filled" fullWidth onClick={handleLogout}>
+                Logout
+              </Button>
             </div>
           </div>
-        </div>
+        </Card>
       )}
     </div>
   );

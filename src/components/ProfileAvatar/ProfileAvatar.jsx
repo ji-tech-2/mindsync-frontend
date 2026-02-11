@@ -1,10 +1,6 @@
 import styles from './ProfileAvatar.module.css';
 
-export default function ProfileAvatar({
-  name,
-  size = 'small',
-  isHoverable = true,
-}) {
+export default function ProfileAvatar({ name, size = 'small' }) {
   let sizeClass = styles.avatarCircle;
 
   if (size === 'medium') {
@@ -13,8 +9,7 @@ export default function ProfileAvatar({
     sizeClass = styles.avatarCircleLarge;
   }
 
-  const hoverClass = isHoverable ? '' : styles.noHover;
-  const combinedClass = `${sizeClass} ${hoverClass}`.trim();
+  const combinedClass = `${sizeClass}`.trim();
 
   return (
     <div className={styles.avatar}>

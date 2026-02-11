@@ -8,7 +8,6 @@ import * as authModule from '@/features/auth';
 // Mock the auth module
 vi.mock('@/features/auth', () => ({
   useAuth: vi.fn(),
-  LogoutButton: () => <button>Logout</button>,
 }));
 
 const mockUser = {
@@ -51,14 +50,17 @@ describe('ProfileDropdown Component', () => {
 
   describe('Dropdown Toggle', () => {
     beforeEach(() => {
-      vi.mocked(authModule.useAuth).mockReturnValue({ user: mockUser });
+      const mockLogout = vi.fn();
+      vi.mocked(authModule.useAuth).mockReturnValue({
+        user: mockUser,
+        logout: mockLogout,
+      });
     });
 
     it('does not show dropdown content initially', () => {
       renderWithRouter(<ProfileDropdown />);
-      expect(screen.queryByText(mockUser.email)).not.toBeInTheDocument();
       expect(
-        screen.queryByText(`Hello, ${mockUser.name}!`)
+        screen.queryByText(`Hi, ${mockUser.name}!`)
       ).not.toBeInTheDocument();
     });
 
@@ -69,8 +71,7 @@ describe('ProfileDropdown Component', () => {
       const button = screen.getByLabelText('Profile menu');
       await user.click(button);
 
-      expect(screen.getByText(mockUser.email)).toBeInTheDocument();
-      expect(screen.getByText(`Hello, ${mockUser.name}!`)).toBeInTheDocument();
+      expect(screen.getByText(`Hi, ${mockUser.name}!`)).toBeInTheDocument();
     });
 
     it('hides dropdown when button is clicked again', async () => {
@@ -79,16 +80,22 @@ describe('ProfileDropdown Component', () => {
 
       const button = screen.getByLabelText('Profile menu');
       await user.click(button);
-      expect(screen.getByText(mockUser.email)).toBeInTheDocument();
+      expect(screen.getByText(`Hi, ${mockUser.name}!`)).toBeInTheDocument();
 
       await user.click(button);
-      expect(screen.queryByText(mockUser.email)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(`Hi, ${mockUser.name}!`)
+      ).not.toBeInTheDocument();
     });
   });
 
   describe('Outside Click Behavior', () => {
     beforeEach(() => {
-      vi.mocked(authModule.useAuth).mockReturnValue({ user: mockUser });
+      const mockLogout = vi.fn();
+      vi.mocked(authModule.useAuth).mockReturnValue({
+        user: mockUser,
+        logout: mockLogout,
+      });
     });
 
     it('closes dropdown when clicking outside', async () => {
@@ -102,26 +109,26 @@ describe('ProfileDropdown Component', () => {
 
       const button = screen.getByLabelText('Profile menu');
       await user.click(button);
-      expect(screen.getByText(mockUser.email)).toBeInTheDocument();
+      expect(screen.getByText(`Hi, ${mockUser.name}!`)).toBeInTheDocument();
 
       const outside = screen.getByTestId('outside');
       await user.click(outside);
 
-      expect(screen.queryByText(mockUser.email)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(`Hi, ${mockUser.name}!`)
+      ).not.toBeInTheDocument();
     });
   });
 
   describe('Dropdown Content', () => {
+    let mockLogout;
+
     beforeEach(() => {
-      vi.mocked(authModule.useAuth).mockReturnValue({ user: mockUser });
-    });
-
-    it('displays user email in header', async () => {
-      const user = userEvent.setup();
-      renderWithRouter(<ProfileDropdown />);
-
-      await user.click(screen.getByLabelText('Profile menu'));
-      expect(screen.getByText(mockUser.email)).toBeInTheDocument();
+      mockLogout = vi.fn();
+      vi.mocked(authModule.useAuth).mockReturnValue({
+        user: mockUser,
+        logout: mockLogout,
+      });
     });
 
     it('displays greeting with user name', async () => {
@@ -129,16 +136,16 @@ describe('ProfileDropdown Component', () => {
       renderWithRouter(<ProfileDropdown />);
 
       await user.click(screen.getByLabelText('Profile menu'));
-      expect(screen.getByText(`Hello, ${mockUser.name}!`)).toBeInTheDocument();
+      expect(screen.getByText(`Hi, ${mockUser.name}!`)).toBeInTheDocument();
     });
 
-    it('displays Edit Profile link', async () => {
+    it('displays Edit Profile button', async () => {
       const user = userEvent.setup();
       renderWithRouter(<ProfileDropdown />);
 
       await user.click(screen.getByLabelText('Profile menu'));
-      const editLink = screen.getByRole('link', { name: /edit profile/i });
-      expect(editLink).toHaveAttribute('href', '/profile');
+      const editButton = screen.getByRole('button', { name: /edit profile/i });
+      expect(editButton).toBeInTheDocument();
     });
 
     it('displays Logout button', async () => {
@@ -146,7 +153,8 @@ describe('ProfileDropdown Component', () => {
       renderWithRouter(<ProfileDropdown />);
 
       await user.click(screen.getByLabelText('Profile menu'));
-      expect(screen.getByText('Logout')).toBeInTheDocument();
+      const logoutButton = screen.getByRole('button', { name: /logout/i });
+      expect(logoutButton).toBeInTheDocument();
     });
 
     it('closes dropdown when Edit Profile is clicked', async () => {
@@ -155,14 +163,48 @@ describe('ProfileDropdown Component', () => {
 
       const button = screen.getByLabelText('Profile menu');
       await user.click(button);
-      expect(screen.getByText(mockUser.email)).toBeInTheDocument();
+      expect(screen.getByText(`Hi, ${mockUser.name}!`)).toBeInTheDocument();
 
-      const editLink = screen.getByRole('link', { name: /edit profile/i });
-      await user.click(editLink);
+      const editButton = screen.getByRole('button', { name: /edit profile/i });
+      await user.click(editButton);
 
       // Dropdown should be closed after navigation
       await waitFor(() => {
-        expect(screen.queryByText(mockUser.email)).not.toBeInTheDocument();
+        expect(
+          screen.queryByText(`Hi, ${mockUser.name}!`)
+        ).not.toBeInTheDocument();
+      });
+    });
+
+    it('calls logout when Logout button is clicked', async () => {
+      const user = userEvent.setup();
+      renderWithRouter(<ProfileDropdown />);
+
+      const button = screen.getByLabelText('Profile menu');
+      await user.click(button);
+
+      const logoutButton = screen.getByRole('button', { name: /logout/i });
+      await user.click(logoutButton);
+
+      expect(mockLogout).toHaveBeenCalled();
+    });
+
+    it('closes dropdown when Logout button is clicked', async () => {
+      const user = userEvent.setup();
+      renderWithRouter(<ProfileDropdown />);
+
+      const button = screen.getByLabelText('Profile menu');
+      await user.click(button);
+      expect(screen.getByText(`Hi, ${mockUser.name}!`)).toBeInTheDocument();
+
+      const logoutButton = screen.getByRole('button', { name: /logout/i });
+      await user.click(logoutButton);
+
+      // Dropdown should be closed after logout
+      await waitFor(() => {
+        expect(
+          screen.queryByText(`Hi, ${mockUser.name}!`)
+        ).not.toBeInTheDocument();
       });
     });
   });

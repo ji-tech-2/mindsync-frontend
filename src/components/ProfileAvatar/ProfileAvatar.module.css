@@ -2,6 +2,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
 }
 
 .avatarCircle {
@@ -15,21 +16,19 @@
   font-size: 0.875rem;
   color: var(--color-text-dark);
   font-weight: var(--font-weight-bold);
-  cursor: pointer;
 }
 
 .avatarCircleMedium {
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background-color: var(--color-primary-dark);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   color: var(--color-text-dark);
   font-weight: var(--font-weight-bold);
-  cursor: pointer;
 }
 
 .avatarCircleLarge {
@@ -43,9 +42,4 @@
   font-size: 2.75rem;
   color: var(--color-text-dark);
   font-weight: var(--font-weight-bold);
-  cursor: pointer;
-}
-
-.noHover:hover {
-  transform: none;
 }

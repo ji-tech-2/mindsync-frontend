@@ -73,6 +73,7 @@
   margin-left: var(--space-sm);
   display: flex;
   align-items: center;
+  height: 100%;
 }
 
 /* Responsive */
