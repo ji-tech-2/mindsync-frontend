@@ -1,0 +1,29 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-light);
+  display: block;
+}
+
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1.5fr;
+  gap: var(--space-sm);
+}
+
+.errorMessage {
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  color: var(--color-error);
+  padding-left: var(--space-lg);
+  display: block;
+  margin-top: var(--space-xs);
+}
