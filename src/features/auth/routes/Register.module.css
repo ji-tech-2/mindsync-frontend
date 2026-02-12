@@ -1,25 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.register-wrapper {
+.wrapper {
   font-family: Poppins, sans-serif;
   margin: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-width: 100%;
   min-height: 100vh;
+  padding: 40px 20px;
   position: relative;
   overflow-x: hidden;
   background: linear-gradient(135deg, #f5f0e8 0%, #e8dcc8 50%, #d4c4a8 100%);
 }
 
-.register-container {
+.container {
   max-width: 380px;
   width: 90%;
   padding: 30px 28px;
@@ -41,7 +36,7 @@
   text-align: center;
 }
 
-.register-container::before {
+.container::before {
   content: '';
   position: absolute;
   top: 0;
@@ -53,7 +48,7 @@
   border-radius: 0 0 4px 4px;
 }
 
-.register-container h2 {
+.container h2 {
   font-size: 1.5em;
   font-weight: 700;
   margin-bottom: 4px;
@@ -63,7 +58,7 @@
   letter-spacing: -0.5px;
 }
 
-.register-container h2::after {
+.container h2::after {
   content: 'Join us and start your wellness journey';
   display: block;
   font-size: 0.38em;
@@ -76,14 +71,14 @@
   letter-spacing: 0.5px;
 }
 
-.register-form {
+.form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 18px;
   margin-top: 15px;
 }
 
-.register-btn {
+.button {
   margin-top: 4px;
   padding: 13px 26px;
   font-size: 0.95em;
@@ -99,55 +94,55 @@
     0 4px 15px rgb(0 0 0 / 15%);
 }
 
-.register-btn:disabled {
+.button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
-.register-message-wrapper {
+.messageWrapper {
   margin-top: 12px;
   padding: 9px 14px;
   border-radius: 8px;
 }
 
-.register-message {
+.message {
   font-size: 0.85em;
   font-weight: 500;
   margin: 0;
 }
 
-.register-message-wrapper.success {
+.messageWrapper.success {
   background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
   box-shadow:
     0 4px 12px rgb(72 187 120 / 30%),
     inset 0 1px 0 rgb(255 255 255 / 20%);
 }
 
-.register-message-wrapper.success .register-message {
+.messageWrapper.success .message {
   color: white;
 }
 
-.register-message-wrapper.error {
+.messageWrapper.error {
   background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
   box-shadow:
     0 4px 12px rgb(252 129 129 / 30%),
     inset 0 1px 0 rgb(255 255 255 / 20%);
 }
 
-.register-message-wrapper.error .register-message {
+.messageWrapper.error .message {
   color: white;
 }
 
-.register-message-wrapper.processing {
+.messageWrapper.processing {
   background: #d1ecf1;
   border: 1px solid #bee5eb;
 }
 
-.register-message-wrapper.processing .register-message {
+.messageWrapper.processing .message {
   color: #0c5460;
 }
 
-.success-message-box {
+.successMessageBox {
   background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
   color: white;
   font-size: 0.95em;
@@ -161,7 +156,7 @@
     inset 0 1px 0 rgb(255 255 255 / 20%);
 }
 
-.login-link-container {
+.loginLinkContainer {
   margin-top: 15px;
   text-align: center;
   font-size: 0.85em;
@@ -173,13 +168,13 @@
   opacity: 0.9;
 }
 
-.login-link-container p {
+.loginLinkContainer p {
   margin: 0;
   font-weight: 400;
   color: #4a5568;
 }
 
-.login-link-btn {
+.loginLinkButton {
   background: none;
   border: none;
   color: #8b6f47;
@@ -193,85 +188,81 @@
 }
 
 @media (width <= 768px) {
-  .register-container {
+  .container {
     max-width: 400px;
     padding: 32px 30px;
   }
 
-  .register-container h2 {
+  .container h2 {
     font-size: 2.1em;
   }
 }
 
 @media (width <= 480px) {
-  html,
-  body,
-  #root {
-    padding: 15px 0;
+  .wrapper {
+    padding: 20px;
   }
 
-  .register-container {
+  .container {
     width: 95%;
     padding: 28px 24px;
     border-radius: 20px;
   }
 
-  .register-container h2 {
+  .container h2 {
     font-size: 1.9em;
   }
 
-  .register-container h2::after {
+  .container h2::after {
     font-size: 0.35em;
   }
 
-  .register-form {
-    gap: 13px;
+  .form {
+    gap: 16px;
     margin-top: 26px;
   }
 
-  .register-btn {
+  .button {
     padding: 13px 22px;
     font-size: 0.98em;
   }
 
-  .register-message-wrapper {
+  .messageWrapper {
     padding: 11px 15px;
   }
 }
 
 @media (width <= 360px) {
-  .register-container {
+  .container {
     padding: 26px 20px;
   }
 
-  .register-container h2 {
+  .container h2 {
     font-size: 1.7em;
   }
 
-  .register-container h2::after {
+  .container h2::after {
     font-size: 0.33em;
   }
 
-  .register-btn {
+  .button {
     padding: 12px 20px;
     font-size: 0.95em;
   }
 }
 
 @media (width >= 1200px) {
-  .register-container {
+  .container {
     max-width: 450px;
     padding: 40px 45px;
   }
 
-  .register-container h2 {
+  .container h2 {
     font-size: 2.4em;
   }
 
-  .register-btn {
+  .button {
     padding: 15px 30px;
     font-size: 1.05em;
   }
 }
-
-/* Form validation styles */

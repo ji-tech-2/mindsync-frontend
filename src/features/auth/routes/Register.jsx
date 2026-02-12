@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient, { API_CONFIG } from '@/config/api';
 import { validatePassword } from '@/utils/passwordValidation';
-import { FormSelect } from '@/components';
+import { Dropdown, TextField, Button } from '@/components';
 import {
   genderOptions,
   occupationOptions,
@@ -11,7 +11,7 @@ import {
   toApiOccupation,
   toApiWorkMode,
 } from '@/utils/fieldMappings';
-import '../assets/register.css';
+import styles from './Register.module.css';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -40,6 +40,16 @@ export default function Register() {
     // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
+    }
+  }
+
+  function handleDropdownChange(fieldName, option) {
+    setForm({
+      ...form,
+      [fieldName]: option.value,
+    });
+    if (errors[fieldName]) {
+      setErrors({ ...errors, [fieldName]: '' });
     }
   }
 
@@ -178,145 +188,147 @@ export default function Register() {
   // RENDER HALAMAN SUKSES
   if (isRegistered) {
     return (
-      <div className="register-wrapper">
-        <div className="register-container success-screen">
+      <div className={styles.wrapper}>
+        <div className={styles.container}>
           <h2>✅ Registration Successful!</h2>
 
-          <p className="register-message success-message-box">{message}</p>
+          <p className={`${styles.message} ${styles.successMessageBox}`}>
+            {message}
+          </p>
 
           <p>
             Your account has been successfully created. Please log in to start
             your mental health journey.
           </p>
 
-          <button
+          <Button
             type="button"
-            className="register-btn"
+            variant="filled"
+            fullWidth
             onClick={handleContinue}
           >
             Login Now
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
-  // Tentukan class untuk error message
-  const messageClass =
+  // Determine message wrapper styling
+  const messageWrapperClass = `${
     message &&
     (message.includes('failed') ||
       message.includes('error') ||
       message.includes('Error'))
-      ? 'register-message error' // Ubah ke 'error' untuk konsistensi CSS
-      : 'register-message success'; // Default ke 'success' atau netral
+      ? styles.error
+      : styles.success
+  }`;
 
   // RENDER FORM REGISTER
   return (
-    <div className="register-wrapper">
-      <div className="register-container">
+    <div className={styles.wrapper}>
+      <div className={styles.container}>
         <h2>Register</h2>
 
-        <form onSubmit={handleSubmit} className="register-form">
-          <div className="form-field">
-            <input
-              name="email"
-              type="email"
-              placeholder="Email (will be used as your username)"
-              value={form.email}
-              onChange={handleChange}
-              className={errors.email ? 'input-error' : ''}
-            />
-            {errors.email && <span className="error-text">{errors.email}</span>}
-          </div>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <TextField
+            label="Email"
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            error={errors.email}
+            fullWidth
+          />
 
-          <div className="form-field">
-            <input
-              name="password"
-              type="password"
-              placeholder="Password (min 8 chars, include A-Z, a-z, 0-9)"
-              value={form.password}
-              onChange={handleChange}
-              className={errors.password ? 'input-error' : ''}
-            />
-            {errors.password && (
-              <span className="error-text">{errors.password}</span>
-            )}
-          </div>
+          <TextField
+            label="Password"
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            error={errors.password}
+            fullWidth
+          />
 
-          <div className="form-field">
-            <input
-              name="name"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={handleChange}
-              className={errors.name ? 'input-error' : ''}
-            />
-            {errors.name && <span className="error-text">{errors.name}</span>}
-          </div>
+          <TextField
+            label="Full Name"
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            error={errors.name}
+            fullWidth
+          />
 
-          <div className="form-field">
-            <input
-              name="dob"
-              type="date"
-              value={form.dob}
-              onChange={handleChange}
-              className={errors.dob ? 'input-error' : ''}
-              max={new Date().toISOString().split('T')[0]}
-            />
-            {errors.dob && <span className="error-text">{errors.dob}</span>}
-          </div>
+          <TextField
+            label="Date of Birth"
+            type="date"
+            name="dob"
+            value={form.dob}
+            onChange={handleChange}
+            error={errors.dob}
+            fullWidth
+            max={new Date().toISOString().split('T')[0]}
+          />
 
-          <div className="form-field">
-            <FormSelect
-              label="Gender"
-              name="gender"
-              value={form.gender}
-              onChange={handleChange}
-              options={genderOptions}
-            />
-          </div>
+          <Dropdown
+            label="Gender"
+            options={genderOptions}
+            value={
+              form.gender
+                ? genderOptions.find((opt) => opt.value === form.gender)
+                : null
+            }
+            onChange={(option) => handleDropdownChange('gender', option)}
+            fullWidth
+          />
 
-          <div className="form-field">
-            <FormSelect
-              label="Occupation"
-              name="occupation"
-              value={form.occupation}
-              onChange={handleChange}
-              options={occupationOptions}
-            />
-          </div>
+          <Dropdown
+            label="Occupation"
+            options={occupationOptions}
+            value={
+              form.occupation
+                ? occupationOptions.find((opt) => opt.value === form.occupation)
+                : null
+            }
+            onChange={(option) => handleDropdownChange('occupation', option)}
+            fullWidth
+          />
 
-          <div className="form-field">
-            <FormSelect
-              label="Work Mode"
-              name="workRmt"
-              value={form.workRmt}
-              onChange={handleChange}
-              options={workModeOptions}
-            />
-          </div>
+          <Dropdown
+            label="Work Mode"
+            options={workModeOptions}
+            value={
+              form.workRmt
+                ? workModeOptions.find((opt) => opt.value === form.workRmt)
+                : null
+            }
+            onChange={(option) => handleDropdownChange('workRmt', option)}
+            fullWidth
+          />
 
-          <button type="submit" className="register-btn" disabled={loading}>
+          <Button type="submit" variant="filled" fullWidth disabled={loading}>
             {loading ? 'Processing...' : 'Register'}
-          </button>
+          </Button>
         </form>
 
         {message && (
-          <div className="register-message-wrapper">
-            <p className={messageClass}>{message}</p>
+          <div className={`${styles.messageWrapper} ${messageWrapperClass}`}>
+            <p className={styles.message}>{message}</p>
           </div>
         )}
 
-        {/* Opsi Navigasi ke Login */}
-        <div className="login-link-container">
+        {/* Login Link Container */}
+        <div className={styles.loginLinkContainer}>
           <p>Sudah punya akun?</p>
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={handleLoginClick}
-            className="login-link-btn"
+            className={styles.loginLinkButton}
           >
             Masuk di sini.
-          </button>
+          </Button>
         </div>
       </div>
     </div>
