@@ -1,4 +1,4 @@
-import { useState, forwardRef } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import styles from './TextField.module.css';
 
 /**
@@ -28,8 +28,35 @@ const TextField = forwardRef(function TextField(
   ref
 ) {
   const [isFocused, setIsFocused] = useState(false);
+  const [isAutofilled, setIsAutofilled] = useState(false);
   const hasValue = value && value.length > 0;
-  const isActive = isFocused || hasValue;
+  const isActive = isFocused || hasValue || isAutofilled;
+
+  useEffect(() => {
+    // Check for autofill on mount and when value changes
+    const checkAutofill = () => {
+      const input = ref?.current || document.activeElement;
+      if (input && input.matches) {
+        try {
+          const autofilled =
+            input.matches(':-webkit-autofill') || input.matches(':autofill');
+          setIsAutofilled(autofilled);
+        } catch {
+          // Browser doesn't support autofill detection
+        }
+      }
+    };
+
+    checkAutofill();
+    // Also check periodically as autofill can happen asynchronously
+    const interval = setInterval(checkAutofill, 100);
+    const timeout = setTimeout(() => clearInterval(interval), 1000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [ref, value]);
 
   const wrapperClass = [
     styles.wrapper,
