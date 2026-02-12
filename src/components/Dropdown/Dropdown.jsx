@@ -1,16 +1,18 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import styles from './Dropdown.module.css';
 
 /**
- * Dropdown Component
+ * Dropdown Component with floating label
  * @param {Object} props
- * @param {string} props.label - Label for the dropdown
+ * @param {string} props.label - Label for the dropdown (acts as placeholder when floatingLabel is false)
  * @param {Array} props.options - Array of option objects { label, value }
  * @param {Object} props.value - Selected option object
  * @param {Function} props.onChange - Selection handler
  * @param {boolean} props.fullWidth - Fill container width
- * @param {string} props.placeholder - Placeholder text
+ * @param {boolean} props.error - Show error state styling (default: false)
  * @param {boolean} props.disabled - Disabled state
+ * @param {boolean} props.floatingLabel - Enable floating label (default: true)
+ * @param {Function} props.onBlur - Blur handler
  */
 const Dropdown = ({
   label,
@@ -18,11 +20,16 @@ const Dropdown = ({
   value,
   onChange,
   fullWidth = false,
-  placeholder = 'Select an option',
+  error = false,
   disabled = false,
+  floatingLabel = true,
+  onBlur,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const measureRef = useRef(null);
+  const minWidthRef = useRef('auto');
+  const hasValue = value && value.label;
 
   const toggleDropdown = () => {
     if (!disabled) setIsOpen(!isOpen);
@@ -36,41 +43,132 @@ const Dropdown = ({
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        const wasOpen = isOpen;
         setIsOpen(false);
+        // Trigger onBlur when closing the dropdown by clicking outside
+        if (wasOpen && onBlur) {
+          onBlur();
+        }
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [isOpen, onBlur]);
+
+  // Calculate minimum width based on content
+  useLayoutEffect(() => {
+    if (fullWidth || !measureRef.current) return;
+
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.visibility = 'hidden';
+    tempDiv.style.whiteSpace = 'nowrap';
+    tempDiv.style.padding = 'var(--space-sm) var(--space-lg)';
+    tempDiv.style.fontSize = 'var(--font-size-md)';
+    tempDiv.style.fontFamily = 'var(--font-body)';
+    tempDiv.style.fontWeight = 'var(--font-weight-medium)';
+    document.body.appendChild(tempDiv);
+
+    let maxWidth = 0;
+
+    // Measure label
+    if (label) {
+      tempDiv.textContent = label;
+      maxWidth = Math.max(maxWidth, tempDiv.offsetWidth);
+    }
+
+    // Measure all options
+    options.forEach((option) => {
+      tempDiv.textContent = option.label;
+      maxWidth = Math.max(maxWidth, tempDiv.offsetWidth);
+    });
+
+    document.body.removeChild(tempDiv);
+
+    // Add extra space for arrow icon and gaps
+    const finalWidth = maxWidth + 60; // padding + arrow + gap
+    minWidthRef.current = `${finalWidth}px`;
+
+    if (dropdownRef.current) {
+      dropdownRef.current.style.minWidth = minWidthRef.current;
+    }
+  }, [options, label, fullWidth]);
+
+  const wrapperClass = [styles.wrapper, fullWidth && styles.fullWidth]
+    .filter(Boolean)
+    .join(' ');
+
+  const headerClass = [
+    styles.header,
+    isOpen ? styles.headerOpen : styles.headerClosed,
+    disabled && styles.disabled,
+    floatingLabel && styles.floatingLabel,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const containerClass = [styles.container, error && styles.error]
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <div
-      className={`${styles.wrapper} ${fullWidth ? styles.fullWidth : ''}`}
-      ref={dropdownRef}
-    >
-      <button
-        type="button"
-        className={`${styles.header} ${isOpen ? styles.headerOpen : styles.headerClosed} ${disabled ? styles.disabled : ''}`}
-        onClick={toggleDropdown}
-        disabled={disabled}
-      >
-        <span className={styles.label}>
-          {value ? value.label : label || placeholder}
-        </span>
-        <svg
-          className={`${styles.arrow} ${isOpen ? styles.arrowUp : ''}`}
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+    <div className={wrapperClass} ref={dropdownRef}>
+      <span ref={measureRef} style={{ display: 'none' }} />
+      {floatingLabel ? (
+        <div
+          className={containerClass}
+          data-has-value={hasValue ? 'true' : 'false'}
         >
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </button>
+          <button
+            type="button"
+            className={headerClass}
+            onClick={toggleDropdown}
+            disabled={disabled}
+          >
+            <span className={styles.buttonLabel}>
+              {value ? value.label : ''}
+            </span>
+            <svg
+              className={`${styles.arrow} ${isOpen ? styles.arrowUp : ''}`}
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          {label && <label className={styles.label}>{label}</label>}
+        </div>
+      ) : (
+        <button
+          type="button"
+          className={headerClass}
+          onClick={toggleDropdown}
+          disabled={disabled}
+        >
+          <span className={styles.buttonLabel}>
+            {value ? value.label : label}
+          </span>
+          <svg
+            className={`${styles.arrow} ${isOpen ? styles.arrowUp : ''}`}
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      )}
 
       {isOpen && (
         <div className={styles.menu}>

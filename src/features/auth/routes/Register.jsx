@@ -1,35 +1,237 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient, { API_CONFIG } from '@/config/api';
 import { validatePassword } from '@/utils/passwordValidation';
-import '../assets/register.css';
+import {
+  Dropdown,
+  TextField,
+  Button,
+  Card,
+  DateField,
+  ErrorMessage,
+} from '@/components';
+import {
+  genderOptions,
+  occupationOptions,
+  workModeOptions,
+  toApiGender,
+  toApiOccupation,
+  toApiWorkMode,
+} from '@/utils/fieldMappings';
+import styles from './Register.module.css';
 
 export default function Register() {
   const navigate = useNavigate();
   const [isRegistered, setIsRegistered] = useState(false);
 
+  // Create refs for form fields
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+  const nameRef = useRef(null);
+  const dobRef = useRef(null);
+  const genderRef = useRef(null);
+  const occupationRef = useRef(null);
+  const workRmtRef = useRef(null);
+
   const [form, setForm] = useState({
     email: '',
     password: '',
     name: '',
-    dob: '',
+    dobDay: '',
+    dobMonth: '',
+    dobYear: '',
     gender: '',
     occupation: '',
+    workRmt: '',
   });
 
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [blurredFields, setBlurredFields] = useState({});
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setForm({
+
+    // For day and year, validate input is numeric
+    if (name === 'dobDay' || name === 'dobYear') {
+      if (value && !/^\d*$/.test(value)) {
+        return; // Only allow digits
+      }
+    }
+
+    const updatedForm = {
       ...form,
       [name]: value,
-    });
+    };
+
+    setForm(updatedForm);
     // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
+    }
+    // Also clear the general DOB error when any DOB field changes
+    if (name === 'dobDay' || name === 'dobMonth' || name === 'dobYear') {
+      if (errors.dob) {
+        setErrors({ ...errors, dob: '' });
+      }
+    }
+
+    // If field is already blurred, validate immediately with updated form
+    if (blurredFields[name]) {
+      validateField(name, updatedForm);
+    }
+  }
+
+  function handleTextFieldBlur(e) {
+    const { name } = e.target;
+    handleBlur(name, form);
+  }
+
+  function handleDateFieldBlur() {
+    handleBlur('dob', form);
+  }
+
+  function handleBlur(fieldName, updatedForm = null) {
+    // Mark field as blurred to show error on blur
+    setBlurredFields({ ...blurredFields, [fieldName]: true });
+    // Validate the specific field with current form state
+    validateField(fieldName, updatedForm || form);
+  }
+
+  const validateField = (fieldName, currentForm) => {
+    const newErrors = { ...errors };
+
+    if (fieldName === 'email') {
+      if (!currentForm.email || !currentForm.email.trim()) {
+        newErrors.email = 'Email is required';
+      } else if (!validateEmail(currentForm.email)) {
+        newErrors.email =
+          'Please enter a valid email address (e.g., user@example.com)';
+      } else {
+        delete newErrors.email;
+      }
+    } else if (fieldName === 'password') {
+      if (!currentForm.password) {
+        newErrors.password = 'Password is required';
+      } else if (currentForm.password.length < 8) {
+        newErrors.password = 'Password must be at least 8 characters';
+      } else if (!validatePassword(currentForm.password)) {
+        newErrors.password =
+          'Password must contain uppercase, lowercase, and number';
+      } else {
+        delete newErrors.password;
+      }
+    } else if (fieldName === 'name') {
+      if (!currentForm.name || !currentForm.name.trim()) {
+        newErrors.name = 'Full name is required';
+      } else if (!validateName(currentForm.name)) {
+        newErrors.name =
+          'Name must be 2-50 characters (letters and spaces only)';
+      } else {
+        delete newErrors.name;
+      }
+    } else if (fieldName === 'dob') {
+      // Clear all dob-related errors first
+      delete newErrors.dobDayError;
+      delete newErrors.dobMonthError;
+      delete newErrors.dobYearError;
+      delete newErrors.dobError;
+      delete newErrors.dobErrorMessage;
+
+      if (
+        !currentForm.dobDay ||
+        !currentForm.dobMonth ||
+        !currentForm.dobYear
+      ) {
+        // Specific field errors for missing values
+        if (!currentForm.dobDay) newErrors.dobDayError = 'Please enter day';
+        if (!currentForm.dobMonth)
+          newErrors.dobMonthError = 'Please select month';
+        if (!currentForm.dobYear) newErrors.dobYearError = 'Please enter year';
+        // Message shows first invalid field
+        if (!currentForm.dobDay) {
+          newErrors.dobErrorMessage = 'Please enter day';
+        } else if (!currentForm.dobMonth) {
+          newErrors.dobErrorMessage = 'Please select month';
+        } else if (!currentForm.dobYear) {
+          newErrors.dobErrorMessage = 'Please enter year';
+        }
+      } else {
+        const day = parseInt(currentForm.dobDay, 10);
+        const month = parseInt(currentForm.dobMonth, 10);
+        const year = parseInt(currentForm.dobYear, 10);
+
+        // Check specific field validity
+        if (day < 1 || day > 31) {
+          newErrors.dobDayError = true;
+          newErrors.dobErrorMessage = `Please enter a valid day`;
+        } else if (month < 1 || month > 12) {
+          newErrors.dobMonthError = true;
+          newErrors.dobErrorMessage = 'Please enter a valid month';
+        } else if (year < 1900 || year > new Date().getFullYear()) {
+          newErrors.dobYearError = true;
+          newErrors.dobErrorMessage = `Please enter a valid date of birth`;
+        } else {
+          const dob = `${year}-${currentForm.dobMonth}-${currentForm.dobDay.padStart(2, '0')}`;
+          const dateObj = new Date(dob);
+
+          if (
+            dateObj.getDate() !== day ||
+            dateObj.getMonth() + 1 !== month ||
+            dateObj.getFullYear() !== year
+          ) {
+            newErrors.dobDayError = true;
+            newErrors.dobErrorMessage = `${currentForm.dobDay} is not a valid day in this month`;
+          } else {
+            const age = validateAge(dob);
+            if (age < 16) {
+              // General date error - all fields are invalid
+              newErrors.dobError = true;
+              newErrors.dobErrorMessage = `You must be at least 16 years old (you are ${age})`;
+            } else if (age > 120) {
+              newErrors.dobError = true;
+              newErrors.dobErrorMessage = 'Please enter a valid date of birth';
+            }
+          }
+        }
+      }
+    } else if (fieldName === 'gender') {
+      if (!currentForm.gender) {
+        newErrors.gender = 'Please select a gender';
+      } else {
+        delete newErrors.gender;
+      }
+    } else if (fieldName === 'occupation') {
+      if (!currentForm.occupation) {
+        newErrors.occupation = 'Please select an occupation';
+      } else {
+        delete newErrors.occupation;
+      }
+    } else if (fieldName === 'workRmt') {
+      if (!currentForm.workRmt) {
+        newErrors.workRmt = 'Please select a work mode';
+      } else {
+        delete newErrors.workRmt;
+      }
+    }
+
+    setErrors(newErrors);
+  };
+
+  function handleDropdownChange(fieldName, option) {
+    setForm({
+      ...form,
+      [fieldName]: option.value,
+    });
+    if (errors[fieldName]) {
+      setErrors({ ...errors, [fieldName]: '' });
+    }
+    // Also clear the general DOB error when month changes
+    if (fieldName === 'dobMonth') {
+      if (errors.dob) {
+        setErrors({ ...errors, dob: '' });
+      }
     }
   }
 
@@ -43,6 +245,47 @@ export default function Register() {
     // At least 2 characters, only letters and spaces
     const nameRegex = /^[a-zA-Z\s]{2,50}$/;
     return nameRegex.test(name);
+  };
+
+  const scrollToFirstError = (errorObj) => {
+    // Array of errors in order of form fields
+    const fieldErrors = [
+      { ref: emailRef, hasError: !!errorObj.email },
+      { ref: passwordRef, hasError: !!errorObj.password },
+      { ref: nameRef, hasError: !!errorObj.name },
+      {
+        ref: dobRef,
+        hasError: !!(
+          errorObj.dobDayError ||
+          errorObj.dobMonthError ||
+          errorObj.dobYearError ||
+          errorObj.dobError
+        ),
+      },
+      { ref: genderRef, hasError: !!errorObj.gender },
+      { ref: occupationRef, hasError: !!errorObj.occupation },
+      { ref: workRmtRef, hasError: !!errorObj.workRmt },
+    ];
+
+    // Find first field with error
+    const firstErrorField = fieldErrors.find((field) => field.hasError);
+
+    if (firstErrorField && firstErrorField.ref.current) {
+      // Scroll to the element (check if method exists for test compatibility)
+      if (typeof firstErrorField.ref.current.scrollIntoView === 'function') {
+        firstErrorField.ref.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+
+      // Try to focus the element
+      if (firstErrorField.ref.current.querySelector('input')) {
+        firstErrorField.ref.current.querySelector('input').focus();
+      } else if (firstErrorField.ref.current.querySelector('button')) {
+        firstErrorField.ref.current.querySelector('button').focus();
+      }
+    }
   };
 
   const validateAge = (dob) => {
@@ -60,7 +303,7 @@ export default function Register() {
     return age;
   };
 
-  const validateForm = () => {
+  const validateFormSync = () => {
     const newErrors = {};
 
     // Email validation
@@ -89,41 +332,197 @@ export default function Register() {
     }
 
     // Date of Birth validation
-    if (!form.dob) {
-      newErrors.dob = 'Date of birth is required';
+    if (!form.dobDay || !form.dobMonth || !form.dobYear) {
+      // Specific field errors for missing values
+      if (!form.dobDay) newErrors.dobDayError = 'Please enter day';
+      if (!form.dobMonth) newErrors.dobMonthError = 'Please select month';
+      if (!form.dobYear) newErrors.dobYearError = 'Please enter year';
+      // Message shows first invalid field
+      if (!form.dobDay) {
+        newErrors.dobErrorMessage = 'Please enter day';
+      } else if (!form.dobMonth) {
+        newErrors.dobErrorMessage = 'Please select month';
+      } else if (!form.dobYear) {
+        newErrors.dobErrorMessage = 'Please enter year';
+      }
     } else {
-      const age = validateAge(form.dob);
-      if (age < 13) {
-        newErrors.dob = 'You must be at least 13 years old';
-      } else if (age > 120) {
-        newErrors.dob = 'Please enter a valid date of birth';
+      const day = parseInt(form.dobDay, 10);
+      const month = parseInt(form.dobMonth, 10);
+      const year = parseInt(form.dobYear, 10);
+
+      // Check specific field validity
+      if (day < 1 || day > 31) {
+        newErrors.dobDayError = true;
+        newErrors.dobErrorMessage = `Invalid day: must be between 1 and 31`;
+      } else if (month < 1 || month > 12) {
+        newErrors.dobMonthError = true;
+        newErrors.dobErrorMessage = 'Invalid month: must be between 1 and 12';
+      } else if (year < 1900 || year > new Date().getFullYear()) {
+        newErrors.dobYearError = true;
+        newErrors.dobErrorMessage = `Invalid year: must be between 1900 and ${new Date().getFullYear()}`;
+      } else {
+        // Check if date is valid (e.g., Feb 30 doesn't exist)
+        const dob = `${year}-${form.dobMonth}-${form.dobDay.padStart(2, '0')}`;
+        const dateObj = new Date(dob);
+
+        if (
+          dateObj.getDate() !== day ||
+          dateObj.getMonth() + 1 !== month ||
+          dateObj.getFullYear() !== year
+        ) {
+          newErrors.dobDayError = true;
+          newErrors.dobErrorMessage = `Invalid date: ${form.dobDay} is not a valid day in this month`;
+        } else {
+          // Check age
+          const age = validateAge(dob);
+          if (age < 13) {
+            newErrors.dobError = true;
+            newErrors.dobErrorMessage = `You must be at least 13 years old (you are ${age})`;
+          } else if (age > 120) {
+            newErrors.dobError = true;
+            newErrors.dobErrorMessage = 'Please enter a valid date of birth';
+          }
+        }
       }
     }
 
     // Gender validation
     if (!form.gender) {
-      newErrors.gender = 'Gender is required';
+      newErrors.gender = 'Please select a gender';
     }
 
     // Occupation validation
-    if (!form.occupation || !form.occupation.trim()) {
-      newErrors.occupation = 'Occupation is required';
-    } else if (form.occupation.length < 2) {
-      newErrors.occupation = 'Occupation must be at least 2 characters';
-    } else if (form.occupation.length > 50) {
-      newErrors.occupation = 'Occupation must not exceed 50 characters';
+    if (!form.occupation) {
+      newErrors.occupation = 'Please select an occupation';
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    // Work Mode validation
+    if (!form.workRmt) {
+      newErrors.workRmt = 'Please select a work mode';
+    }
+
+    return newErrors;
   };
+  const newErrors = {};
+
+  // Email validation
+  if (!form.email || !form.email.trim()) {
+    newErrors.email = 'Email is required';
+  } else if (!validateEmail(form.email)) {
+    newErrors.email =
+      'Please enter a valid email address (e.g., user@example.com)';
+  }
+
+  // Password validation
+  if (!form.password) {
+    newErrors.password = 'Password is required';
+  } else if (form.password.length < 8) {
+    newErrors.password = 'Password must be at least 8 characters';
+  } else if (!validatePassword(form.password)) {
+    newErrors.password =
+      'Password must contain uppercase, lowercase, and number';
+  }
+
+  // Name validation
+  if (!form.name || !form.name.trim()) {
+    newErrors.name = 'Full name is required';
+  } else if (!validateName(form.name)) {
+    newErrors.name = 'Name must be 2-50 characters (letters and spaces only)';
+  }
+
+  // Date of Birth validation
+  if (!form.dobDay || !form.dobMonth || !form.dobYear) {
+    // Specific field errors for missing values
+    if (!form.dobDay) newErrors.dobDayError = 'Please enter day';
+    if (!form.dobMonth) newErrors.dobMonthError = 'Please select month';
+    if (!form.dobYear) newErrors.dobYearError = 'Please enter year';
+    // Message shows first invalid field
+    if (!form.dobDay) {
+      newErrors.dobErrorMessage = 'Please enter day';
+    } else if (!form.dobMonth) {
+      newErrors.dobErrorMessage = 'Please select month';
+    } else if (!form.dobYear) {
+      newErrors.dobErrorMessage = 'Please enter year';
+    }
+  } else {
+    const day = parseInt(form.dobDay, 10);
+    const month = parseInt(form.dobMonth, 10);
+    const year = parseInt(form.dobYear, 10);
+
+    // Check specific field validity
+    if (day < 1 || day > 31) {
+      newErrors.dobDayError = true;
+      newErrors.dobErrorMessage = `Invalid day: must be between 1 and 31`;
+    } else if (month < 1 || month > 12) {
+      newErrors.dobMonthError = true;
+      newErrors.dobErrorMessage = 'Invalid month: must be between 1 and 12';
+    } else if (year < 1900 || year > new Date().getFullYear()) {
+      newErrors.dobYearError = true;
+      newErrors.dobErrorMessage = `Invalid year: must be between 1900 and ${new Date().getFullYear()}`;
+    } else {
+      // Check if date is valid (e.g., Feb 30 doesn't exist)
+      const dob = `${year}-${form.dobMonth}-${form.dobDay.padStart(2, '0')}`;
+      const dateObj = new Date(dob);
+
+      if (
+        dateObj.getDate() !== day ||
+        dateObj.getMonth() + 1 !== month ||
+        dateObj.getFullYear() !== year
+      ) {
+        newErrors.dobDayError = true;
+        newErrors.dobErrorMessage = `Invalid date: ${form.dobDay} is not a valid day in this month`;
+      } else {
+        // Check age
+        const age = validateAge(dob);
+        if (age < 13) {
+          newErrors.dobError = true;
+          newErrors.dobErrorMessage = `You must be at least 13 years old (you are ${age})`;
+        } else if (age > 120) {
+          newErrors.dobError = true;
+          newErrors.dobErrorMessage = 'Please enter a valid date of birth';
+        }
+      }
+    }
+  }
+
+  // Gender validation
+  if (!form.gender) {
+    newErrors.gender = 'Please select a gender';
+  }
+
+  // Occupation validation
+  if (!form.occupation) {
+    newErrors.occupation = 'Please select an occupation';
+  }
+
+  // Work Mode validation
+  if (!form.workRmt) {
+    newErrors.workRmt = 'Please select a work mode';
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    // Validate form before submitting
-    if (!validateForm()) {
-      setMessage('Please fix the errors before submitting');
+    // Validate form synchronously to get errors immediately
+    const formErrors = validateFormSync();
+
+    // Mark all fields as blurred to show all errors
+    setBlurredFields({
+      email: true,
+      password: true,
+      name: true,
+      dob: true,
+      gender: true,
+      occupation: true,
+      workRmt: true,
+    });
+
+    // Set errors state
+    setErrors(formErrors);
+
+    // If there are errors, scroll to first error
+    if (Object.keys(formErrors).length > 0) {
+      scrollToFirstError(formErrors);
       return;
     }
 
@@ -134,7 +533,23 @@ export default function Register() {
     // Backend response: { success: true, message: "...", data: { email, name } }
     // Note: Backend doesn't return token on register, user needs to login after
     try {
-      const response = await apiClient.post(API_CONFIG.AUTH_REGISTER, form);
+      // Combine DOB fields into YYYY-MM-DD format
+      const dob = `${form.dobYear}-${form.dobMonth}-${form.dobDay.padStart(2, '0')}`;
+
+      // Transform gender and occupation values to API format
+      const formDataToSubmit = {
+        email: form.email,
+        password: form.password,
+        name: form.name,
+        dob,
+        gender: toApiGender(form.gender),
+        occupation: toApiOccupation(form.occupation),
+        workRmt: toApiWorkMode(form.workRmt),
+      };
+      const response = await apiClient.post(
+        API_CONFIG.AUTH_REGISTER,
+        formDataToSubmit
+      );
       const result = response.data;
       setLoading(false);
 
@@ -169,151 +584,229 @@ export default function Register() {
     navigate('/signIn');
   };
 
-  // RENDER HALAMAN SUKSES
+  // RENDER SUCCESS SCREEN
   if (isRegistered) {
     return (
-      <div className="register-wrapper">
-        <div className="register-container success-screen">
-          <h2>✅ Registration Successful!</h2>
+      <div className={styles.wrapper}>
+        <Card padded elevation="md" variant="light" className={styles.card}>
+          <div style={{ textAlign: 'center' }}>
+            <h2 className={styles.title}>✅ Registration Successful!</h2>
 
-          <p className="register-message success-message-box">{message}</p>
+            <p className={`${styles.message} ${styles.successMessageBox}`}>
+              {message}
+            </p>
 
-          <p>
-            Your account has been successfully created. Please log in to start
-            your mental health journey.
-          </p>
+            <p>
+              Your account has been successfully created. Please log in to start
+              your mental health journey.
+            </p>
 
-          <button
-            type="button"
-            className="register-btn"
-            onClick={handleContinue}
-          >
-            Login Now
-          </button>
-        </div>
+            <Button
+              type="button"
+              variant="filled"
+              fullWidth
+              onClick={handleContinue}
+            >
+              Login Now
+            </Button>
+          </div>
+        </Card>
       </div>
     );
   }
 
-  // Tentukan class untuk error message
-  const messageClass =
+  // Determine message wrapper styling
+  const messageWrapperClass = `${
     message &&
     (message.includes('failed') ||
       message.includes('error') ||
       message.includes('Error'))
-      ? 'register-message error' // Ubah ke 'error' untuk konsistensi CSS
-      : 'register-message success'; // Default ke 'success' atau netral
+      ? styles.error
+      : styles.success
+  }`;
 
   // RENDER FORM REGISTER
   return (
-    <div className="register-wrapper">
-      <div className="register-container">
-        <h2>Register</h2>
+    <div className={styles.wrapper}>
+      <Card padded elevation="md" variant="light" className={styles.card}>
+        <div style={{ textAlign: 'center' }}>
+          <h2 className={styles.title}>Register</h2>
+          <p className={styles.subtitle}>
+            Join us and start your wellness journey
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="register-form">
-          <div className="form-field">
-            <input
-              name="email"
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div ref={emailRef}>
+            <TextField
+              label="Email"
               type="email"
-              placeholder="Email (will be used as your username)"
+              name="email"
               value={form.email}
               onChange={handleChange}
-              className={errors.email ? 'input-error' : ''}
+              onBlur={handleTextFieldBlur}
+              error={blurredFields.email && !!errors.email}
+              fullWidth
             />
-            {errors.email && <span className="error-text">{errors.email}</span>}
+            {blurredFields.email && <ErrorMessage message={errors.email} />}
           </div>
 
-          <div className="form-field">
-            <input
-              name="password"
+          <div ref={passwordRef}>
+            <TextField
+              label="Password"
               type="password"
-              placeholder="Password (min 8 chars, include A-Z, a-z, 0-9)"
+              name="password"
               value={form.password}
               onChange={handleChange}
-              className={errors.password ? 'input-error' : ''}
+              onBlur={handleTextFieldBlur}
+              error={blurredFields.password && !!errors.password}
+              fullWidth
             />
-            {errors.password && (
-              <span className="error-text">{errors.password}</span>
+            {blurredFields.password && (
+              <ErrorMessage message={errors.password} />
             )}
           </div>
 
-          <div className="form-field">
-            <input
+          <div ref={nameRef}>
+            <TextField
+              label="Full Name"
+              type="text"
               name="name"
-              placeholder="Full Name"
               value={form.name}
               onChange={handleChange}
-              className={errors.name ? 'input-error' : ''}
+              onBlur={handleTextFieldBlur}
+              error={blurredFields.name && !!errors.name}
+              fullWidth
             />
-            {errors.name && <span className="error-text">{errors.name}</span>}
+            {blurredFields.name && <ErrorMessage message={errors.name} />}
           </div>
 
-          <div className="form-field">
-            <input
-              name="dob"
-              type="date"
-              value={form.dob}
-              onChange={handleChange}
-              className={errors.dob ? 'input-error' : ''}
-              max={new Date().toISOString().split('T')[0]}
+          <div ref={dobRef}>
+            <DateField
+              label="Date of Birth"
+              dayValue={form.dobDay}
+              monthValue={form.dobMonth}
+              yearValue={form.dobYear}
+              onDayChange={(e) => {
+                const updatedForm = { ...form, dobDay: e.target.value };
+                handleChange(e);
+                if (blurredFields.dob) validateField('dob', updatedForm);
+              }}
+              onMonthChange={(option) => {
+                const updatedForm = { ...form, dobMonth: option.value };
+                handleDropdownChange('dobMonth', option);
+                if (blurredFields.dob) validateField('dob', updatedForm);
+              }}
+              onYearChange={(e) => {
+                const updatedForm = { ...form, dobYear: e.target.value };
+                handleChange(e);
+                if (blurredFields.dob) validateField('dob', updatedForm);
+              }}
+              onDayBlur={handleDateFieldBlur}
+              onMonthBlur={handleDateFieldBlur}
+              onYearBlur={handleDateFieldBlur}
+              dayError={blurredFields.dob && !!errors.dobDayError}
+              monthError={blurredFields.dob && !!errors.dobMonthError}
+              yearError={blurredFields.dob && !!errors.dobYearError}
+              dateError={blurredFields.dob && !!errors.dobError}
             />
-            {errors.dob && <span className="error-text">{errors.dob}</span>}
-          </div>
-
-          <div className="form-field">
-            <select
-              name="gender"
-              value={form.gender}
-              onChange={handleChange}
-              className={errors.gender ? 'input-error' : ''}
-            >
-              <option value="" disabled>
-                Select Gender
-              </option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
-            {errors.gender && (
-              <span className="error-text">{errors.gender}</span>
+            {blurredFields.dob && (
+              <ErrorMessage message={errors.dobErrorMessage} />
             )}
           </div>
 
-          <div className="form-field">
-            <input
-              name="occupation"
-              placeholder="Occupation"
-              value={form.occupation}
-              onChange={handleChange}
-              className={errors.occupation ? 'input-error' : ''}
+          <div ref={genderRef}>
+            <Dropdown
+              label="Gender"
+              options={genderOptions}
+              value={
+                form.gender
+                  ? genderOptions.find((opt) => opt.value === form.gender)
+                  : null
+              }
+              onChange={(option) => {
+                const updatedForm = { ...form, gender: option.value };
+                handleDropdownChange('gender', option);
+                if (blurredFields.gender) validateField('gender', updatedForm);
+              }}
+              onBlur={() => handleBlur('gender', form)}
+              error={blurredFields.gender && !!errors.gender}
+              fullWidth
             />
-            {errors.occupation && (
-              <span className="error-text">{errors.occupation}</span>
+            {blurredFields.gender && <ErrorMessage message={errors.gender} />}
+          </div>
+
+          <div ref={occupationRef}>
+            <Dropdown
+              label="Occupation"
+              options={occupationOptions}
+              value={
+                form.occupation
+                  ? occupationOptions.find(
+                      (opt) => opt.value === form.occupation
+                    )
+                  : null
+              }
+              onChange={(option) => {
+                const updatedForm = { ...form, occupation: option.value };
+                handleDropdownChange('occupation', option);
+                if (blurredFields.occupation)
+                  validateField('occupation', updatedForm);
+              }}
+              onBlur={() => handleBlur('occupation', form)}
+              error={blurredFields.occupation && !!errors.occupation}
+              fullWidth
+            />
+            {blurredFields.occupation && (
+              <ErrorMessage message={errors.occupation} />
             )}
           </div>
 
-          <button type="submit" className="register-btn" disabled={loading}>
+          <div ref={workRmtRef}>
+            <Dropdown
+              label="Work Mode"
+              options={workModeOptions}
+              value={
+                form.workRmt
+                  ? workModeOptions.find((opt) => opt.value === form.workRmt)
+                  : null
+              }
+              onChange={(option) => {
+                const updatedForm = { ...form, workRmt: option.value };
+                handleDropdownChange('workRmt', option);
+                if (blurredFields.workRmt)
+                  validateField('workRmt', updatedForm);
+              }}
+              onBlur={() => handleBlur('workRmt', form)}
+              error={blurredFields.workRmt && !!errors.workRmt}
+              fullWidth
+            />
+            {blurredFields.workRmt && <ErrorMessage message={errors.workRmt} />}
+          </div>
+
+          <Button type="submit" variant="filled" fullWidth disabled={loading}>
             {loading ? 'Processing...' : 'Register'}
-          </button>
+          </Button>
         </form>
 
         {message && (
-          <div className="register-message-wrapper">
-            <p className={messageClass}>{message}</p>
+          <div className={`${styles.messageWrapper} ${messageWrapperClass}`}>
+            <p className={styles.message}>{message}</p>
           </div>
         )}
 
-        {/* Opsi Navigasi ke Login */}
-        <div className="login-link-container">
-          <p>Sudah punya akun?</p>
+        {/* Login Link Container */}
+        <div className={styles.loginLinkContainer}>
+          <p>Already have an account?</p>
           <button
             type="button"
             onClick={handleLoginClick}
-            className="login-link-btn"
+            className={styles.loginLinkButton}
           >
-            Masuk di sini.
+            Login Here
           </button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

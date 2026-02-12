@@ -1,0 +1,17 @@
+.errorMessage {
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  color: var(--color-error);
+  padding-top: var(--space-xs);
+  animation: fade-in var(--transition-fast) ease-in-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

@@ -10,6 +10,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 3rem;
+  height: 100%;
   transition: all var(--transition-fast);
 }
 
@@ -55,6 +56,27 @@
   cursor: not-allowed;
 }
 
+/* Autofill styles - override browser defaults */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active {
+  box-shadow: 0 0 0 30px var(--color-bg-light) inset !important;
+  -webkit-text-fill-color: var(--color-text-light) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Move label to top when autofilled */
+.input:-webkit-autofill ~ .label,
+.input:autofill ~ .label {
+  top: 0;
+  left: var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-primary-dark);
+  background-color: var(--color-bg-light);
+  padding: 0 var(--space-xs);
+}
+
 /* Floating label */
 .label {
   position: absolute;
@@ -73,8 +95,9 @@
   white-space: nowrap;
 }
 
-/* Active/focused label - moves to top */
-.labelActive {
+/* Label moves to top when input is focused or has value */
+.input:focus ~ .label,
+.input:not(:placeholder-shown) ~ .label {
   top: 0;
   left: var(--space-md);
   font-size: var(--font-size-sm);
@@ -85,11 +108,11 @@
 
 /* Error state */
 .container.error .input {
-  border-color: var(--color-error);
+  outline-color: var(--color-error);
 }
 
-.container.error.focused .input {
-  border-color: var(--color-error);
+.container.error .label {
+  color: var(--color-error);
 }
 
 .errorMessage {

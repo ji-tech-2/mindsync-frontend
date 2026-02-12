@@ -2,15 +2,38 @@
   position: relative;
   display: inline-block;
   font-family: var(--font-body);
-  width: fit-content;
+  width: max-content;
+  flex-direction: column;
+  gap: var(--space-xs);
+  z-index: 1;
+}
+
+/* When dropdown is open, raise entire wrapper above other dropdowns */
+.wrapper:has(.menu) {
+  z-index: 100;
 }
 
 .fullWidth {
   width: 100%;
-  display: block;
+  display: flex;
+}
+
+.container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 3rem;
+  height: 100%;
+  transition: all var(--transition-fast);
+}
+
+.fullWidth .container {
+  width: 100%;
 }
 
 .header {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -21,30 +44,62 @@
   font-family: var(--font-body);
   cursor: pointer;
   transition: all var(--transition-fast);
-  outline: none;
+  outline: var(--border-md) solid var(--color-primary);
   min-height: 3rem;
   gap: var(--space-md);
   border-radius: var(--radius-xl);
   line-height: var(--line-height-normal);
   user-select: none;
+  border: none;
+  background-color: var(--color-bg-light);
+  color: var(--color-text-light);
+  z-index: 2;
+}
+
+.header:hover:not(.disabled) {
+  outline-color: var(--color-primary-dark);
+}
+
+.header:focus {
+  outline-color: var(--color-primary-dark);
+  outline-width: var(--border-lg);
 }
 
 /* Closed state - like outlined button */
 .headerClosed {
-  border: var(--border-md) solid var(--color-primary);
-  background-color: transparent;
-  color: var(--color-primary-dark);
+  outline: var(--border-md) solid var(--color-primary);
 }
 
 .headerClosed:hover:not(.disabled) {
   background-color: var(--color-primary-light);
 }
 
-/* Open state - like filled button */
-.headerOpen {
+/* When floating label is enabled, match TextField styling (no background on hover) */
+.floatingLabel.headerClosed:hover:not(.disabled) {
+  background-color: var(--color-bg-light);
+}
+
+/* When floating label is NOT enabled - filled button with primary background */
+.header:not(.floatingLabel):hover:not(.disabled, .headerOpen) {
+  background-color: var(--color-primary-light);
+}
+
+.header:not(.floatingLabel).headerOpen {
   background-color: var(--color-primary);
   color: var(--color-text-dark);
-  border: var(--border-md) solid var(--color-primary);
+}
+
+.header:not(.floatingLabel).headerOpen .arrow {
+  color: var(--color-text-dark);
+}
+
+.header:not(.floatingLabel):hover.headerOpen .arrow {
+  color: var(--color-text-dark);
+}
+
+/* Open state - like filled button */
+.headerOpen {
+  outline: var(--border-md) solid var(--color-primary);
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
@@ -54,15 +109,80 @@
   cursor: not-allowed;
 }
 
-.label {
+/* Error state */
+.error .header {
+  outline-color: var(--color-error);
+}
+
+.buttonLabel {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/* Floating label */
+.label {
+  position: absolute;
+  left: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-primary-dark);
+  background-color: transparent;
+  padding: 0 var(--space-xs);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  z-index: 3;
+}
+
+/* Label moves to top when dropdown has a value */
+.container[data-has-value='true'] .label {
+  top: 0;
+  left: var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-primary-dark);
+  background-color: var(--color-bg-light);
+  padding: 0 var(--space-xs);
+}
+
+.error .label {
+  color: var(--color-error);
+}
+
+/* Label color changes on button hover/focus */
+.header:hover ~ .label,
+.header:focus ~ .label {
+  color: var(--color-primary-dark);
+}
+
+/* Keep error color even on hover/focus */
+.error .header:hover ~ .label,
+.error .header:focus ~ .label {
+  color: var(--color-error);
+}
+
 .arrow {
-  transition: transform var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    color var(--transition-fast);
   flex-shrink: 0;
+  color: var(--color-primary);
+}
+
+.headerOpen .arrow {
+  color: var(--color-primary-dark);
+}
+
+.header:hover:not(.disabled) .arrow {
+  color: var(--color-primary-dark);
+}
+
+.error .arrow {
+  color: var(--color-error) !important;
 }
 
 .arrowUp {
@@ -75,11 +195,11 @@
   left: 0;
   right: 0;
   background-color: var(--color-bg-light);
-  border: var(--border-md) solid var(--color-primary);
-  border-top: none;
+  margin-top: var(--border-md);
+  outline: var(--border-lg) solid var(--color-primary-dark);
   border-bottom-left-radius: var(--radius-xl);
   border-bottom-right-radius: var(--radius-xl);
-  z-index: 10;
+  z-index: 1;
   overflow: hidden;
   box-shadow: var(--shadow-md);
   transform-origin: top;
@@ -113,7 +233,7 @@
 }
 
 .option:not(:last-child) {
-  border-bottom: 1px solid var(--color-primary-light);
+  border-bottom: var(--border-sm) solid var(--color-primary-light);
 }
 
 .option:hover {

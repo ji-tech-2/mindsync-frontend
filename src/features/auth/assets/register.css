@@ -83,35 +83,6 @@
   margin-top: 15px;
 }
 
-.register-form input,
-.register-form select {
-  padding: 9px 14px;
-  border: 2px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 0.85em;
-  width: 100%;
-  background: #fff;
-  color: #2d3748;
-  font-family: Poppins, sans-serif;
-  font-weight: 400;
-  box-sizing: border-box;
-}
-
-.register-form input:focus,
-.register-form select:focus {
-  border-color: #5a7c59;
-  box-shadow:
-    0 0 0 3px rgb(90 124 89 / 10%),
-    0 4px 12px rgb(90 124 89 / 15%);
-  outline: none;
-  background-color: #fff;
-}
-
-.register-form input::placeholder {
-  color: #a0aec0;
-  font-weight: 300;
-}
-
 .register-btn {
   margin-top: 4px;
   padding: 13px 26px;
@@ -230,11 +201,6 @@
   .register-container h2 {
     font-size: 2.1em;
   }
-
-  .register-form input,
-  .register-form select {
-    padding: 13px 16px;
-  }
 }
 
 @media (width <= 480px) {
@@ -263,12 +229,6 @@
     margin-top: 26px;
   }
 
-  .register-form input,
-  .register-form select {
-    padding: 13px 15px;
-    font-size: 0.95em;
-  }
-
   .register-btn {
     padding: 13px 22px;
     font-size: 0.98em;
@@ -292,12 +252,6 @@
     font-size: 0.33em;
   }
 
-  .register-form input,
-  .register-form select {
-    padding: 12px 14px;
-    font-size: 0.9em;
-  }
-
   .register-btn {
     padding: 12px 20px;
     font-size: 0.95em;
@@ -314,12 +268,6 @@
     font-size: 2.4em;
   }
 
-  .register-form input,
-  .register-form select {
-    padding: 14px 18px;
-    font-size: 1em;
-  }
-
   .register-btn {
     padding: 15px 30px;
     font-size: 1.05em;
@@ -327,28 +275,3 @@
 }
 
 /* Form validation styles */
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  text-align: left;
-}
-
-.error-text {
-  color: #e53e3e;
-  font-size: 0.82em;
-  font-weight: 500;
-  padding-left: 4px;
-}
-
-.input-error {
-  border-color: #fc8181 !important;
-  background-color: #fff5f5 !important;
-}
-
-.input-error:focus {
-  border-color: #e53e3e !important;
-  box-shadow:
-    0 0 0 3px rgb(229 62 62 / 10%),
-    0 4px 12px rgb(229 62 62 / 15%) !important;
-}

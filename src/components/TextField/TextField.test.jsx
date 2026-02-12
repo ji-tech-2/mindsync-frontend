@@ -23,33 +23,6 @@ describe('TextField Component', () => {
     expect(handleChange).toHaveBeenCalledTimes(1);
   });
 
-  it('applies focused class on focus', () => {
-    const { container } = render(<TextField label="Username" />);
-    const input = screen.getByRole('textbox');
-    const containerDiv = container.querySelector(`div[class*="container"]`);
-
-    fireEvent.focus(input);
-    expect(containerDiv.className).toMatch(/focused/);
-  });
-
-  it('removes focused class on blur', () => {
-    const { container } = render(<TextField label="Username" />);
-    const input = screen.getByRole('textbox');
-    const containerDiv = container.querySelector(`div[class*="container"]`);
-
-    fireEvent.focus(input);
-    fireEvent.blur(input);
-    expect(containerDiv.className).not.toMatch(/focused/);
-  });
-
-  it('renders error message when error prop is provided', () => {
-    render(<TextField label="Email" error="Invalid email address" />);
-    expect(screen.getByText('Invalid email address')).toBeInTheDocument();
-    expect(screen.getByText('Invalid email address').className).toMatch(
-      /errorMessage/
-    );
-  });
-
   it('applies error class to container when error prop is provided', () => {
     const { container } = render(<TextField label="Email" error="Error" />);
     const containerDiv = container.querySelector(`div[class*="container"]`);
@@ -75,21 +48,6 @@ describe('TextField Component', () => {
 
     expect(wrapper.className).toMatch(/fullWidth/);
     expect(containerDiv.className).toMatch(/fullWidth/);
-  });
-
-  it('applies labelActive class when input has value', () => {
-    render(<TextField label="Username" value="johndoe" onChange={() => {}} />);
-    const label = screen.getByText('Username');
-    expect(label.className).toMatch(/labelActive/);
-  });
-
-  it('applies labelActive class when input is focused', () => {
-    render(<TextField label="Username" />);
-    const input = screen.getByRole('textbox');
-    const label = screen.getByText('Username');
-
-    fireEvent.focus(input);
-    expect(label.className).toMatch(/labelActive/);
   });
 
   it('forwards ref correctly', () => {
