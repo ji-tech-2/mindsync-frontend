@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient, { API_CONFIG } from '@/config/api';
 import { validatePassword } from '@/utils/passwordValidation';
-import { Dropdown, TextField, Button } from '@/components';
+import { Dropdown, TextField, Button, Card } from '@/components';
 import {
   genderOptions,
   occupationOptions,
@@ -185,31 +185,33 @@ export default function Register() {
     navigate('/signIn');
   };
 
-  // RENDER HALAMAN SUKSES
+  // RENDER SUCCESS SCREEN
   if (isRegistered) {
     return (
       <div className={styles.wrapper}>
-        <div className={styles.container}>
-          <h2>✅ Registration Successful!</h2>
+        <Card padded elevation="md" variant="light" className={styles.card}>
+          <div style={{ textAlign: 'center' }}>
+            <h2 className={styles.title}>✅ Registration Successful!</h2>
 
-          <p className={`${styles.message} ${styles.successMessageBox}`}>
-            {message}
-          </p>
+            <p className={`${styles.message} ${styles.successMessageBox}`}>
+              {message}
+            </p>
 
-          <p>
-            Your account has been successfully created. Please log in to start
-            your mental health journey.
-          </p>
+            <p>
+              Your account has been successfully created. Please log in to start
+              your mental health journey.
+            </p>
 
-          <Button
-            type="button"
-            variant="filled"
-            fullWidth
-            onClick={handleContinue}
-          >
-            Login Now
-          </Button>
-        </div>
+            <Button
+              type="button"
+              variant="filled"
+              fullWidth
+              onClick={handleContinue}
+            >
+              Login Now
+            </Button>
+          </div>
+        </Card>
       </div>
     );
   }
@@ -227,8 +229,13 @@ export default function Register() {
   // RENDER FORM REGISTER
   return (
     <div className={styles.wrapper}>
-      <div className={styles.container}>
-        <h2>Register</h2>
+      <Card padded elevation="md" variant="light" className={styles.card}>
+        <div style={{ textAlign: 'center' }}>
+          <h2 className={styles.title}>Register</h2>
+          <p className={styles.subtitle}>
+            Join us and start your wellness journey
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <TextField
@@ -321,16 +328,16 @@ export default function Register() {
 
         {/* Login Link Container */}
         <div className={styles.loginLinkContainer}>
-          <p>Sudah punya akun?</p>
-          <Button
-            variant="ghost"
+          <p>Already have an account?</p>
+          <button
+            type="button"
             onClick={handleLoginClick}
             className={styles.loginLinkButton}
           >
-            Masuk di sini.
-          </Button>
+            Login Here
+          </button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
