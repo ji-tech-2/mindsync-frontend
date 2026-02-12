@@ -1,6 +1,8 @@
 export { default as Button } from './Button';
 export { default as Card } from './Card';
+export { default as DateField } from './DateField';
 export { default as Dropdown } from './Dropdown';
+export { default as ErrorMessage } from './ErrorMessage';
 export { default as FormInput } from './FormInput';
 export { default as FormSelect } from './FormSelect';
 export { default as OTPInput } from './OTPInput';
