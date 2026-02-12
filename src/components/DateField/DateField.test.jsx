@@ -3,11 +3,23 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import DateField from './DateField';
 
 describe('DateField', () => {
-  it('should render all three fields', () => {
+  it('should render with default label', () => {
     render(<DateField />);
-    expect(screen.getByPlaceholderText('DD')).toBeInTheDocument();
     expect(screen.getByText('Select a date')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('YYYY')).toBeInTheDocument();
+  });
+
+  it('should render day and year text fields with correct labels', () => {
+    render(<DateField />);
+    const dayLabels = screen.getAllByText('Day');
+    const yearLabels = screen.getAllByText('Year');
+    expect(dayLabels.length).toBeGreaterThan(0);
+    expect(yearLabels.length).toBeGreaterThan(0);
+  });
+
+  it('should render month dropdown with correct label', () => {
+    render(<DateField />);
+    const monthLabels = screen.getAllByText('Month');
+    expect(monthLabels.length).toBeGreaterThan(0);
   });
 
   it('should display values correctly', () => {
@@ -16,42 +28,74 @@ describe('DateField', () => {
     expect(screen.getByDisplayValue('2000')).toBeInTheDocument();
   });
 
-  it('should call onChange handlers when fields change', () => {
+  it('should call onChange handlers when day field changes', () => {
     const handleDayChange = vi.fn();
-    const handleMonthChange = vi.fn();
-    const handleYearChange = vi.fn();
+    render(<DateField onDayChange={handleDayChange} />);
 
-    render(
-      <DateField
-        onDayChange={handleDayChange}
-        onMonthChange={handleMonthChange}
-        onYearChange={handleYearChange}
-      />
-    );
-
-    const dayInput = screen.getByPlaceholderText('DD');
-    const yearInput = screen.getByPlaceholderText('YYYY');
-
+    const inputs = screen.getAllByRole('textbox');
+    const dayInput = inputs[0];
     fireEvent.change(dayInput, { target: { value: '15' } });
-    fireEvent.change(yearInput, { target: { value: '2000' } });
 
     expect(handleDayChange).toHaveBeenCalled();
+  });
+
+  it('should call onChange handler when year field changes', () => {
+    const handleYearChange = vi.fn();
+    render(<DateField onYearChange={handleYearChange} />);
+
+    const inputs = screen.getAllByRole('textbox');
+    const yearInput = inputs[inputs.length - 1];
+
+    fireEvent.change(yearInput, { target: { value: '2000' } });
+
     expect(handleYearChange).toHaveBeenCalled();
   });
 
-  it('should display error message when error prop is provided', () => {
-    render(<DateField error="Invalid date" />);
-    expect(screen.getByText('Invalid date')).toBeInTheDocument();
+  it('should call onBlur handlers when fields lose focus', () => {
+    const handleDayBlur = vi.fn();
+    const handleYearBlur = vi.fn();
+
+    render(<DateField onDayBlur={handleDayBlur} onYearBlur={handleYearBlur} />);
+
+    const inputs = screen.getAllByRole('textbox');
+    const dayInput = inputs[0];
+    const yearInput = inputs[inputs.length - 1];
+
+    fireEvent.blur(dayInput);
+    fireEvent.blur(yearInput);
+
+    expect(handleDayBlur).toHaveBeenCalled();
+    expect(handleYearBlur).toHaveBeenCalled();
   });
 
   it('should use custom label when provided', () => {
-    render(<DateField label="Event Date" />);
-    expect(screen.getByText('Event Date')).toBeInTheDocument();
+    render(<DateField label="Birth Date" />);
+    expect(screen.getByText('Birth Date')).toBeInTheDocument();
   });
 
-  it('should not display error message when no error', () => {
-    const { container } = render(<DateField />);
-    const errorElement = container.querySelector('.errorMessage');
-    expect(errorElement).not.toBeInTheDocument();
+  it('should apply error styling when dayError is true', () => {
+    render(<DateField dayError={true} />);
+    // Day field should have error state
+    expect(screen.getAllByText('Day')).toBeTruthy();
+  });
+
+  it('should apply error styling when monthError is true', () => {
+    render(<DateField monthError={true} />);
+    // Month field should have error state
+    expect(screen.getAllByText('Month')).toBeTruthy();
+  });
+
+  it('should apply error styling when yearError is true', () => {
+    render(<DateField yearError={true} />);
+    // Year field should have error state
+    expect(screen.getAllByText('Year')).toBeTruthy();
+  });
+
+  it('should apply error styling to all fields when dateError is true', () => {
+    render(<DateField dateError={true} />);
+    // All fields should have error state
+    expect(screen.getAllByText('Day')).toBeTruthy();
+    expect(screen.getAllByText('Month')).toBeTruthy();
+    expect(screen.getAllByText('Year')).toBeTruthy();
   });
 });

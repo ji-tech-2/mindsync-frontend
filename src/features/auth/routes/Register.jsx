@@ -271,11 +271,13 @@ export default function Register() {
     const firstErrorField = fieldErrors.find((field) => field.hasError);
 
     if (firstErrorField && firstErrorField.ref.current) {
-      // Scroll to the element
-      firstErrorField.ref.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
+      // Scroll to the element (check if method exists for test compatibility)
+      if (typeof firstErrorField.ref.current.scrollIntoView === 'function') {
+        firstErrorField.ref.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
 
       // Try to focus the element
       if (firstErrorField.ref.current.querySelector('input')) {
