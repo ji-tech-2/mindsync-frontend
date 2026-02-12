@@ -29,8 +29,24 @@ const Template = (args) => {
   );
 };
 
+const TemplateWithContainer = (args) => {
+  const [selected, setSelected] = useState(args.value);
+  return (
+    <div style={{ width: args.fullWidth ? '400px' : '100%' }}>
+      <Dropdown
+        {...args}
+        value={selected}
+        onChange={(val) => {
+          setSelected(val);
+          args.onChange?.(val);
+        }}
+      />
+    </div>
+  );
+};
+
 export const Default = {
-  render: Template,
+  render: TemplateWithContainer,
   args: {
     label: 'Mental Health Index',
     options: [
@@ -43,7 +59,7 @@ export const Default = {
 };
 
 export const SelectedValue = {
-  render: Template,
+  render: TemplateWithContainer,
   args: {
     label: 'Mental Health Index',
     value: { label: 'Option 1', value: '1' },
@@ -56,7 +72,7 @@ export const SelectedValue = {
 };
 
 export const FullWidth = {
-  render: Template,
+  render: TemplateWithContainer,
   args: {
     label: 'Mental Health Index',
     fullWidth: true,
@@ -69,10 +85,23 @@ export const FullWidth = {
 };
 
 export const Disabled = {
-  render: Template,
+  render: TemplateWithContainer,
   args: {
     label: 'Disabled Dropdown',
     disabled: true,
     options: [],
+  },
+};
+
+export const WithoutFloatingLabel = {
+  render: TemplateWithContainer,
+  args: {
+    label: 'Mental Health Index',
+    floatingLabel: false,
+    options: [
+      { label: 'Option 1', value: '1' },
+      { label: 'Option 2', value: '2' },
+      { label: 'Option 3', value: '3' },
+    ],
   },
 };
