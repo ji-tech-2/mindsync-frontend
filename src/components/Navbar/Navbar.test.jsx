@@ -13,9 +13,8 @@ import { AuthProvider } from '@/features/auth';
 // Mock TokenManager for AuthProvider
 vi.mock('@/config/api', () => ({
   TokenManager: {
-    getToken: vi.fn(),
     getUserData: vi.fn(),
-    clearToken: vi.fn(),
+    clearUserData: vi.fn(),
   },
 }));
 
@@ -28,10 +27,8 @@ import { TokenManager } from '../../config/api';
 
 const renderNavbar = (userData = null) => {
   if (userData) {
-    TokenManager.getToken.mockReturnValue('mock-token');
     TokenManager.getUserData.mockReturnValue(userData);
   } else {
-    TokenManager.getToken.mockReturnValue(null);
     TokenManager.getUserData.mockReturnValue(null);
   }
 

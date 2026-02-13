@@ -9,7 +9,6 @@ import {
   isAuthenticated,
   getCurrentUser,
   logout,
-  getAuthToken,
   requireAuth,
 } from './authHelper';
 import { TokenManager } from '@/config/api';
@@ -17,11 +16,9 @@ import { TokenManager } from '@/config/api';
 // Mock TokenManager
 vi.mock('@/config/api', () => ({
   TokenManager: {
-    getToken: vi.fn(),
     getUserData: vi.fn(),
-    setToken: vi.fn(),
     setUserData: vi.fn(),
-    clearToken: vi.fn(),
+    clearUserData: vi.fn(),
     isAuthenticated: vi.fn(),
   },
 }));
@@ -66,22 +63,10 @@ describe('authHelper', () => {
     });
   });
 
-  describe('getAuthToken()', () => {
-    it('should return token when available', () => {
-      TokenManager.getToken.mockReturnValue('jwt-token-123');
-      expect(getAuthToken()).toBe('jwt-token-123');
-    });
-
-    it('should return null when no token', () => {
-      TokenManager.getToken.mockReturnValue(null);
-      expect(getAuthToken()).toBeNull();
-    });
-  });
-
   describe('logout()', () => {
-    it('should clear token via TokenManager', () => {
+    it('should clear user data via TokenManager', () => {
       logout();
-      expect(TokenManager.clearToken).toHaveBeenCalled();
+      expect(TokenManager.clearUserData).toHaveBeenCalled();
     });
 
     it('should dispatch auth:logout event', () => {

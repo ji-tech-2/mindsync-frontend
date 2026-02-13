@@ -12,7 +12,7 @@ import { TokenManager } from '@/config/api';
 
 /**
  * Check if user is currently authenticated
- * @returns {boolean} True if user has valid token
+ * @returns {boolean} True if user data exists
  */
 export function isAuthenticated() {
   return TokenManager.isAuthenticated();
@@ -27,24 +27,16 @@ export function getCurrentUser() {
 }
 
 /**
- * Logout user by clearing token and user data
+ * Logout user by clearing user data
  * Dispatches event to notify AuthContext and other listeners
  * Note: Navigation is handled by AuthContext listening to 'auth:logout'
  * For React components, prefer using useAuth().logout() directly
  */
 export function logout() {
-  TokenManager.clearToken();
+  TokenManager.clearUserData();
 
   // Dispatch logout event - AuthContext handles state update and navigation
   window.dispatchEvent(new CustomEvent('auth:logout'));
-}
-
-/**
- * Get authentication token
- * @returns {string|null} JWT token or null
- */
-export function getAuthToken() {
-  return TokenManager.getToken();
 }
 
 /**

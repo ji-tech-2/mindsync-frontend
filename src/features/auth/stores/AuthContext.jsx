@@ -32,10 +32,9 @@ export const AuthProvider = ({ children }) => {
   // Initialize auth state on mount
   useEffect(() => {
     const initializeAuth = () => {
-      const token = TokenManager.getToken();
       const userData = TokenManager.getUserData();
 
-      if (token && userData) {
+      if (userData) {
         // Ensure user has userId field
         const normalizedUser = {
           ...userData,
@@ -66,7 +65,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Login function
-  const login = useCallback((token, userData) => {
+  const login = useCallback((userData) => {
     // Ensure user has an ID field for consistency
     const normalizedUser = {
       ...userData,
@@ -78,14 +77,13 @@ export const AuthProvider = ({ children }) => {
         `temp_${Date.now()}`,
     };
 
-    TokenManager.setToken(token);
     TokenManager.setUserData(normalizedUser);
     setUser(normalizedUser);
   }, []);
 
   // Simple logout function - just clears state (for programmatic use)
   const logout = useCallback(() => {
-    TokenManager.clearToken();
+    TokenManager.clearUserData();
     setUser(null);
   }, []);
 
@@ -102,7 +100,7 @@ export const AuthProvider = ({ children }) => {
     // This prevents the current page from seeing the cleared auth state
     logoutTimeoutRef.current = setTimeout(() => {
       // Clear auth state
-      TokenManager.clearToken();
+      TokenManager.clearUserData();
       setUser(null);
 
       // Clear the flag after auth is cleared

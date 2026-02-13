@@ -17,7 +17,7 @@ A React-based mental health screening and wellness application with JWT authenti
 
 ## Features
 
-- **JWT Authentication** - Secure token-based authentication with Spring Boot backend
+- **HttpOnly Cookie Authentication** - Secure session-based authentication with Spring Boot backend
 - **Protected Routes** - Route guards for authenticated-only pages
 - **Mental Health Screening** - Interactive questionnaire for mental wellness assessment
 - **Real-time Polling** - Live prediction results with partial status updates
@@ -34,7 +34,7 @@ A React-based mental health screening and wellness application with JWT authenti
 - **State Management**: React Context API
 - **Testing**: Vitest + React Testing Library
 - **Styling**: CSS Modules
-- **Authentication**: JWT (JSON Web Tokens)
+- **Authentication**: HttpOnly Cookies (JWT stored server-side)
 
 ## Project Structure
 
@@ -50,7 +50,7 @@ mindsync-frontend/
 │   │   ├── LogoutButton.jsx        # Example logout component
 │   │   └── ProtectedRoute.jsx      # Route guard component
 │   ├── config/
-│   │   └── api.js                  # Axios instance, interceptors, token manager
+│   │   └── api.js                  # Axios instance, interceptors, user data manager
 │   ├── contexts/
 │   │   └── AuthContext.jsx         # Global authentication state
 │   ├── pages/
@@ -191,7 +191,7 @@ npm run test:coverage
 
 ### Overview
 
-The application uses **JWT (JSON Web Tokens)** for authentication with the Spring Boot backend.
+The application uses **HttpOnly Cookies** for authentication with the Spring Boot backend. JWT tokens are stored in secure httpOnly cookies, making them inaccessible to JavaScript and providing better protection against XSS attacks.
 
 ### Key Components
 
@@ -205,8 +205,9 @@ The application uses **JWT (JSON Web Tokens)** for authentication with the Sprin
 
 3. **API Client** (`src/config/api.js`)
    - Axios instance with interceptors
-   - Automatic token injection: `Authorization: Bearer <token>`
+   - Automatic cookie transmission: `withCredentials: true`
    - Automatic 401 error handling
+   - No token storage needed (handled by browser)
 
 ### Usage Examples
 
@@ -231,7 +232,7 @@ function MyComponent() {
 
 ```jsx
 import apiClient from './config/api';
-
+Cookies automatically sent with every request
 // Token automatically attached!
 const response = await apiClient.get('/user/profile');
 ```
@@ -255,7 +256,7 @@ const response = await apiClient.get('/user/profile');
 
 | Endpoint                  | Method | Auth Required | Description                          |
 | ------------------------- | ------ | ------------- | ------------------------------------ |
-| `/login`                  | POST   | No            | User login, returns JWT token        |
+| `/login`                  | POST   | No            | User login, sets httpOnly cookie     |
 | `/register`               | POST   | No            | User registration                    |
 | `/v0-1/model-predict`     | POST   | Yes           | Submit screening data for prediction |
 | `/v0-1/model-result/{id}` | GET    | Yes           | Poll for prediction results          |
@@ -277,8 +278,6 @@ const response = await apiClient.get('/user/profile');
 ```json
 {
   "success": true,
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "type": "Bearer",
   "user": {
     "email": "user@example.com",
     "name": "John Doe",
@@ -287,11 +286,11 @@ const response = await apiClient.get('/user/profile');
 }
 ```
 
+**Note:** JWT token is automatically set as a secure httpOnly cookie by the backend. No token is returned in the response body.
+
 **Protected Requests:**
 
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
+Cookies are automatically sent with every request when `withCredentials: true` is configured in axios.
 
 ## Conventions
 

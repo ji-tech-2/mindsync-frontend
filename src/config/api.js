@@ -15,9 +15,9 @@
  * - Self-signed certificates allowed in development (secure: false in vite.config.js)
  *
  * Security Implementation:
- * - JWT token stored in memory (not localStorage)
- * - Token automatically attached to requests via Axios interceptors
- * - HttpOnly cookies support (when backend implements it)
+ * - Authentication via HttpOnly cookies (JWT sent automatically by browser)
+ * - No token storage in localStorage or memory (more secure against XSS)
+ * - Credentials automatically included with requests (withCredentials: true)
  */
 
 import axios from 'axios';
@@ -73,53 +73,14 @@ export const API_CONFIG = {
 };
 
 // ====================================
-// TOKEN MANAGEMENT (TEMPORARY: localStorage)
+// USER DATA MANAGEMENT
 // ====================================
-// TEMPORARY: Using localStorage for persistence across page reloads
-// TODO: Switch to HttpOnly cookies for production security
-// Backend should return: { success: true, token: "jwt_token_here", user: {...} }
-let authToken = null;
+// User data stored in memory only (non-sensitive info)
+// Authentication state managed via HttpOnly cookies by backend
+// Backend response: { success: true, user: { email, name, userId } }
 let userData = null;
 
-const TOKEN_KEY = 'auth_token';
-const USER_DATA_KEY = 'user_data';
-
 export const TokenManager = {
-  // Set token after successful login/register
-  setToken(token) {
-    authToken = token;
-    // TEMPORARY: Store in localStorage for persistence
-    if (token) {
-      localStorage.setItem(TOKEN_KEY, token);
-    }
-  },
-
-  // Get current token
-  getToken() {
-    // Return in-memory token if available
-    if (authToken) {
-      return authToken;
-    }
-
-    // TEMPORARY: Fallback to localStorage
-    const storedToken = localStorage.getItem(TOKEN_KEY);
-    if (storedToken) {
-      authToken = storedToken;
-      return storedToken;
-    }
-
-    return null;
-  },
-
-  // Clear token on logout
-  clearToken() {
-    authToken = null;
-    userData = null;
-    // TEMPORARY: Clear from localStorage
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_DATA_KEY);
-  },
-
   // Store user data (non-sensitive info only)
   setUserData(user) {
     // Only store non-sensitive user data (no passwords!)
@@ -129,34 +90,19 @@ export const TokenManager = {
       userId: user.userId, // From backend response
       // Add other non-sensitive fields as needed
     };
-
-    // TEMPORARY: Store in localStorage for persistence
-    localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
   },
 
   getUserData() {
-    // Return in-memory data if available
-    if (userData) {
-      return userData;
-    }
+    return userData;
+  },
 
-    // TEMPORARY: Fallback to localStorage
-    const storedData = localStorage.getItem(USER_DATA_KEY);
-    if (storedData) {
-      try {
-        userData = JSON.parse(storedData);
-        return userData;
-      } catch (e) {
-        console.error('Failed to parse user data:', e);
-        return null;
-      }
-    }
-
-    return null;
+  // Clear user data on logout
+  clearUserData() {
+    userData = null;
   },
 
   isAuthenticated() {
-    return !!this.getToken();
+    return !!userData;
   },
 };
 
@@ -168,42 +114,25 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Enable cookies for HttpOnly cookie support
+  withCredentials: true, // Send cookies with every request (required for httpOnly cookies)
 });
 
-// Request Interceptor: Attach JWT token to all requests
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = TokenManager.getToken();
-
-    // Attach JWT token to Authorization header
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response Interceptor: Handle token refresh and errors
+// Response Interceptor: Handle authentication errors
 apiClient.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    // Handle 401 Unauthorized - token expired or invalid
+    // Handle 401 Unauthorized - session expired or invalid
     if (error.response?.status === 401) {
-      // Don't clear token if already on login/register page
+      // Don't clear user data if already on login/register page
       const publicPaths = ['/signIn', '/register', '/'];
       const currentPath = window.location.pathname;
 
       if (!publicPaths.includes(currentPath)) {
-        // Just clear the token - let ProtectedRoute handle the redirect
+        // Clear user data - let ProtectedRoute handle the redirect
         // This is a session expiry, not an intentional logout
-        TokenManager.clearToken();
+        TokenManager.clearUserData();
       }
     }
 
@@ -229,12 +158,10 @@ export const API_URLS = {
   weeklyChart: (userId) =>
     getApiUrl(`${API_CONFIG.WEEKLY_CHART_ENDPOINT}/${userId}`),
   streak: (userId) => getApiUrl(`${API_CONFIG.STREAK_ENDPOINT}/${userId}`),
-  weeklyCriticalFactors: (userId, days = 7) =>
-    getApiUrl(
-      `${API_CONFIG.WEEKLY_CRITICAL_FACTORS}?user_id=${userId}&days=${days}`
-    ),
+  weeklyCriticalFactors: (userId) =>
+    getApiUrl(`${API_CONFIG.WEEKLY_CRITICAL_FACTORS}/${userId}`),
   dailySuggestion: (userId) =>
-    getApiUrl(`${API_CONFIG.DAILY_SUGGESTION}?user_id=${userId}`),
+    getApiUrl(`${API_CONFIG.DAILY_SUGGESTION}/${userId}`),
 };
 
 // ====================================

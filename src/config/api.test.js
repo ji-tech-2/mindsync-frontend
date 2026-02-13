@@ -9,38 +9,16 @@ import { TokenManager, API_CONFIG } from './api';
 
 describe('TokenManager - Security', () => {
   beforeEach(() => {
-    // Clear token state before each test
-    TokenManager.clearToken();
+    // Clear user data before each test
+    TokenManager.clearUserData();
   });
 
   afterEach(() => {
-    TokenManager.clearToken();
-  });
-
-  describe('Token Storage (Memory-Only)', () => {
-    it('should store token in memory', () => {
-      TokenManager.setToken('test-jwt-token');
-      expect(TokenManager.getToken()).toBe('test-jwt-token');
-    });
-
-    it('should return null when no token is set', () => {
-      expect(TokenManager.getToken()).toBeNull();
-    });
-
-    it('should clear token from memory', () => {
-      TokenManager.setToken('test-jwt-token');
-      TokenManager.clearToken();
-      expect(TokenManager.getToken()).toBeNull();
-    });
-
-    it('should not persist token in sessionStorage', () => {
-      TokenManager.setToken('test-jwt-token');
-      expect(sessionStorage.getItem('auth_token')).toBeNull();
-    });
+    TokenManager.clearUserData();
   });
 
   describe('User Data Storage', () => {
-    it('should store user data', () => {
+    it('should store user data in memory', () => {
       const userData = {
         email: 'test@example.com',
         name: 'Test User',
@@ -54,9 +32,9 @@ describe('TokenManager - Security', () => {
       expect(TokenManager.getUserData()).toBeNull();
     });
 
-    it('should clear user data on clearToken', () => {
+    it('should clear user data on clearUserData', () => {
       TokenManager.setUserData({ email: 'test@example.com' });
-      TokenManager.clearToken();
+      TokenManager.clearUserData();
       expect(TokenManager.getUserData()).toBeNull();
     });
 
@@ -79,18 +57,26 @@ describe('TokenManager - Security', () => {
   });
 
   describe('Authentication Check', () => {
-    it('should return true when token exists', () => {
-      TokenManager.setToken('valid-token');
+    it('should return true when user data exists', () => {
+      TokenManager.setUserData({
+        email: 'test@example.com',
+        name: 'Test',
+        userId: '123',
+      });
       expect(TokenManager.isAuthenticated()).toBe(true);
     });
 
-    it('should return false when no token exists', () => {
+    it('should return false when no user data exists', () => {
       expect(TokenManager.isAuthenticated()).toBe(false);
     });
 
-    it('should return false after token is cleared', () => {
-      TokenManager.setToken('valid-token');
-      TokenManager.clearToken();
+    it('should return false after user data is cleared', () => {
+      TokenManager.setUserData({
+        email: 'test@example.com',
+        name: 'Test',
+        userId: '123',
+      });
+      TokenManager.clearUserData();
       expect(TokenManager.isAuthenticated()).toBe(false);
     });
   });
@@ -122,7 +108,6 @@ describe('Security Events', () => {
     const mockHandler = vi.fn();
     window.addEventListener('auth:logout', mockHandler);
 
-    TokenManager.setToken('test-token');
     window.dispatchEvent(new CustomEvent('auth:logout'));
 
     expect(mockHandler).toHaveBeenCalled();

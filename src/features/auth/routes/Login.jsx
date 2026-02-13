@@ -54,7 +54,8 @@ export default function Login() {
     setMessage('');
     setErrors({});
 
-    // Backend response: { success: true, token: "jwt_token", type: "Bearer", user: { email, name, userId } }
+    // Backend response: { success: true, user: { email, name, userId } }
+    // Authentication via httpOnly cookie (no token in response)
     try {
       const response = await apiClient.post(API_CONFIG.AUTH_LOGIN, {
         email,
@@ -64,11 +65,12 @@ export default function Login() {
       const data = response.data;
       setLoading(false);
 
-      if (data.success && data.token) {
+      if (data.success && data.user) {
         setMessage('Login successful!');
 
         // Use AuthContext login to update global auth state
-        login(data.token, data.user);
+        // Cookie is automatically sent with subsequent requests
+        login(data.user);
 
         // Redirect to the page they were trying to visit, or dashboard
         navigate(from, { replace: true });

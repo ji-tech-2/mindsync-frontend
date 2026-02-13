@@ -55,9 +55,8 @@ vi.mock('../../screening/components/StreakCard', () => ({
 
 vi.mock('@/config/api', () => ({
   TokenManager: {
-    getToken: vi.fn(),
     getUserData: vi.fn(),
-    clearToken: vi.fn(),
+    clearUserData: vi.fn(),
   },
   API_CONFIG: {},
   API_URLS: {
@@ -132,10 +131,8 @@ const setupFetchWith = (factorsRes, suggestionRes, streakRes) => {
 
 const renderDashboard = (userData = null) => {
   if (userData) {
-    TokenManager.getToken.mockReturnValue('mock-token');
     TokenManager.getUserData.mockReturnValue(userData);
   } else {
-    TokenManager.getToken.mockReturnValue(null);
     TokenManager.getUserData.mockReturnValue(null);
   }
 
