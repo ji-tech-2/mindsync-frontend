@@ -10,7 +10,7 @@ import FormContainer from '../components/FormContainer';
 import FormSection from '../components/FormSection';
 import ErrorAlert from '../components/ErrorAlert';
 
-export default function Login() {
+export default function SignIn() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
@@ -160,7 +160,7 @@ export default function Login() {
     }
 
     setLoading(true);
-    setMessage('Processing login...');
+    setMessage('Processing sign in...');
     setErrors({});
 
     // Backend response: { success: true, user: { email, name, userId } }
@@ -175,7 +175,7 @@ export default function Login() {
       setLoading(false);
 
       if (data.success && data.user) {
-        setMessage('Login successful!');
+        setMessage('Sign in successful!');
 
         // Use AuthContext login to update global auth state
         // Cookie is automatically sent with subsequent requests
@@ -184,21 +184,21 @@ export default function Login() {
         // Redirect to the page they were trying to visit, or dashboard
         navigate(from, { replace: true });
       } else {
-        setMessage(data.message || 'Login failed');
+        setMessage(data.message || 'Sign in failed');
       }
     } catch (err) {
       setLoading(false);
       const errorMessage =
         err.response?.data?.message || 'Server error occurred';
       setMessage(errorMessage);
-      console.error('Login error:', err);
+      console.error('Sign in error:', err);
     }
   }
 
   return (
     <AuthPageLayout>
       <PageHeader
-        title="Login"
+        title="Sign In"
         subtitle="Welcome back, let's continue your wellness journey"
       />
 
@@ -234,7 +234,7 @@ export default function Login() {
         </FormSection>
 
         <Button type="submit" variant="filled" fullWidth disabled={loading}>
-          {loading ? 'Processing...' : 'Login'}
+          {loading ? 'Processing...' : 'Sign In'}
         </Button>
       </FormContainer>
 

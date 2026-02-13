@@ -327,7 +327,7 @@ const ResultPage = () => {
           <div className="auth-buttons">
             <button
               className="btn btn-primary"
-              onClick={() => navigate('/signIn')}
+              onClick={() => navigate('/signin')}
             >
               Sign In
             </button>

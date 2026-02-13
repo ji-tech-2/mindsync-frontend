@@ -35,7 +35,7 @@ const renderProtectedRoute = (initialRoute = '/protected') => {
     <MemoryRouter initialEntries={[initialRoute]}>
       <AuthProvider>
         <Routes>
-          <Route path="/signIn" element={<LoginPage />} />
+          <Route path="/signin" element={<LoginPage />} />
           <Route
             path="/protected"
             element={

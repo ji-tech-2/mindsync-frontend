@@ -25,7 +25,6 @@ import {
   toApiOccupation,
   toApiWorkMode,
 } from '@/utils/fieldMappings';
-import styles from './SignUp.module.css';
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -583,7 +582,7 @@ export default function SignUp() {
   }
 
   const handleContinue = () => {
-    navigate('/signIn'); // Redirect to login after successful registration
+    navigate('/signin'); // Redirect to login after successful registration
   };
 
   // RENDER SUCCESS SCREEN
@@ -765,8 +764,8 @@ export default function SignUp() {
       </FormContainer>
 
       {/* Login Link Container */}
-      <p className={styles.loginLinkContainer}>
-        Already have an account? <Link href="/signIn">Login Here</Link>
+      <p style={{ textAlign: 'center', marginTop: 'var(--space-md)' }}>
+        Already have an account? <Link href="/signin">Sign In Here</Link>
       </p>
 
       <ErrorAlert

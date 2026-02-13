@@ -496,7 +496,7 @@ describe('Register Component', () => {
       const continueButton = screen.getByText('Login Now');
       fireEvent.click(continueButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith('/signIn');
+      expect(mockNavigate).toHaveBeenCalledWith('/signin');
     });
   });
 
@@ -547,7 +547,7 @@ describe('Register Component', () => {
       const loginButton = screen.getByText('Login Here');
       fireEvent.click(loginButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith('/signIn');
+      expect(mockNavigate).toHaveBeenCalledWith('/signin');
     });
   });
 });

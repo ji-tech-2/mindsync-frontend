@@ -98,7 +98,7 @@ export default function ForgotPassword() {
       if (response.data.success) {
         setMessage('Password reset successfully! Redirecting to login...');
         setTimeout(() => {
-          navigate('/signIn');
+          navigate('/signin');
         }, 2000);
       } else {
         setMessage(response.data.message || 'Failed to reset password');
@@ -192,7 +192,7 @@ export default function ForgotPassword() {
           <p>Remember your password?</p>
           <button
             type="button"
-            onClick={() => navigate('/signIn')}
+            onClick={() => navigate('/signin')}
             className="back-to-login-btn"
           >
             Back to Login

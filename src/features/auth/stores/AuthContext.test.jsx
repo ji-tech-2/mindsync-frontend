@@ -70,7 +70,7 @@ const renderWithAuth = (initialRoute = '/') => {
             }
           />
           <Route
-            path="/signIn"
+            path="/signin"
             element={<div data-testid="login-page">Login Page</div>}
           />
           <Route path="/dashboard" element={<AuthStateDisplay />} />

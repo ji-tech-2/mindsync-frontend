@@ -209,7 +209,7 @@ describe('ForgotPassword Component', () => {
         vi.advanceTimersByTime(2000);
       });
 
-      expect(mockNavigate).toHaveBeenCalledWith('/signIn');
+      expect(mockNavigate).toHaveBeenCalledWith('/signin');
     });
 
     it('should show error message on API failure', async () => {
@@ -244,7 +244,7 @@ describe('ForgotPassword Component', () => {
       const backButton = screen.getByRole('button', { name: /back to login/i });
       fireEvent.click(backButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith('/signIn');
+      expect(mockNavigate).toHaveBeenCalledWith('/signin');
     });
   });
 });

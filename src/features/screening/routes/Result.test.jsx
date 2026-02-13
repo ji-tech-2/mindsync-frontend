@@ -596,7 +596,7 @@ describe('Result Component - Guest User (Not Authenticated)', () => {
     const loginButton = screen.getByRole('button', { name: /Sign In/i });
     loginButton.click();
 
-    expect(mockNavigate).toHaveBeenCalledWith('/signIn');
+    expect(mockNavigate).toHaveBeenCalledWith('/signin');
   });
 
   it('should navigate to register when register button clicked', async () => {

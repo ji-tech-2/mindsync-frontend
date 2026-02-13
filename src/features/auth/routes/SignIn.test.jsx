@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import Login from './Login';
+import SignIn from './SignIn';
 import apiClient from '@/config/api';
 import { AuthProvider } from '../stores/AuthContext';
 
@@ -36,7 +36,7 @@ const renderLogin = () => {
   return render(
     <BrowserRouter>
       <AuthProvider>
-        <Login />
+        <SignIn />
       </AuthProvider>
     </BrowserRouter>
   );

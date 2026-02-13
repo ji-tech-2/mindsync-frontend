@@ -23,7 +23,7 @@ export default function History() {
   // Check if user is logged in and fetch data
   useEffect(() => {
     if (!user) {
-      navigate('/signIn');
+      navigate('/signin');
       return;
     }
 
