@@ -13,10 +13,9 @@ vi.mock('@/config/api', () => ({
     post: vi.fn(),
   },
   TokenManager: {
-    getToken: vi.fn(),
     getUserData: vi.fn(),
     setUserData: vi.fn(),
-    clearToken: vi.fn(),
+    clearUserData: vi.fn(),
   },
 }));
 

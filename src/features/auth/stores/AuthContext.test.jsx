@@ -14,11 +14,9 @@ import { TokenManager } from '@/config/api';
 // Mock TokenManager
 vi.mock('@/config/api', () => ({
   TokenManager: {
-    getToken: vi.fn(),
     getUserData: vi.fn(),
-    setToken: vi.fn(),
     setUserData: vi.fn(),
-    clearToken: vi.fn(),
+    clearUserData: vi.fn(),
   },
 }));
 
@@ -47,9 +45,7 @@ const AuthActions = () => {
   return (
     <div>
       <button
-        onClick={() =>
-          login('test-token', { email: 'test@example.com', name: 'Test' })
-        }
+        onClick={() => login({ email: 'test@example.com', name: 'Test' })}
       >
         Login
       </button>
@@ -87,7 +83,6 @@ const renderWithAuth = (initialRoute = '/') => {
 describe('AuthContext', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    TokenManager.getToken.mockReturnValue(null);
     TokenManager.getUserData.mockReturnValue(null);
   });
 
@@ -96,7 +91,7 @@ describe('AuthContext', () => {
   });
 
   describe('Initial State', () => {
-    it('should show not-authenticated when no token exists', async () => {
+    it('should show not-authenticated when no user data exists', async () => {
       renderWithAuth();
 
       await waitFor(() => {
@@ -106,8 +101,7 @@ describe('AuthContext', () => {
       });
     });
 
-    it('should show authenticated when token exists', async () => {
-      TokenManager.getToken.mockReturnValue('valid-token');
+    it('should show authenticated when user data exists', async () => {
       TokenManager.getUserData.mockReturnValue({ email: 'user@example.com' });
 
       renderWithAuth();
@@ -143,15 +137,13 @@ describe('AuthContext', () => {
         expect(screen.getByTestId('auth-status')).toHaveTextContent(
           'authenticated'
         );
-        expect(TokenManager.setToken).toHaveBeenCalledWith('test-token');
         expect(TokenManager.setUserData).toHaveBeenCalled();
       });
     });
   });
 
   describe('Logout Action', () => {
-    it('should clear token and user state on logout', async () => {
-      TokenManager.getToken.mockReturnValue('valid-token');
+    it('should clear user data and state on logout', async () => {
       TokenManager.getUserData.mockReturnValue({ email: 'user@example.com' });
 
       renderWithAuth();
@@ -169,7 +161,7 @@ describe('AuthContext', () => {
       });
 
       await waitFor(() => {
-        expect(TokenManager.clearToken).toHaveBeenCalled();
+        expect(TokenManager.clearUserData).toHaveBeenCalled();
         expect(screen.getByTestId('auth-status')).toHaveTextContent(
           'not-authenticated'
         );

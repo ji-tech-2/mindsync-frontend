@@ -14,11 +14,9 @@ import { TokenManager } from '@/config/api';
 // Mock TokenManager
 vi.mock('@/config/api', () => ({
   TokenManager: {
-    getToken: vi.fn(),
     getUserData: vi.fn(),
-    setToken: vi.fn(),
     setUserData: vi.fn(),
-    clearToken: vi.fn(),
+    clearUserData: vi.fn(),
     isAuthenticated: vi.fn(),
   },
 }));
@@ -67,7 +65,6 @@ const renderProtectedRoute = (initialRoute = '/protected') => {
 describe('ProtectedRoute Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    TokenManager.getToken.mockReturnValue(null);
     TokenManager.getUserData.mockReturnValue(null);
     TokenManager.isAuthenticated.mockReturnValue(false);
   });
@@ -94,8 +91,8 @@ describe('ProtectedRoute Component', () => {
 
   describe('Authenticated User', () => {
     beforeEach(() => {
-      TokenManager.getToken.mockReturnValue('valid-token');
       TokenManager.getUserData.mockReturnValue({ email: 'user@example.com' });
+      TokenManager.isAuthenticated.mockReturnValue(true);
     });
 
     it('should render protected content when authenticated', async () => {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/features/auth';
 import { WeeklyChart } from '@/components';
 import {
   fetchScreeningHistory,
@@ -9,6 +10,7 @@ import '../assets/history.css';
 
 export default function History() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [historyData, setHistoryData] = useState([]);
   const [weeklyData, setWeeklyData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,8 +22,6 @@ export default function History() {
 
   // Check if user is logged in and fetch data
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user_data'));
-
     if (!user) {
       navigate('/signIn');
       return;
@@ -94,7 +94,7 @@ export default function History() {
       console.warn('⚠️ History loading failed:', err);
       setIsLoading(false);
     });
-  }, [navigate]); // ✅ Hanya depend on navigate, bukan user object
+  }, [user, navigate]);
 
   const getCategoryColor = (category) => {
     if (category == null) return '#718096'; // Default gray for null/undefined

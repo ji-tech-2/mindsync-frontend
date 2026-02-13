@@ -101,10 +101,7 @@ export default function Screening() {
   const { user } = useAuth();
 
   // Get userId from authenticated user
-  const userId =
-    user?.userId ||
-    user?.id ||
-    JSON.parse(localStorage.getItem('user') || '{}')?.userId;
+  const userId = user?.userId || user?.id || null;
 
   const questions = [
     {
@@ -315,9 +312,8 @@ export default function Screening() {
         const transformedData = transformToJSON(updatedAnswers);
 
         // 2. Add user_id if user is logged in
-        const userData = JSON.parse(localStorage.getItem('user_data'));
-        if (userData) {
-          const userId = userData?.userId || userData?.id || userData?.user_id;
+        if (user) {
+          const userId = user?.userId || user?.id || user?.user_id;
           if (userId) {
             transformedData.user_id = userId;
             console.log('✅ User logged in, adding user_id:', userId);

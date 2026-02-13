@@ -77,10 +77,7 @@ export default function Dashboard() {
     loadWeeklyData();
   }, [user]);
 
-  const userId =
-    user?.userId ||
-    user?.id ||
-    JSON.parse(localStorage.getItem('user') || '{}')?.userId;
+  const userId = user?.userId || user?.id || null;
 
   // State untuk API data
   const [factors, setFactors] = useState([]);
