@@ -243,13 +243,30 @@ export default function SignIn() {
         Create Account
       </Button>
 
+      {/* Show success messages */}
+      {message && message.includes('successful') && (
+        <p
+          style={{
+            color: 'var(--color-success, green)',
+            textAlign: 'center',
+            marginTop: 'var(--space-md)',
+          }}
+        >
+          {message}
+        </p>
+      )}
+
+      {/* Show error messages */}
       <ErrorAlert
         message={message}
         show={
           message &&
+          !message.includes('successful') &&
           (message.includes('failed') ||
             message.includes('error') ||
-            message.includes('Error'))
+            message.includes('Error') ||
+            message.includes('credentials') ||
+            message.includes('Invalid'))
         }
       />
     </AuthPageLayout>

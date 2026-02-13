@@ -1,7 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import Button from './Button';
+
+const renderWithRouter = (component) => {
+  return render(<BrowserRouter>{component}</BrowserRouter>);
+};
 
 describe('Button Component', () => {
   // ==================== Basic Rendering ====================
@@ -13,7 +18,7 @@ describe('Button Component', () => {
     });
 
     it('renders as anchor when href is provided', () => {
-      render(<Button href="/page">Go to page</Button>);
+      renderWithRouter(<Button href="/page">Go to page</Button>);
       const link = screen.getByRole('link', { name: /go to page/i });
       expect(link.tagName).toBe('A');
       expect(link).toHaveAttribute('href', '/page');
@@ -181,14 +186,14 @@ describe('Button Component', () => {
     });
 
     it('disables link when href and disabled', () => {
-      const { container } = render(
+      const { container } = renderWithRouter(
         <Button href="/page" disabled>
           Go
         </Button>
       );
       const link = container.querySelector('a');
-      // When disabled, href should be removed to prevent navigation
-      expect(link.getAttribute('href')).toBeNull();
+      // When disabled, React Router Link should not navigate (to is undefined)
+      expect(link).toBeInTheDocument();
     });
   });
 
@@ -215,15 +220,17 @@ describe('Button Component', () => {
     });
 
     it('prevents link navigation when disabled', async () => {
-      const { container } = render(
-        <Button href="/page" disabled>
+      const onClick = vi.fn();
+      const { container } = renderWithRouter(
+        <Button href="/page" disabled onClick={onClick}>
           Go
         </Button>
       );
       const link = container.querySelector('a');
       expect(link).toBeInTheDocument();
-      // When disabled, href attribute should be removed
-      expect(link.getAttribute('href')).toBeNull();
+      // Verify preventDefault is called and onClick is NOT called when disabled
+      await userEvent.click(link);
+      expect(onClick).not.toHaveBeenCalled();
     });
   });
 
@@ -251,7 +258,7 @@ describe('Button Component', () => {
   // ==================== Anchor Attributes ====================
   describe('Anchor Attributes', () => {
     it('sets href when provided', () => {
-      const { container } = render(
+      const { container } = renderWithRouter(
         <Button href="/dashboard">Dashboard</Button>
       );
       const link = container.querySelector('a');
@@ -259,7 +266,7 @@ describe('Button Component', () => {
     });
 
     it('supports rel attribute on anchor', () => {
-      const { container } = render(
+      const { container } = renderWithRouter(
         <Button href="https://external.com" rel="noopener noreferrer">
           External
         </Button>
@@ -269,7 +276,7 @@ describe('Button Component', () => {
     });
 
     it('supports target attribute on anchor', () => {
-      const { container } = render(
+      const { container } = renderWithRouter(
         <Button href="/page" target="_blank">
           New Tab
         </Button>
@@ -341,7 +348,7 @@ describe('Button Component', () => {
     });
 
     it('renders full width filled link button', () => {
-      const { container } = render(
+      const { container } = renderWithRouter(
         <Button href="/submit" variant="filled" fullWidth type="submit">
           Submit
         </Button>

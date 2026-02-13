@@ -76,7 +76,7 @@ describe('Register Component', () => {
       renderRegister();
 
       expect(screen.getByText('Already have an account?')).toBeInTheDocument();
-      expect(screen.getByText('Login Here')).toBeInTheDocument();
+      expect(screen.getByText('Sign In Here')).toBeInTheDocument();
     });
   });
 
@@ -493,7 +493,7 @@ describe('Register Component', () => {
         ).toBeInTheDocument();
       });
 
-      const continueButton = screen.getByText('Login Now');
+      const continueButton = screen.getByText('Sign In Now');
       fireEvent.click(continueButton);
 
       expect(mockNavigate).toHaveBeenCalledWith('/signin');
@@ -541,13 +541,12 @@ describe('Register Component', () => {
   });
 
   describe('Navigation', () => {
-    it('should navigate to login page when clicking login link', () => {
+    it('should have login link with correct href', () => {
       renderRegister();
 
-      const loginButton = screen.getByText('Login Here');
-      fireEvent.click(loginButton);
-
-      expect(mockNavigate).toHaveBeenCalledWith('/signin');
+      const loginButton = screen.getByText('Sign In Here');
+      expect(loginButton).toBeInTheDocument();
+      expect(loginButton).toHaveAttribute('href', '/signin');
     });
   });
 });
