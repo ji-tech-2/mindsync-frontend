@@ -9,6 +9,7 @@ import {
   Card,
   DateField,
   ErrorMessage,
+  Link,
 } from '@/components';
 import {
   genderOptions,
@@ -579,11 +580,6 @@ export default function SignUp() {
     navigate('/signIn'); // Redirect to login after successful registration
   };
 
-  // Fungsi baru untuk navigasi ke Login
-  const handleLoginClick = () => {
-    navigate('/signIn');
-  };
-
   // RENDER SUCCESS SCREEN
   if (isRegistered) {
     return (
@@ -796,14 +792,9 @@ export default function SignUp() {
 
         {/* Login Link Container */}
         <div className={styles.loginLinkContainer}>
-          <p>Already have an account?</p>
-          <button
-            type="button"
-            onClick={handleLoginClick}
-            className={styles.loginLinkButton}
-          >
-            Login Here
-          </button>
+          <p>
+            Already have an account? <Link href="/signIn">Login Here</Link>
+          </p>
         </div>
       </Card>
     </div>

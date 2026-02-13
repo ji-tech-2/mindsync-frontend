@@ -1,0 +1,26 @@
+.link {
+  /* Inherit all sizing and typography from parent */
+  color: var(--color-primary);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  outline: none;
+}
+
+.link:hover,
+.link:active {
+  color: var(--color-primary-dark);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.link.disabled {
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+  text-decoration: none;
+}
