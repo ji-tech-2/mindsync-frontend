@@ -40,31 +40,11 @@
   opacity: 0.8;
 }
 
-.messageWrapper {
+.errorMessage {
+  color: var(--color-error);
   margin-top: var(--space-lg);
-  padding: var(--space-md) var(--space-lg);
-  border-radius: var(--radius-md);
-}
-
-.message {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  margin: 0;
-}
-
-.messageWrapper.success {
-  background: var(--color-success);
-  color: white;
-}
-
-.messageWrapper.error {
-  background: var(--color-error);
-  color: white;
-}
-
-.messageWrapper.processing {
-  background: rgb(209 236 241);
-  color: #0c5460;
+  margin-bottom: 0;
+  text-align: center;
 }
 
 @media (width <= 768px) {

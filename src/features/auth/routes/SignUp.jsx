@@ -611,16 +611,6 @@ export default function SignUp() {
     );
   }
 
-  // Determine message wrapper styling
-  const messageWrapperClass = `${
-    message &&
-    (message.includes('failed') ||
-      message.includes('error') ||
-      message.includes('Error'))
-      ? styles.error
-      : styles.success
-  }`;
-
   return (
     <div className={styles.wrapper}>
       <Card padded elevation="md" variant="light" className={styles.card}>
@@ -784,18 +774,17 @@ export default function SignUp() {
           </Button>
         </form>
 
-        {message && (
-          <div className={`${styles.messageWrapper} ${messageWrapperClass}`}>
-            <p className={styles.message}>{message}</p>
-          </div>
-        )}
-
         {/* Login Link Container */}
-        <div className={styles.loginLinkContainer}>
-          <p>
-            Already have an account? <Link href="/signIn">Login Here</Link>
-          </p>
-        </div>
+        <p className={styles.loginLinkContainer}>
+          Already have an account? <Link href="/signIn">Login Here</Link>
+        </p>
+
+        {message &&
+          (message.includes('failed') ||
+            message.includes('error') ||
+            message.includes('Error')) && (
+            <p className={styles.errorMessage}>{message}</p>
+          )}
       </Card>
     </div>
   );
