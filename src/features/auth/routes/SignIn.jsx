@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import apiClient, { API_CONFIG } from '@/config/api';
-import { Button, TextField, ErrorMessage, Link } from '@/components';
+import { Button, TextField, Message, Link } from '@/components';
 import PasswordField from '../components/PasswordField';
 import AuthPageLayout from '../components/AuthPageLayout';
 import PageHeader from '../components/PageHeader';
@@ -214,7 +214,9 @@ export default function SignIn() {
             error={blurredFields.email && !!errors.email}
             fullWidth
           />
-          {blurredFields.email && <ErrorMessage message={errors.email} />}
+          {blurredFields.email && (
+            <Message type="error" message={errors.email} />
+          )}
         </FormSection>
 
         <FormSection ref={passwordRef}>
@@ -227,7 +229,9 @@ export default function SignIn() {
             error={blurredFields.password && !!errors.password}
             fullWidth
           />
-          {blurredFields.password && <ErrorMessage message={errors.password} />}
+          {blurredFields.password && (
+            <Message type="error" message={errors.password} />
+          )}
           <div style={{ marginTop: 'var(--space-sm)' }}>
             <Link href="/forgot-password">Forgot Password?</Link>
           </div>

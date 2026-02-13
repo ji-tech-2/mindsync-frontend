@@ -8,7 +8,7 @@ import {
   Button,
   Card,
   DateField,
-  ErrorMessage,
+  Message,
   Link,
 } from '@/components';
 import PasswordField from '../components/PasswordField';
@@ -628,7 +628,9 @@ export default function SignUp() {
             error={blurredFields.email && !!errors.email}
             fullWidth
           />
-          {blurredFields.email && <ErrorMessage message={errors.email} />}
+          {blurredFields.email && (
+            <Message type="error" message={errors.email} />
+          )}
         </FormSection>
 
         <FormSection ref={passwordRef}>
@@ -641,7 +643,9 @@ export default function SignUp() {
             error={blurredFields.password && !!errors.password}
             fullWidth
           />
-          {blurredFields.password && <ErrorMessage message={errors.password} />}
+          {blurredFields.password && (
+            <Message type="error" message={errors.password} />
+          )}
         </FormSection>
 
         <FormSection ref={nameRef}>
@@ -655,7 +659,7 @@ export default function SignUp() {
             error={blurredFields.name && !!errors.name}
             fullWidth
           />
-          {blurredFields.name && <ErrorMessage message={errors.name} />}
+          {blurredFields.name && <Message type="error" message={errors.name} />}
         </FormSection>
 
         <FormSection ref={dobRef}>
@@ -688,7 +692,7 @@ export default function SignUp() {
             dateError={blurredFields.dob && !!errors.dobError}
           />
           {blurredFields.dob && (
-            <ErrorMessage message={errors.dobErrorMessage} />
+            <Message type="error" message={errors.dobErrorMessage} />
           )}
         </FormSection>
 
@@ -710,7 +714,9 @@ export default function SignUp() {
             error={blurredFields.gender && !!errors.gender}
             fullWidth
           />
-          {blurredFields.gender && <ErrorMessage message={errors.gender} />}
+          {blurredFields.gender && (
+            <Message type="error" message={errors.gender} />
+          )}
         </FormSection>
 
         <FormSection ref={occupationRef}>
@@ -733,7 +739,7 @@ export default function SignUp() {
             fullWidth
           />
           {blurredFields.occupation && (
-            <ErrorMessage message={errors.occupation} />
+            <Message type="error" message={errors.occupation} />
           )}
         </FormSection>
 
@@ -755,7 +761,9 @@ export default function SignUp() {
             error={blurredFields.workRmt && !!errors.workRmt}
             fullWidth
           />
-          {blurredFields.workRmt && <ErrorMessage message={errors.workRmt} />}
+          {blurredFields.workRmt && (
+            <Message type="error" message={errors.workRmt} />
+          )}
         </FormSection>
 
         <Button type="submit" variant="filled" fullWidth disabled={loading}>
@@ -765,7 +773,7 @@ export default function SignUp() {
 
       {/* Login Link Container */}
       <p style={{ textAlign: 'center', marginTop: 'var(--space-md)' }}>
-        Already have an account? <Link href="/signin">Sign In Here</Link>
+        Already have an account? <Link href="/signin">Sign Here</Link>
       </p>
 
       <ErrorAlert

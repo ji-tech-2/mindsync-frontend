@@ -1,8 +1,19 @@
-.errorMessage {
+.message {
   font-family: var(--font-body);
   font-size: var(--font-size-sm);
-  color: var(--color-error);
   animation: slide-down var(--transition-fast) forwards;
+}
+
+.error {
+  color: var(--color-error);
+}
+
+.success {
+  color: var(--color-success);
+}
+
+.info {
+  color: var(--color-text-muted);
 }
 
 @keyframes slide-down {

@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '@/config/api';
 import { getPasswordError } from '@/utils/passwordValidation';
-import { TextField, Button, ErrorMessage, Link } from '@/components';
+import { TextField, Button, Message, Link } from '@/components';
 import PasswordField from '../components/PasswordField';
 import AuthPageLayout from '../components/AuthPageLayout';
 import PageHeader from '../components/PageHeader';
@@ -205,7 +205,7 @@ export default function ForgotPassword() {
             fullWidth
           />
           {blurredFields.email && errors.email && (
-            <ErrorMessage message={errors.email} />
+            <Message type="error" message={errors.email} />
           )}
         </FormSection>
 
@@ -220,7 +220,7 @@ export default function ForgotPassword() {
             fullWidth
           />
           {blurredFields.newPassword && errors.newPassword && (
-            <ErrorMessage message={errors.newPassword} />
+            <Message type="error" message={errors.newPassword} />
           )}
         </FormSection>
 
@@ -245,7 +245,7 @@ export default function ForgotPassword() {
                 fullWidth
               />
               {blurredFields.otp && errors.otp && (
-                <ErrorMessage message={errors.otp} />
+                <Message type="error" message={errors.otp} />
               )}
             </div>
             <Button
