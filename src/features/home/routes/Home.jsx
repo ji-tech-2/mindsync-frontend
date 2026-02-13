@@ -42,12 +42,12 @@ export default function Home() {
             <p>Start evaluating your mental condition without an account.</p>
           </div>
 
-          <div className="action-card" onClick={() => navigate('/signIn')}>
+          <div className="action-card" onClick={() => navigate('/signin')}>
             <div className="action-icon" style={{ background: '#59c2e0' }}>
               🔒
             </div>
-            <h3>Sign In / Register</h3>
-            <p>Sign in to save your results and history.</p>
+            <h3>Login / Sign Up</h3>
+            <p>Sign up to save your results and history.</p>
           </div>
         </div>
       </div>

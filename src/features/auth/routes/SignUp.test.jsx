@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import Register from './Register';
+import SignUp from './SignUp';
 import apiClient from '@/config/api';
 import { AuthProvider } from '../stores/AuthContext';
 
@@ -36,7 +36,7 @@ const renderRegister = () => {
   return render(
     <BrowserRouter>
       <AuthProvider>
-        <Register />
+        <SignUp />
       </AuthProvider>
     </BrowserRouter>
   );
@@ -68,7 +68,7 @@ describe('Register Component', () => {
       ).toBeInTheDocument();
       expect(document.querySelector('input[name="name"]')).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: /register/i })
+        screen.getByRole('button', { name: /sign up/i })
       ).toBeInTheDocument();
     });
 
@@ -76,7 +76,7 @@ describe('Register Component', () => {
       renderRegister();
 
       expect(screen.getByText('Already have an account?')).toBeInTheDocument();
-      expect(screen.getByText('Login Here')).toBeInTheDocument();
+      expect(screen.getByText('Sign In Here')).toBeInTheDocument();
     });
   });
 
@@ -84,7 +84,7 @@ describe('Register Component', () => {
     it('should show error when email is empty', async () => {
       renderRegister();
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -98,7 +98,7 @@ describe('Register Component', () => {
       const emailInput = document.querySelector('input[name="email"]');
       fireEvent.change(emailInput, { target: { value: 'valid@email.com' } });
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -118,7 +118,7 @@ describe('Register Component', () => {
       const emailInput = document.querySelector('input[name="email"]');
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -132,7 +132,7 @@ describe('Register Component', () => {
       const passwordInput = document.querySelector('input[name="password"]');
       fireEvent.change(passwordInput, { target: { value: 'Pass1' } });
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -148,7 +148,7 @@ describe('Register Component', () => {
       const passwordInput = document.querySelector('input[name="password"]');
       fireEvent.change(passwordInput, { target: { value: 'password123' } }); // no uppercase
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -165,7 +165,7 @@ describe('Register Component', () => {
     it('should show error when name is empty', async () => {
       renderRegister();
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -179,7 +179,7 @@ describe('Register Component', () => {
       const nameInput = document.querySelector('input[name="name"]');
       fireEvent.change(nameInput, { target: { value: 'A' } });
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -194,7 +194,7 @@ describe('Register Component', () => {
     it('should show error when dob is empty', async () => {
       renderRegister();
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -226,7 +226,7 @@ describe('Register Component', () => {
         target: { value: recentDate.toISOString().split('T')[0] },
       });
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -241,7 +241,7 @@ describe('Register Component', () => {
     it('should show error when gender is not selected', async () => {
       renderRegister();
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -254,7 +254,7 @@ describe('Register Component', () => {
     it('should show error when occupation is empty', async () => {
       renderRegister();
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -272,7 +272,7 @@ describe('Register Component', () => {
       const occupationInput = screen.getByLabelText('Occupation');
       fireEvent.change(occupationInput, { target: { value: 'A' } });
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -288,7 +288,7 @@ describe('Register Component', () => {
       const occupationInput = screen.getByLabelText('Occupation');
       fireEvent.change(occupationInput, { target: { value: 'A'.repeat(51) } });
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -339,7 +339,7 @@ describe('Register Component', () => {
       renderRegister();
       fillValidForm();
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -369,7 +369,7 @@ describe('Register Component', () => {
       renderRegister();
       fillValidForm();
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -393,7 +393,7 @@ describe('Register Component', () => {
       renderRegister();
       fillValidForm();
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -410,7 +410,7 @@ describe('Register Component', () => {
       renderRegister();
       fillValidForm();
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -428,7 +428,7 @@ describe('Register Component', () => {
       renderRegister();
       fillValidForm();
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -484,7 +484,7 @@ describe('Register Component', () => {
         target: { value: validFormData.occupation },
       });
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -493,10 +493,10 @@ describe('Register Component', () => {
         ).toBeInTheDocument();
       });
 
-      const continueButton = screen.getByText('Login Now');
+      const continueButton = screen.getByText('Sign In Now');
       fireEvent.click(continueButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith('/signIn');
+      expect(mockNavigate).toHaveBeenCalledWith('/signin');
     });
   });
 
@@ -531,7 +531,7 @@ describe('Register Component', () => {
         target: { value: validFormData.occupation },
       });
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /sign up/i });
       fireEvent.click(submitButton);
 
       expect(
@@ -541,13 +541,12 @@ describe('Register Component', () => {
   });
 
   describe('Navigation', () => {
-    it('should navigate to login page when clicking login link', () => {
+    it('should have login link with correct href', () => {
       renderRegister();
 
-      const loginButton = screen.getByText('Login Here');
-      fireEvent.click(loginButton);
-
-      expect(mockNavigate).toHaveBeenCalledWith('/signIn');
+      const loginButton = screen.getByText('Sign In Here');
+      expect(loginButton).toBeInTheDocument();
+      expect(loginButton).toHaveAttribute('href', '/signin');
     });
   });
 });

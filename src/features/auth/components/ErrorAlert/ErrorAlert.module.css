@@ -1,0 +1,7 @@
+.errorMessage {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-lg);
+  margin-bottom: 0;
+  text-align: center;
+}

@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }) => {
   // Graceful logout - prevents redirect flash
   // Sets isLoggingOut flag briefly to prevent ProtectedRoute redirect during transition
   const logoutWithTransition = useCallback(() => {
-    // Set flag to prevent ProtectedRoute from redirecting to /signIn
+    // Set flag to prevent ProtectedRoute from redirecting to /signin
     setIsLoggingOut(true);
 
     // Navigate to home page first

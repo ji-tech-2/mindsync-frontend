@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ProtectedRoute } from '@/features/auth';
 import { MainLayout, AuthLayout } from '@/layouts';
 
@@ -10,8 +10,8 @@ const Home = lazy(() =>
 const Login = lazy(() =>
   import('@/features/auth').then((m) => ({ default: m.Login }))
 );
-const Register = lazy(() =>
-  import('@/features/auth').then((m) => ({ default: m.Register }))
+const SignUp = lazy(() =>
+  import('@/features/auth').then((m) => ({ default: m.SignUp }))
 );
 const ForgotPassword = lazy(() =>
   import('@/features/auth').then((m) => ({ default: m.ForgotPassword }))
@@ -51,6 +51,20 @@ function LoadingFallback() {
 }
 
 /**
+ * Scroll restoration component
+ * Restores scroll position on route navigation
+ */
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
+/**
  * Main Application Router
  *
  * Handles:
@@ -59,37 +73,41 @@ function LoadingFallback() {
  * - Lazy loading with suspense boundaries
  * - Different layouts for different route groups
  * - Not found redirects
+ * - Scroll restoration on route navigation
  */
 export function AppRouter() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <Routes>
-        {/* Auth routes with footer only */}
-        <Route element={<AuthLayout />}>
-          <Route path="/signIn" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/screening" element={<Screening />} />
-        </Route>
-
-        {/* Main routes with navbar and footer */}
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
-
-          {/* Protected routes - require authentication */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/history" element={<History />} />
+    <>
+      <ScrollToTop />
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
+          {/* Auth routes with footer only */}
+          <Route element={<AuthLayout />}>
+            <Route path="/signin" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/screening" element={<Screening />} />
           </Route>
 
-          {/* Semi-public routes - accessible to all, but full features require auth */}
-          <Route path="/result/:predictionId" element={<Result />} />
+          {/* Main routes with navbar and footer */}
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Home />} />
 
-          {/* Catch-all redirect to home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
-    </Suspense>
+            {/* Protected routes - require authentication */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/history" element={<History />} />
+            </Route>
+
+            {/* Semi-public routes - accessible to all, but full features require auth */}
+            <Route path="/result/:predictionId" element={<Result />} />
+
+            {/* Catch-all redirect to home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </Suspense>
+    </>
   );
 }

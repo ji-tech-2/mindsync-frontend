@@ -5,14 +5,14 @@
  * Redirects unauthenticated users to the login page (or custom path if specified).
  *
  * During logout transition, this component does NOT redirect to prevent
- * the flash of /signIn page before the logout overlay completes.
+ * the flash of /signin page before the logout overlay completes.
  */
 
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
-const ProtectedRoute = ({ children, redirectTo = '/signIn' }) => {
+const ProtectedRoute = ({ children, redirectTo = '/signin' }) => {
   const { user, isLoading, isLoggingOut } = useAuth();
   const location = useLocation();
 

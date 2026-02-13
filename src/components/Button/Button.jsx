@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import styles from './Button.module.css';
 
 /**
@@ -76,14 +77,14 @@ function Button({
   // Render as anchor tag if href is provided
   if (href) {
     return (
-      <a
-        href={disabled ? undefined : href}
+      <Link
+        to={disabled ? undefined : href}
         className={buttonClass}
         onClick={handleClick}
         {...rest}
       >
         {content}
-      </a>
+      </Link>
     );
   }
 

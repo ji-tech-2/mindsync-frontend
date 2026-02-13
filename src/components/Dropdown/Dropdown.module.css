@@ -200,10 +200,34 @@
   border-bottom-left-radius: var(--radius-xl);
   border-bottom-right-radius: var(--radius-xl);
   z-index: 1;
-  overflow: hidden;
+  max-height: 300px;
+  overflow: hidden auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text-muted) transparent;
   box-shadow: var(--shadow-md);
   transform-origin: top;
   animation: slide-down var(--transition-fast) forwards;
+}
+
+/* Custom scrollbar styling */
+.menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.menu::-webkit-scrollbar-thumb {
+  background-color: var(--color-text-muted);
+  border-radius: var(--radius-full);
+  border: var(--border-sm) solid transparent;
+  background-clip: content-box;
+}
+
+.menu::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-primary);
+  background-clip: content-box;
 }
 
 @keyframes slide-down {
