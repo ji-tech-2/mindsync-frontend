@@ -11,6 +11,7 @@ import {
   ErrorMessage,
   Link,
 } from '@/components';
+import PasswordField from '../components/PasswordField';
 import {
   genderOptions,
   occupationOptions,
@@ -637,9 +638,8 @@ export default function SignUp() {
           </div>
 
           <div ref={passwordRef}>
-            <TextField
+            <PasswordField
               label="Password"
-              type="password"
               name="password"
               value={form.password}
               onChange={handleChange}

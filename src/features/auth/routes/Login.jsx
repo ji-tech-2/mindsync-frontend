@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import apiClient, { API_CONFIG } from '@/config/api';
 import { Card, TextField, Button, ErrorMessage, Link } from '@/components';
+import PasswordField from '../components/PasswordField';
 import styles from './Login.module.css';
 
 export default function Login() {
@@ -74,8 +75,6 @@ export default function Login() {
     } else if (fieldName === 'password') {
       if (!currentForm.password) {
         newErrors.password = 'Password is required';
-      } else if (currentForm.password.length < 8) {
-        newErrors.password = 'Password must be at least 8 characters';
       } else {
         delete newErrors.password;
       }
@@ -130,8 +129,6 @@ export default function Login() {
     // Password validation
     if (!form.password) {
       newErrors.password = 'Password is required';
-    } else if (form.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
     }
 
     return newErrors;
@@ -220,9 +217,8 @@ export default function Login() {
           </div>
 
           <div ref={passwordRef}>
-            <TextField
+            <PasswordField
               label="Password"
-              type="password"
               name="password"
               value={form.password}
               onChange={handleChange}
