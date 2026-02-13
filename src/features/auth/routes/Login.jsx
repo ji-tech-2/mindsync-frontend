@@ -2,9 +2,13 @@ import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import apiClient, { API_CONFIG } from '@/config/api';
-import { Card, TextField, Button, ErrorMessage, Link } from '@/components';
+import { Button, TextField, ErrorMessage, Link } from '@/components';
 import PasswordField from '../components/PasswordField';
-import styles from './Login.module.css';
+import AuthPageLayout from '../components/AuthPageLayout';
+import PageHeader from '../components/PageHeader';
+import FormContainer from '../components/FormContainer';
+import FormSection from '../components/FormSection';
+import ErrorAlert from '../components/ErrorAlert';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -192,65 +196,62 @@ export default function Login() {
   }
 
   return (
-    <div className={styles.wrapper}>
-      <Card padded elevation="md" variant="light" className={styles.card}>
-        <div style={{ textAlign: 'center' }}>
-          <h2 className={styles.title}>Login</h2>
-          <p className={styles.subtitle}>
-            Welcome back, let's continue your wellness journey
-          </p>
-        </div>
+    <AuthPageLayout>
+      <PageHeader
+        title="Login"
+        subtitle="Welcome back, let's continue your wellness journey"
+      />
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div ref={emailRef}>
-            <TextField
-              label="Email"
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              onBlur={handleTextFieldBlur}
-              error={blurredFields.email && !!errors.email}
-              fullWidth
-            />
-            {blurredFields.email && <ErrorMessage message={errors.email} />}
+      <FormContainer onSubmit={handleSubmit}>
+        <FormSection ref={emailRef}>
+          <TextField
+            label="Email"
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            onBlur={handleTextFieldBlur}
+            error={blurredFields.email && !!errors.email}
+            fullWidth
+          />
+          {blurredFields.email && <ErrorMessage message={errors.email} />}
+        </FormSection>
+
+        <FormSection ref={passwordRef}>
+          <PasswordField
+            label="Password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            onBlur={handleTextFieldBlur}
+            error={blurredFields.password && !!errors.password}
+            fullWidth
+          />
+          {blurredFields.password && <ErrorMessage message={errors.password} />}
+          <div style={{ marginTop: 'var(--space-sm)' }}>
+            <Link href="/forgot-password">Forgot Password?</Link>
           </div>
+        </FormSection>
 
-          <div ref={passwordRef}>
-            <PasswordField
-              label="Password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              onBlur={handleTextFieldBlur}
-              error={blurredFields.password && !!errors.password}
-              fullWidth
-            />
-            {blurredFields.password && (
-              <ErrorMessage message={errors.password} />
-            )}
-            <div style={{ marginTop: 'var(--space-sm)' }}>
-              <Link href="/forgot-password">Forgot Password?</Link>
-            </div>
-          </div>
-
-          <Button type="submit" variant="filled" fullWidth disabled={loading}>
-            {loading ? 'Processing...' : 'Login'}
-          </Button>
-        </form>
-
-        {/* Create Account Button */}
-        <Button type="button" variant="outlined" fullWidth href="/sign-up">
-          Create Account
+        <Button type="submit" variant="filled" fullWidth disabled={loading}>
+          {loading ? 'Processing...' : 'Login'}
         </Button>
+      </FormContainer>
 
-        {message &&
+      {/* Create Account Button */}
+      <Button type="button" variant="outlined" fullWidth href="/sign-up">
+        Create Account
+      </Button>
+
+      <ErrorAlert
+        message={message}
+        show={
+          message &&
           (message.includes('failed') ||
             message.includes('error') ||
-            message.includes('Error')) && (
-            <p className={styles.errorMessage}>{message}</p>
-          )}
-      </Card>
-    </div>
+            message.includes('Error'))
+        }
+      />
+    </AuthPageLayout>
   );
 }

@@ -12,6 +12,11 @@ import {
   Link,
 } from '@/components';
 import PasswordField from '../components/PasswordField';
+import AuthPageLayout from '../components/AuthPageLayout';
+import PageHeader from '../components/PageHeader';
+import FormContainer from '../components/FormContainer';
+import FormSection from '../components/FormSection';
+import ErrorAlert from '../components/ErrorAlert';
 import {
   genderOptions,
   occupationOptions,
@@ -584,208 +589,195 @@ export default function SignUp() {
   // RENDER SUCCESS SCREEN
   if (isRegistered) {
     return (
-      <div className={styles.wrapper}>
-        <Card padded elevation="md" variant="light" className={styles.card}>
-          <div style={{ textAlign: 'center' }}>
-            <h2 className={styles.title}>✅ Registration Successful!</h2>
-
-            <p className={`${styles.message} ${styles.successMessageBox}`}>
-              {message}
-            </p>
-
-            <p>
-              Your account has been successfully created. Please log in to start
-              your mental health journey.
-            </p>
-
-            <Button
-              type="button"
-              variant="filled"
-              fullWidth
-              onClick={handleContinue}
-            >
-              Login Now
-            </Button>
-          </div>
-        </Card>
-      </div>
+      <AuthPageLayout>
+        <PageHeader title="✅ Registration Successful!" subtitle="" />
+        <FormContainer onSubmit={(e) => e.preventDefault()}>
+          <p style={{ textAlign: 'center', marginBottom: 'var(--space-lg)' }}>
+            Your account has been successfully created. Please log in to start
+            your mental health journey.
+          </p>
+          <ErrorAlert message={message} show={true} />
+          <Button
+            type="button"
+            variant="filled"
+            fullWidth
+            onClick={handleContinue}
+          >
+            Login Now
+          </Button>
+        </FormContainer>
+      </AuthPageLayout>
     );
   }
 
   return (
-    <div className={styles.wrapper}>
-      <Card padded elevation="md" variant="light" className={styles.card}>
-        <div style={{ textAlign: 'center' }}>
-          <h2 className={styles.title}>Sign Up</h2>
-          <p className={styles.subtitle}>
-            Join us and start your wellness journey
-          </p>
-        </div>
+    <AuthPageLayout>
+      <PageHeader
+        title="Sign Up"
+        subtitle="Join us and start your wellness journey"
+      />
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div ref={emailRef}>
-            <TextField
-              label="Email"
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              onBlur={handleTextFieldBlur}
-              error={blurredFields.email && !!errors.email}
-              fullWidth
-            />
-            {blurredFields.email && <ErrorMessage message={errors.email} />}
-          </div>
+      <FormContainer onSubmit={handleSubmit}>
+        <FormSection ref={emailRef}>
+          <TextField
+            label="Email"
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            onBlur={handleTextFieldBlur}
+            error={blurredFields.email && !!errors.email}
+            fullWidth
+          />
+          {blurredFields.email && <ErrorMessage message={errors.email} />}
+        </FormSection>
 
-          <div ref={passwordRef}>
-            <PasswordField
-              label="Password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              onBlur={handleTextFieldBlur}
-              error={blurredFields.password && !!errors.password}
-              fullWidth
-            />
-            {blurredFields.password && (
-              <ErrorMessage message={errors.password} />
-            )}
-          </div>
+        <FormSection ref={passwordRef}>
+          <PasswordField
+            label="Password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            onBlur={handleTextFieldBlur}
+            error={blurredFields.password && !!errors.password}
+            fullWidth
+          />
+          {blurredFields.password && <ErrorMessage message={errors.password} />}
+        </FormSection>
 
-          <div ref={nameRef}>
-            <TextField
-              label="Full Name"
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              onBlur={handleTextFieldBlur}
-              error={blurredFields.name && !!errors.name}
-              fullWidth
-            />
-            {blurredFields.name && <ErrorMessage message={errors.name} />}
-          </div>
+        <FormSection ref={nameRef}>
+          <TextField
+            label="Full Name"
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            onBlur={handleTextFieldBlur}
+            error={blurredFields.name && !!errors.name}
+            fullWidth
+          />
+          {blurredFields.name && <ErrorMessage message={errors.name} />}
+        </FormSection>
 
-          <div ref={dobRef}>
-            <DateField
-              label="Date of Birth"
-              dayValue={form.dobDay}
-              monthValue={form.dobMonth}
-              yearValue={form.dobYear}
-              onDayChange={(e) => {
-                const updatedForm = { ...form, dobDay: e.target.value };
-                handleChange(e);
-                if (blurredFields.dob) validateField('dob', updatedForm);
-              }}
-              onMonthChange={(option) => {
-                const updatedForm = { ...form, dobMonth: option.value };
-                handleDropdownChange('dobMonth', option);
-                if (blurredFields.dob) validateField('dob', updatedForm);
-              }}
-              onYearChange={(e) => {
-                const updatedForm = { ...form, dobYear: e.target.value };
-                handleChange(e);
-                if (blurredFields.dob) validateField('dob', updatedForm);
-              }}
-              onDayBlur={handleDateFieldBlur}
-              onMonthBlur={handleDateFieldBlur}
-              onYearBlur={handleDateFieldBlur}
-              dayError={blurredFields.dob && !!errors.dobDayError}
-              monthError={blurredFields.dob && !!errors.dobMonthError}
-              yearError={blurredFields.dob && !!errors.dobYearError}
-              dateError={blurredFields.dob && !!errors.dobError}
-            />
-            {blurredFields.dob && (
-              <ErrorMessage message={errors.dobErrorMessage} />
-            )}
-          </div>
+        <FormSection ref={dobRef}>
+          <DateField
+            label="Date of Birth"
+            dayValue={form.dobDay}
+            monthValue={form.dobMonth}
+            yearValue={form.dobYear}
+            onDayChange={(e) => {
+              const updatedForm = { ...form, dobDay: e.target.value };
+              handleChange(e);
+              if (blurredFields.dob) validateField('dob', updatedForm);
+            }}
+            onMonthChange={(option) => {
+              const updatedForm = { ...form, dobMonth: option.value };
+              handleDropdownChange('dobMonth', option);
+              if (blurredFields.dob) validateField('dob', updatedForm);
+            }}
+            onYearChange={(e) => {
+              const updatedForm = { ...form, dobYear: e.target.value };
+              handleChange(e);
+              if (blurredFields.dob) validateField('dob', updatedForm);
+            }}
+            onDayBlur={handleDateFieldBlur}
+            onMonthBlur={handleDateFieldBlur}
+            onYearBlur={handleDateFieldBlur}
+            dayError={blurredFields.dob && !!errors.dobDayError}
+            monthError={blurredFields.dob && !!errors.dobMonthError}
+            yearError={blurredFields.dob && !!errors.dobYearError}
+            dateError={blurredFields.dob && !!errors.dobError}
+          />
+          {blurredFields.dob && (
+            <ErrorMessage message={errors.dobErrorMessage} />
+          )}
+        </FormSection>
 
-          <div ref={genderRef}>
-            <Dropdown
-              label="Gender"
-              options={genderOptions}
-              value={
-                form.gender
-                  ? genderOptions.find((opt) => opt.value === form.gender)
-                  : null
-              }
-              onChange={(option) => {
-                const updatedForm = { ...form, gender: option.value };
-                handleDropdownChange('gender', option);
-                if (blurredFields.gender) validateField('gender', updatedForm);
-              }}
-              onBlur={() => handleBlur('gender', form)}
-              error={blurredFields.gender && !!errors.gender}
-              fullWidth
-            />
-            {blurredFields.gender && <ErrorMessage message={errors.gender} />}
-          </div>
+        <FormSection ref={genderRef}>
+          <Dropdown
+            label="Gender"
+            options={genderOptions}
+            value={
+              form.gender
+                ? genderOptions.find((opt) => opt.value === form.gender)
+                : null
+            }
+            onChange={(option) => {
+              const updatedForm = { ...form, gender: option.value };
+              handleDropdownChange('gender', option);
+              if (blurredFields.gender) validateField('gender', updatedForm);
+            }}
+            onBlur={() => handleBlur('gender', form)}
+            error={blurredFields.gender && !!errors.gender}
+            fullWidth
+          />
+          {blurredFields.gender && <ErrorMessage message={errors.gender} />}
+        </FormSection>
 
-          <div ref={occupationRef}>
-            <Dropdown
-              label="Occupation"
-              options={occupationOptions}
-              value={
-                form.occupation
-                  ? occupationOptions.find(
-                      (opt) => opt.value === form.occupation
-                    )
-                  : null
-              }
-              onChange={(option) => {
-                const updatedForm = { ...form, occupation: option.value };
-                handleDropdownChange('occupation', option);
-                if (blurredFields.occupation)
-                  validateField('occupation', updatedForm);
-              }}
-              onBlur={() => handleBlur('occupation', form)}
-              error={blurredFields.occupation && !!errors.occupation}
-              fullWidth
-            />
-            {blurredFields.occupation && (
-              <ErrorMessage message={errors.occupation} />
-            )}
-          </div>
+        <FormSection ref={occupationRef}>
+          <Dropdown
+            label="Occupation"
+            options={occupationOptions}
+            value={
+              form.occupation
+                ? occupationOptions.find((opt) => opt.value === form.occupation)
+                : null
+            }
+            onChange={(option) => {
+              const updatedForm = { ...form, occupation: option.value };
+              handleDropdownChange('occupation', option);
+              if (blurredFields.occupation)
+                validateField('occupation', updatedForm);
+            }}
+            onBlur={() => handleBlur('occupation', form)}
+            error={blurredFields.occupation && !!errors.occupation}
+            fullWidth
+          />
+          {blurredFields.occupation && (
+            <ErrorMessage message={errors.occupation} />
+          )}
+        </FormSection>
 
-          <div ref={workRmtRef}>
-            <Dropdown
-              label="Work Mode"
-              options={workModeOptions}
-              value={
-                form.workRmt
-                  ? workModeOptions.find((opt) => opt.value === form.workRmt)
-                  : null
-              }
-              onChange={(option) => {
-                const updatedForm = { ...form, workRmt: option.value };
-                handleDropdownChange('workRmt', option);
-                if (blurredFields.workRmt)
-                  validateField('workRmt', updatedForm);
-              }}
-              onBlur={() => handleBlur('workRmt', form)}
-              error={blurredFields.workRmt && !!errors.workRmt}
-              fullWidth
-            />
-            {blurredFields.workRmt && <ErrorMessage message={errors.workRmt} />}
-          </div>
+        <FormSection ref={workRmtRef}>
+          <Dropdown
+            label="Work Mode"
+            options={workModeOptions}
+            value={
+              form.workRmt
+                ? workModeOptions.find((opt) => opt.value === form.workRmt)
+                : null
+            }
+            onChange={(option) => {
+              const updatedForm = { ...form, workRmt: option.value };
+              handleDropdownChange('workRmt', option);
+              if (blurredFields.workRmt) validateField('workRmt', updatedForm);
+            }}
+            onBlur={() => handleBlur('workRmt', form)}
+            error={blurredFields.workRmt && !!errors.workRmt}
+            fullWidth
+          />
+          {blurredFields.workRmt && <ErrorMessage message={errors.workRmt} />}
+        </FormSection>
 
-          <Button type="submit" variant="filled" fullWidth disabled={loading}>
-            {loading ? 'Processing...' : 'Sign Up'}
-          </Button>
-        </form>
+        <Button type="submit" variant="filled" fullWidth disabled={loading}>
+          {loading ? 'Processing...' : 'Sign Up'}
+        </Button>
+      </FormContainer>
 
-        {/* Login Link Container */}
-        <p className={styles.loginLinkContainer}>
-          Already have an account? <Link href="/signIn">Login Here</Link>
-        </p>
+      {/* Login Link Container */}
+      <p className={styles.loginLinkContainer}>
+        Already have an account? <Link href="/signIn">Login Here</Link>
+      </p>
 
-        {message &&
+      <ErrorAlert
+        message={message}
+        show={
+          message &&
           (message.includes('failed') ||
             message.includes('error') ||
-            message.includes('Error')) && (
-            <p className={styles.errorMessage}>{message}</p>
-          )}
-      </Card>
-    </div>
+            message.includes('Error'))
+        }
+      />
+    </AuthPageLayout>
   );
 }
