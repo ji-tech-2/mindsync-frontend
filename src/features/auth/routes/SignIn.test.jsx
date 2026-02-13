@@ -294,7 +294,7 @@ describe('Login Component', () => {
       const signUpButton = screen.getByText('Sign up here.');
       fireEvent.click(signUpButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith('/sign-up');
+      expect(mockNavigate).toHaveBeenCalledWith('/signup');
     });
 
     it('should navigate to forgot password page when clicking the button', () => {

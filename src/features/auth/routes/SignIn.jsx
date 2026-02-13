@@ -239,7 +239,7 @@ export default function SignIn() {
       </FormContainer>
 
       {/* Create Account Button */}
-      <Button type="button" variant="outlined" fullWidth href="/sign-up">
+      <Button type="button" variant="outlined" fullWidth href="/signup">
         Create Account
       </Button>
 

@@ -67,7 +67,7 @@ export function AppRouter() {
         {/* Auth routes with footer only */}
         <Route element={<AuthLayout />}>
           <Route path="/signin" element={<Login />} />
-          <Route path="/sign-up" element={<SignUp />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/screening" element={<Screening />} />
         </Route>
