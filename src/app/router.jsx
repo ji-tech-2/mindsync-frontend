@@ -10,8 +10,8 @@ const Home = lazy(() =>
 const Login = lazy(() =>
   import('@/features/auth').then((m) => ({ default: m.Login }))
 );
-const Register = lazy(() =>
-  import('@/features/auth').then((m) => ({ default: m.Register }))
+const SignUp = lazy(() =>
+  import('@/features/auth').then((m) => ({ default: m.SignUp }))
 );
 const ForgotPassword = lazy(() =>
   import('@/features/auth').then((m) => ({ default: m.ForgotPassword }))
@@ -67,7 +67,7 @@ export function AppRouter() {
         {/* Auth routes with footer only */}
         <Route element={<AuthLayout />}>
           <Route path="/signIn" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/sign-up" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/screening" element={<Screening />} />
         </Route>

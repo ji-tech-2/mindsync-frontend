@@ -18,9 +18,9 @@ import {
   toApiOccupation,
   toApiWorkMode,
 } from '@/utils/fieldMappings';
-import styles from './Register.module.css';
+import styles from './SignUp.module.css';
 
-export default function Register() {
+export default function SignUp() {
   const navigate = useNavigate();
   const [isRegistered, setIsRegistered] = useState(false);
 
@@ -531,7 +531,7 @@ export default function Register() {
     setErrors({});
 
     // Backend response: { success: true, message: "...", data: { email, name } }
-    // Note: Backend doesn't return token on register, user needs to login after
+    // Note: Backend doesn't return token on sign up, user needs to login after
     try {
       // Combine DOB fields into YYYY-MM-DD format
       const dob = `${form.dobYear}-${form.dobMonth}-${form.dobDay.padStart(2, '0')}`;
@@ -625,12 +625,11 @@ export default function Register() {
       : styles.success
   }`;
 
-  // RENDER FORM REGISTER
   return (
     <div className={styles.wrapper}>
       <Card padded elevation="md" variant="light" className={styles.card}>
         <div style={{ textAlign: 'center' }}>
-          <h2 className={styles.title}>Register</h2>
+          <h2 className={styles.title}>Sign Up</h2>
           <p className={styles.subtitle}>
             Join us and start your wellness journey
           </p>
@@ -785,7 +784,7 @@ export default function Register() {
           </div>
 
           <Button type="submit" variant="filled" fullWidth disabled={loading}>
-            {loading ? 'Processing...' : 'Register'}
+            {loading ? 'Processing...' : 'Sign Up'}
           </Button>
         </form>
 

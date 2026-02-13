@@ -9,7 +9,7 @@ import { Footer } from '@/components';
  * - Main content area for route components (via Outlet)
  * - Footer at the bottom
  *
- * Used for: Authentication pages (Login, Register, ForgotPassword, Screening)
+ * Used for: Authentication pages (Login, Sign Up, ForgotPassword, Screening)
  */
 export function AuthLayout() {
   return (

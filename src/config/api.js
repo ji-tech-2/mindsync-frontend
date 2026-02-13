@@ -125,8 +125,8 @@ apiClient.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized - session expired or invalid
     if (error.response?.status === 401) {
-      // Don't clear user data if already on login/register page
-      const publicPaths = ['/signIn', '/register', '/'];
+      // Don't clear user data if already on login/sign up page
+      const publicPaths = ['/signIn', '/sign-up', '/'];
       const currentPath = window.location.pathname;
 
       if (!publicPaths.includes(currentPath)) {

@@ -62,11 +62,11 @@ describe('Login Component', () => {
       ).toBeInTheDocument();
     });
 
-    it('should render register link', () => {
+    it('should render sign up link', () => {
       renderLogin();
 
       expect(screen.getByText("Don't have an account?")).toBeInTheDocument();
-      expect(screen.getByText('Register here.')).toBeInTheDocument();
+      expect(screen.getByText('Sign up here.')).toBeInTheDocument();
     });
   });
 
@@ -288,13 +288,13 @@ describe('Login Component', () => {
   });
 
   describe('Navigation', () => {
-    it('should navigate to register page when clicking register link', () => {
+    it('should navigate to sign up page when clicking sign up link', () => {
       renderLogin();
 
-      const registerButton = screen.getByText('Register here.');
-      fireEvent.click(registerButton);
+      const signUpButton = screen.getByText('Sign up here.');
+      fireEvent.click(signUpButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith('/register');
+      expect(mockNavigate).toHaveBeenCalledWith('/sign-up');
     });
 
     it('should navigate to forgot password page when clicking the button', () => {

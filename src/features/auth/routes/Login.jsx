@@ -86,9 +86,8 @@ export default function Login() {
     }
   };
 
-  // Fungsi untuk mengarahkan ke halaman register
-  const handleRegisterClick = () => {
-    navigate('/register'); // Ganti dengan path halaman register Anda
+  const handleSignUpClick = () => {
+    navigate('/sign-up');
   };
 
   return (
@@ -152,10 +151,10 @@ export default function Login() {
           <p>Don't have an account?</p>
           <button
             type="button"
-            onClick={handleRegisterClick}
+            onClick={handleSignUpClick}
             className="register-link-btn"
           >
-            Register here.
+            Sign up here.
           </button>
         </div>
       </div>
