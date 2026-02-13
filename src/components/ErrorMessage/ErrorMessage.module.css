@@ -2,15 +2,17 @@
   font-family: var(--font-body);
   font-size: var(--font-size-sm);
   color: var(--color-error);
-  animation: fade-in var(--transition-fast) ease-in-out;
+  animation: slide-down var(--transition-fast) forwards;
 }
 
-@keyframes fade-in {
+@keyframes slide-down {
   from {
     opacity: 0;
+    transform: translateY(-10px);
   }
 
   to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
