@@ -1,65 +1,173 @@
-// login
-import { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import apiClient, { API_CONFIG } from '@/config/api';
-import '../assets/login.css';
+import { Card, TextField, Button, ErrorMessage, Link } from '@/components';
+import styles from './Login.module.css';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const [message, setMessage] = useState(''); // untuk tampilkan pesan
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
 
+  // Create refs for form fields
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+
   // Get the page they were trying to visit, or default to dashboard
   const from = location.state?.from?.pathname || '/dashboard';
 
-  // Validation function
-  const validateForm = () => {
-    const newErrors = {};
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+  });
 
-    // Email validation
-    if (!email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [blurredFields, setBlurredFields] = useState({});
+
+  function handleChange(e) {
+    const { name, value } = e.target;
+
+    const updatedForm = {
+      ...form,
+      [name]: value,
+    };
+
+    setForm(updatedForm);
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: '' });
     }
 
-    // Password validation
-    if (!password) {
-      newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    // If field is already blurred, validate immediately with updated form
+    if (blurredFields[name]) {
+      validateField(name, updatedForm);
+    }
+  }
+
+  function handleTextFieldBlur(e) {
+    const { name } = e.target;
+    handleBlur(name, form);
+  }
+
+  function handleBlur(fieldName, updatedForm = null) {
+    // Mark field as blurred to show error on blur
+    setBlurredFields({ ...blurredFields, [fieldName]: true });
+    // Validate the specific field with current form state
+    validateField(fieldName, updatedForm || form);
+  }
+
+  const validateField = (fieldName, currentForm) => {
+    const newErrors = { ...errors };
+
+    if (fieldName === 'email') {
+      if (!currentForm.email || !currentForm.email.trim()) {
+        newErrors.email = 'Email is required';
+      } else if (!validateEmail(currentForm.email)) {
+        newErrors.email =
+          'Please enter a valid email address (e.g., user@example.com)';
+      } else {
+        delete newErrors.email;
+      }
+    } else if (fieldName === 'password') {
+      if (!currentForm.password) {
+        newErrors.password = 'Password is required';
+      } else if (currentForm.password.length < 8) {
+        newErrors.password = 'Password must be at least 8 characters';
+      } else {
+        delete newErrors.password;
+      }
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  // Validation functions
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const scrollToFirstError = (errorObj) => {
+    // Array of errors in order of form fields
+    const fieldErrors = [
+      { ref: emailRef, hasError: !!errorObj.email },
+      { ref: passwordRef, hasError: !!errorObj.password },
+    ];
+
+    // Find first field with error
+    const firstErrorField = fieldErrors.find((field) => field.hasError);
+
+    if (firstErrorField && firstErrorField.ref.current) {
+      // Scroll to the element (check if method exists for test compatibility)
+      if (typeof firstErrorField.ref.current.scrollIntoView === 'function') {
+        firstErrorField.ref.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+
+      // Try to focus the element
+      if (firstErrorField.ref.current.querySelector('input')) {
+        firstErrorField.ref.current.querySelector('input').focus();
+      }
+    }
+  };
+
+  const validateFormSync = () => {
+    const newErrors = {};
+
+    // Email validation
+    if (!form.email || !form.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!validateEmail(form.email)) {
+      newErrors.email =
+        'Please enter a valid email address (e.g., user@example.com)';
+    }
+
+    // Password validation
+    if (!form.password) {
+      newErrors.password = 'Password is required';
+    } else if (form.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
+
+    return newErrors;
+  };
+
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    // Validate form before submitting
-    if (!validateForm()) {
+    // Validate form synchronously to get errors immediately
+    const formErrors = validateFormSync();
+
+    // Mark all fields as blurred to show all errors
+    setBlurredFields({
+      email: true,
+      password: true,
+    });
+
+    // Set errors state
+    setErrors(formErrors);
+
+    // If there are errors, scroll to first error
+    if (Object.keys(formErrors).length > 0) {
+      scrollToFirstError(formErrors);
       return;
     }
 
     setLoading(true);
-    setMessage('');
+    setMessage('Processing login...');
     setErrors({});
 
     // Backend response: { success: true, user: { email, name, userId } }
     // Authentication via httpOnly cookie (no token in response)
     try {
       const response = await apiClient.post(API_CONFIG.AUTH_LOGIN, {
-        email,
-        password,
+        email: form.email,
+        password: form.password,
       });
 
       const data = response.data;
@@ -84,80 +192,78 @@ export default function Login() {
       setMessage(errorMessage);
       console.error('Login error:', err);
     }
-  };
+  }
 
-  const handleSignUpClick = () => {
-    navigate('/sign-up');
-  };
+  // Determine message wrapper styling
+  const messageWrapperClass = `${
+    message &&
+    (message.includes('failed') ||
+      message.includes('error') ||
+      message.includes('Error'))
+      ? styles.error
+      : styles.success
+  }`;
 
   return (
-    <div className="login-wrapper">
-      <div className="login-container">
-        <h2>Login</h2>
+    <div className={styles.wrapper}>
+      <Card padded elevation="md" variant="light" className={styles.card}>
+        <div style={{ textAlign: 'center' }}>
+          <h2 className={styles.title}>Login</h2>
+          <p className={styles.subtitle}>
+            Welcome back, let's continue your wellness journey
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-field">
-            <input
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div ref={emailRef}>
+            <TextField
+              label="Email"
               type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (errors.email) setErrors({ ...errors, email: '' });
-              }}
-              className={errors.email ? 'input-error' : ''}
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              onBlur={handleTextFieldBlur}
+              error={blurredFields.email && !!errors.email}
+              fullWidth
             />
-            {errors.email && <span className="error-text">{errors.email}</span>}
+            {blurredFields.email && <ErrorMessage message={errors.email} />}
           </div>
 
-          <div className="form-field">
-            <input
+          <div ref={passwordRef}>
+            <TextField
+              label="Password"
               type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (errors.password) setErrors({ ...errors, password: '' });
-              }}
-              className={errors.password ? 'input-error' : ''}
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              onBlur={handleTextFieldBlur}
+              error={blurredFields.password && !!errors.password}
+              fullWidth
             />
-            {errors.password && (
-              <span className="error-text">{errors.password}</span>
+            {blurredFields.password && (
+              <ErrorMessage message={errors.password} />
             )}
+            <div style={{ marginTop: 'var(--space-sm)' }}>
+              <Link href="/forgot-password">Forgot Password?</Link>
+            </div>
           </div>
 
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? 'Loading...' : 'Login'}
-          </button>
+          <Button type="submit" variant="filled" fullWidth disabled={loading}>
+            {loading ? 'Processing...' : 'Login'}
+          </Button>
         </form>
 
-        <button
-          type="button"
-          onClick={() => navigate('/forgot-password')}
-          className="forgot-password-btn"
-        >
-          Forgot Password?
-        </button>
-
         {message && (
-          <p
-            className={`login-message ${message.includes('successful') || message.includes('berhasil') ? 'success' : 'error'}`}
-          >
-            {message}
-          </p>
+          <div className={`${styles.messageWrapper} ${messageWrapperClass}`}>
+            <p className={styles.message}>{message}</p>
+          </div>
         )}
 
-        <div className="register-link-container">
-          <p>Don't have an account?</p>
-          <button
-            type="button"
-            onClick={handleSignUpClick}
-            className="register-link-btn"
-          >
-            Sign up here.
-          </button>
-        </div>
-      </div>
+        {/* Create Account Button */}
+        <Button type="button" variant="outlined" fullWidth href="/sign-up">
+          Create Account
+        </Button>
+      </Card>
     </div>
   );
 }

@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+.wrapper {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 100%;
+  min-height: 100vh;
+  padding: var(--space-2xl) var(--space-md);
+  position: relative;
+  overflow-x: hidden;
+  background: var(--color-bg-surface);
+}
+
+.card {
+  max-width: 480px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-sm);
+}
+
+.title {
+  font-size: 2.4em;
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-xs);
+  color: var(--color-primary);
+}
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  margin-top: var(--space-xs);
+  color: var(--color-text-muted);
+  opacity: 0.8;
+}
+
+.messageWrapper {
+  margin-top: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+}
+
+.message {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+}
+
+.messageWrapper.success {
+  background: var(--color-success);
+  color: white;
+}
+
+.messageWrapper.error {
+  background: var(--color-error);
+  color: white;
+}
+
+.messageWrapper.processing {
+  background: rgb(209 236 241);
+  color: #0c5460;
+}
+
+@media (width <= 768px) {
+  .wrapper {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .title {
+    font-size: 2.1em;
+  }
+}
+
+@media (width <= 480px) {
+  .wrapper {
+    padding: var(--space-md);
+  }
+
+  .title {
+    font-size: 1.9em;
+  }
+
+  .subtitle {
+    font-size: 0.9em;
+  }
+
+  .form {
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+  }
+
+  .messageWrapper {
+    padding: var(--space-md) var(--space-lg);
+  }
+}
+
+@media (width <= 360px) {
+  .wrapper {
+    padding: var(--space-md);
+  }
+
+  .title {
+    font-size: 1.7em;
+  }
+
+  .subtitle {
+    font-size: 0.8em;
+  }
+}
+
+@media (width >= 1200px) {
+  .wrapper {
+    padding: var(--space-3xl) var(--space-2xl);
+  }
+
+  .title {
+    font-size: 2.6em;
+  }
+}
