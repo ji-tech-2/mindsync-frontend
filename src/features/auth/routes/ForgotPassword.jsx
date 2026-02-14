@@ -189,15 +189,17 @@ export default function ForgotPassword() {
     }
   };
 
-  const sendOTP = async () => {
-    // Validate stage 1 first
-    const stage1Errors = validateStage1();
+  const sendOTP = async (isResend = false) => {
+    // Validate stage 1 first (only if not resending)
+    if (!isResend) {
+      const stage1Errors = validateStage1();
 
-    setBlurredFields({ email: true });
+      setBlurredFields({ email: true });
 
-    if (Object.keys(stage1Errors).length > 0) {
-      setErrors(stage1Errors);
-      return;
+      if (Object.keys(stage1Errors).length > 0) {
+        setErrors(stage1Errors);
+        return;
+      }
     }
 
     setLoading(true);
@@ -213,9 +215,11 @@ export default function ForgotPassword() {
       if (response.data.success) {
         setMessage(response.data.message || 'OTP sent successfully!');
         setIsError(false);
-        // Proceed to next stage
-        setIsGoingBack(false);
-        setCurrentStage(1);
+        // Proceed to next stage only if not resending
+        if (!isResend) {
+          setIsGoingBack(false);
+          setCurrentStage(1);
+        }
       }
     } catch (error) {
       console.error('Error sending OTP:', error);
@@ -262,9 +266,7 @@ export default function ForgotPassword() {
       if (response.data.success) {
         setMessage('Password reset successfully! Redirecting to login...');
         setIsError(false);
-        setTimeout(() => {
-          navigate('/signin');
-        }, 2000);
+        navigate('/signin');
       } else {
         setMessage(response.data.message || 'Failed to reset password');
         setIsError(true);
@@ -301,7 +303,7 @@ export default function ForgotPassword() {
         type="button"
         variant="filled"
         fullWidth
-        onClick={sendOTP}
+        onClick={() => sendOTP()}
         disabled={loading}
       >
         {loading ? 'Sending...' : 'Send OTP'}
@@ -313,16 +315,35 @@ export default function ForgotPassword() {
   const stage2 = (
     <>
       <FormSection ref={otpRef}>
-        <TextField
-          label="One-Time Password"
-          type="text"
-          name="otp"
-          value={form.otp}
-          onChange={handleChange}
-          onBlur={() => handleBlur('otp')}
-          error={blurredFields.otp && !!errors.otp}
-          fullWidth
-        />
+        <div
+          style={{
+            display: 'flex',
+            gap: 'var(--space-md)',
+            alignItems: 'flex-start',
+          }}
+        >
+          <div style={{ flex: 1 }}>
+            <TextField
+              label="OTP"
+              type="text"
+              name="otp"
+              value={form.otp}
+              onChange={handleChange}
+              onBlur={() => handleBlur('otp')}
+              error={blurredFields.otp && !!errors.otp}
+              fullWidth
+            />
+          </div>
+          <Button
+            type="button"
+            variant="outlined"
+            onClick={() => sendOTP(true)}
+            disabled={loading}
+            style={{ marginTop: '24px' }}
+          >
+            Resend OTP
+          </Button>
+        </div>
         {blurredFields.otp && errors.otp && (
           <Message type="error" message={errors.otp} />
         )}
