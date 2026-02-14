@@ -290,6 +290,37 @@ describe('Login Component', () => {
         screen.getByRole('button', { name: /processing/i })
       ).toBeDisabled();
     });
+
+    it('should navigate immediately after successful login', async () => {
+      const mockResponse = {
+        success: true,
+        user: {
+          email: 'test@example.com',
+          name: 'Test User',
+          userId: 1,
+        },
+      };
+
+      apiClient.post.mockResolvedValue({ data: mockResponse });
+
+      renderLogin();
+
+      const emailInput = document.querySelector('input[name="email"]');
+      const passwordInput = document.querySelector('input[name="password"]');
+
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+      fireEvent.change(passwordInput, { target: { value: 'password123' } });
+
+      const submitButton = screen.getByRole('button', { name: /sign in/i });
+      fireEvent.click(submitButton);
+
+      // Should navigate immediately without delay
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/dashboard', {
+          replace: true,
+        });
+      });
+    });
   });
 
   describe('Navigation', () => {

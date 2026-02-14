@@ -30,7 +30,6 @@ import {
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const [isRegistered, setIsRegistered] = useState(false);
   const [currentStage, setCurrentStage] = useState(0);
   const [isGoingBack, setIsGoingBack] = useState(false);
 
@@ -472,12 +471,13 @@ export default function SignUp() {
         formDataToSubmit
       );
       const result = response.data;
-      setLoading(false);
 
       if (result.success) {
-        setMessage('Registration successful! Welcome aboard.');
-        setIsRegistered(true);
+        setMessage('Registration successful! Redirecting to login...');
+        setLoading(false);
+        navigate('/signin');
       } else {
+        setLoading(false);
         setMessage(
           result.message || 'Registration failed. Please check your form data.'
         );
@@ -541,34 +541,6 @@ export default function SignUp() {
       }
     }
   };
-
-  const handleContinue = () => {
-    navigate('/signin'); // Redirect to login after successful registration
-  };
-
-  // RENDER SUCCESS SCREEN
-  if (isRegistered) {
-    return (
-      <AuthPageLayout>
-        <PageHeader title="✅ Registration Successful!" subtitle="" />
-        <FormContainer onSubmit={(e) => e.preventDefault()}>
-          <p style={{ textAlign: 'center', marginBottom: 'var(--space-lg)' }}>
-            Your account has been successfully created. Please log in to start
-            your mental health journey.
-          </p>
-          <ErrorAlert message={message} show={true} />
-          <Button
-            type="button"
-            variant="filled"
-            fullWidth
-            onClick={handleContinue}
-          >
-            Login Now
-          </Button>
-        </FormContainer>
-      </AuthPageLayout>
-    );
-  }
 
   // STAGE 1: Personal Information
   const stage1 = (

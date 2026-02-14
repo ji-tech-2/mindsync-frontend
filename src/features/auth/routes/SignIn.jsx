@@ -172,10 +172,10 @@ export default function SignIn() {
       });
 
       const data = response.data;
-      setLoading(false);
 
       if (data.success && data.user) {
         setMessage('Sign in successful!');
+        setLoading(false);
 
         // Use AuthContext login to update global auth state
         // Cookie is automatically sent with subsequent requests
@@ -184,6 +184,7 @@ export default function SignIn() {
         // Redirect to the page they were trying to visit, or dashboard
         navigate(from, { replace: true });
       } else {
+        setLoading(false);
         setMessage(data.message || 'Sign in failed');
       }
     } catch (err) {
