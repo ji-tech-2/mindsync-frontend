@@ -46,6 +46,35 @@ Object.defineProperty(globalThis, 'sessionStorage', {
   configurable: true,
 });
 
+// ---------------------------------------------------------------------------
+// Mock ResizeObserver for tests
+// ResizeObserver is used by StageContainer for smooth height transitions
+// Provide a simple spy-able mock that doesn't error
+// ---------------------------------------------------------------------------
+class ResizeObserverMock {
+  constructor(callback) {
+    this.callback = callback;
+  }
+
+  observe() {
+    // Mock observe - doesn't actually observe
+  }
+
+  unobserve() {
+    // Mock unobserve
+  }
+
+  disconnect() {
+    // Mock disconnect
+  }
+}
+
+Object.defineProperty(globalThis, 'ResizeObserver', {
+  value: ResizeObserverMock,
+  writable: true,
+  configurable: true,
+});
+
 // Cleanup after each test
 afterEach(() => {
   cleanup();

@@ -1,16 +1,17 @@
 .wrapper {
-  display: flex;
   flex-direction: column;
   gap: var(--space-xs);
   width: 100%;
-}
-
-.label {
-  font-family: var(--font-body);
-  font-size: var(--font-size-md);
+  border: none;
+  padding: 0;
+  margin: 0;
   font-weight: var(--font-weight-medium);
   color: var(--color-text-light);
   display: block;
+}
+
+.label {
+  margin-bottom: var(--space-sm);
 }
 
 .fieldsGrid {

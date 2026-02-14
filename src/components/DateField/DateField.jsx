@@ -53,8 +53,8 @@ const DateField = ({
   label = 'Select a date',
 }) => {
   return (
-    <div className={styles.wrapper}>
-      <label className={styles.label}>{label}</label>
+    <fieldset className={styles.wrapper}>
+      <legend className={styles.label}>{label}</legend>
       <div className={styles.fieldsGrid}>
         <TextField
           label="Day"
@@ -90,7 +90,7 @@ const DateField = ({
           error={yearError || dateError}
         />
       </div>
-    </div>
+    </fieldset>
   );
 };
 

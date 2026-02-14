@@ -1,0 +1,29 @@
+.message {
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  animation: slide-down var(--transition-fast) forwards;
+}
+
+.error {
+  color: var(--color-error);
+}
+
+.success {
+  color: var(--color-success);
+}
+
+.info {
+  color: var(--color-text-muted);
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
