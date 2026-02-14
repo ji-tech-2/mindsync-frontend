@@ -406,20 +406,8 @@ export default function ForgotPassword() {
   return (
     <AuthPageLayout>
       <PageHeader
-        title={
-          currentStage === 0
-            ? 'Reset Password'
-            : currentStage === 1
-              ? 'Verify OTP'
-              : 'Set New Password'
-        }
-        subtitle={
-          currentStage === 0
-            ? 'Enter your email to receive an OTP'
-            : currentStage === 1
-              ? 'Enter the code we sent to your email'
-              : 'Create a new password for your account'
-        }
+        title="Reset Password"
+        subtitle="Create a new password for your account"
       />
 
       <FormContainer onSubmit={handleSubmit}>

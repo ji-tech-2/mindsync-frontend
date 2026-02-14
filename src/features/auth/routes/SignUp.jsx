@@ -492,19 +492,6 @@ export default function SignUp() {
     }
   }
 
-  // Helper to check if stage 1 is complete
-  const isStage1Complete = () => {
-    return (
-      form.name &&
-      form.dobDay &&
-      form.dobMonth &&
-      form.dobYear &&
-      form.gender &&
-      form.occupation &&
-      form.workRmt
-    );
-  };
-
   const scrollToFirstError = (errorObj, stage = 'stage1') => {
     // Array of errors in order of form fields for each stage
     let fieldErrors = [];
@@ -709,7 +696,6 @@ export default function SignUp() {
         variant="filled"
         fullWidth
         onClick={handleNextStage}
-        disabled={!isStage1Complete()}
       >
         Next
       </Button>
