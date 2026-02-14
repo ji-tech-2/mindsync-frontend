@@ -243,7 +243,13 @@ export default function SignIn() {
       </FormContainer>
 
       {/* Create Account Button */}
-      <Button type="button" variant="outlined" fullWidth href="/signup">
+      <Button
+        type="button"
+        variant="outlined"
+        fullWidth
+        href="/signup"
+        style={{ marginTop: 'var(--space-sm)' }}
+      >
         Create Account
       </Button>
 
