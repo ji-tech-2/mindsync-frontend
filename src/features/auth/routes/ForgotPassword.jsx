@@ -322,7 +322,7 @@ export default function ForgotPassword() {
             alignItems: 'flex-start',
           }}
         >
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, marginTop: 'var(--border-md)' }}>
             <TextField
               label="OTP"
               type="text"
@@ -339,7 +339,6 @@ export default function ForgotPassword() {
             variant="outlined"
             onClick={() => sendOTP(true)}
             disabled={loading}
-            style={{ marginTop: '24px' }}
           >
             Resend OTP
           </Button>
