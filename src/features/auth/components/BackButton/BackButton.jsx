@@ -19,6 +19,7 @@ function BackButton({ onClick, className = '', ...rest }) {
       onClick={onClick}
       icon={<FontAwesomeIcon icon={faChevronLeft} />}
       className={className}
+      aria-label="Back"
       {...rest}
     />
   );

@@ -3,7 +3,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import DateField from './DateField';
 
 describe('DateField', () => {
-  it('should render with default label', () => {
+  it('should render fieldset with legend', () => {
+    render(<DateField />);
+    const fieldset = screen.getByRole('group');
+    expect(fieldset).toBeInTheDocument();
+  });
+
+  it('should render legend with default label', () => {
     render(<DateField />);
     expect(screen.getByText('Select a date')).toBeInTheDocument();
   });

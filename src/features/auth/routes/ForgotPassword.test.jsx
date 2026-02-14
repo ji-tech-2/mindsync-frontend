@@ -1,11 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  act,
-} from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import ForgotPassword from './ForgotPassword';
 import apiClient from '@/config/api';
@@ -48,42 +42,46 @@ describe('ForgotPassword Component', () => {
     vi.useRealTimers();
   });
 
-  describe('Initial Rendering', () => {
-    it('should render all form fields correctly', () => {
+  describe('Stage 1: Email Entry', () => {
+    it('should render Stage 1 with email field on initial load', () => {
       renderForgotPassword();
 
+      // Stage 1 fields should be present
       expect(document.querySelector('input[name="email"]')).toBeInTheDocument();
-      expect(
-        document.querySelector('input[name="newPassword"]')
-      ).toBeInTheDocument();
-      expect(document.querySelector('input[name="otp"]')).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: /reset password/i })
-      ).toBeInTheDocument();
       expect(
         screen.getByRole('button', { name: /send otp/i })
       ).toBeInTheDocument();
+
+      // Stage 2 & 3 fields should not be present
       expect(
-        screen.getByRole('link', { name: /back to sign in/i })
-      ).toBeInTheDocument();
+        document.querySelector('input[name="otp"]')
+      ).not.toBeInTheDocument();
+      expect(
+        document.querySelector('input[name="newPassword"]')
+      ).not.toBeInTheDocument();
+    });
+
+    it('should have back to sign in link on Stage 1', () => {
+      renderForgotPassword();
+
+      const backLink = screen.getByRole('link', { name: /back to sign in/i });
+      expect(backLink).toBeInTheDocument();
+      expect(backLink).toHaveAttribute('href', '/signin');
     });
   });
 
-  describe('Form Validation', () => {
-    it('should show error when fields are empty', async () => {
+  describe('Stage 1 to Stage 2 Transition', () => {
+    it('should show error when email is empty', async () => {
       renderForgotPassword();
 
-      const submitButton = screen.getByRole('button', {
-        name: /reset password/i,
-      });
-      fireEvent.click(submitButton);
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: '' } });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
 
       await waitFor(() => {
         expect(screen.getByText('Email is required')).toBeInTheDocument();
-        expect(
-          screen.getByText('New password is required')
-        ).toBeInTheDocument();
-        expect(screen.getByText('OTP is required')).toBeInTheDocument();
       });
     });
 
@@ -92,7 +90,7 @@ describe('ForgotPassword Component', () => {
 
       const emailInput = document.querySelector('input[name="email"]');
       fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
-      fireEvent.blur(emailInput); // Blur the field to trigger validation
+      fireEvent.blur(emailInput);
 
       await waitFor(() => {
         expect(
@@ -100,14 +98,16 @@ describe('ForgotPassword Component', () => {
         ).toBeInTheDocument();
       });
     });
-  });
 
-  describe('OTP Functionality', () => {
     it('should call API when sending OTP with valid email', async () => {
       renderForgotPassword();
 
       const emailInput = document.querySelector('input[name="email"]');
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      apiClient.post.mockResolvedValue({
+        data: { success: true, message: 'OTP sent' },
+      });
 
       const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
       fireEvent.click(sendOtpButton);
@@ -121,30 +121,301 @@ describe('ForgotPassword Component', () => {
         );
       });
     });
+
+    it('should transition to Stage 2 after sending OTP', async () => {
+      renderForgotPassword();
+
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      apiClient.post.mockResolvedValue({
+        data: { success: true, message: 'OTP sent' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      await waitFor(() => {
+        expect(document.querySelector('input[name="otp"]')).toBeInTheDocument();
+      });
+    });
+
+    it('should show Back button on Stage 2', async () => {
+      renderForgotPassword();
+
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      apiClient.post.mockResolvedValue({
+        data: { success: true, message: 'OTP sent' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      await waitFor(() => {
+        const backButton = screen.getByRole('button', { name: /back/i });
+        expect(backButton).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Stage 2: OTP Entry', () => {
+    it('should render OTP field on Stage 2', async () => {
+      renderForgotPassword();
+
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      apiClient.post.mockResolvedValue({
+        data: { success: true, message: 'OTP sent' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      await waitFor(() => {
+        expect(document.querySelector('input[name="otp"]')).toBeInTheDocument();
+      });
+    });
+
+    it('should return to Stage 1 when clicking Back', async () => {
+      renderForgotPassword();
+
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      apiClient.post.mockResolvedValue({
+        data: { success: true, message: 'OTP sent' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      await waitFor(() => {
+        const backButton = screen.getByRole('button', { name: /back/i });
+        expect(backButton).toBeInTheDocument();
+        fireEvent.click(backButton);
+      });
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('input[name="email"]')
+        ).toBeInTheDocument();
+        expect(
+          document.querySelector('input[name="otp"]')
+        ).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Stage 2 to Stage 3 Transition', () => {
+    it('should show error when OTP is empty', async () => {
+      renderForgotPassword();
+
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      apiClient.post.mockResolvedValue({
+        data: { success: true, message: 'OTP sent' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      await waitFor(() => {
+        const nextButton = screen.getByRole('button', { name: /next/i });
+        fireEvent.click(nextButton);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText('OTP is required')).toBeInTheDocument();
+      });
+    });
+
+    it('should transition to Stage 3 after valid OTP', async () => {
+      renderForgotPassword();
+
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      apiClient.post.mockResolvedValue({
+        data: { success: true, message: 'OTP sent' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      await waitFor(() => {
+        const otpInput = document.querySelector('input[name="otp"]');
+        fireEvent.change(otpInput, { target: { value: '123456' } });
+      });
+
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('input[name="newPassword"]')
+        ).toBeInTheDocument();
+        expect(
+          document.querySelector('input[name="confirmPassword"]')
+        ).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Stage 3: Password Reset', () => {
+    it('should render password fields on Stage 3', async () => {
+      renderForgotPassword();
+
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      apiClient.post.mockResolvedValue({
+        data: { success: true, message: 'OTP sent' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      await waitFor(() => {
+        const otpInput = document.querySelector('input[name="otp"]');
+        fireEvent.change(otpInput, { target: { value: '123456' } });
+      });
+
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('input[name="newPassword"]')
+        ).toBeInTheDocument();
+        expect(
+          document.querySelector('input[name="confirmPassword"]')
+        ).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: /reset password/i })
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('should show error when new password is empty on Stage 3', async () => {
+      renderForgotPassword();
+
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      apiClient.post.mockResolvedValue({
+        data: { success: true, message: 'OTP sent' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      await waitFor(() => {
+        const otpInput = document.querySelector('input[name="otp"]');
+        fireEvent.change(otpInput, { target: { value: '123456' } });
+      });
+
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
+
+      await waitFor(() => {
+        const resetButton = screen.getByRole('button', {
+          name: /reset password/i,
+        });
+        fireEvent.click(resetButton);
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(/New password is required|Password is required/i)
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('should return to Stage 2 when clicking Back on Stage 3', async () => {
+      renderForgotPassword();
+
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      apiClient.post.mockResolvedValue({
+        data: { success: true, message: 'OTP sent' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      await waitFor(() => {
+        const otpInput = document.querySelector('input[name="otp"]');
+        fireEvent.change(otpInput, { target: { value: '123456' } });
+      });
+
+      let nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
+
+      await waitFor(() => {
+        const backButton = screen.getByRole('button', { name: /back/i });
+        expect(backButton).toBeInTheDocument();
+        fireEvent.click(backButton);
+      });
+
+      await waitFor(() => {
+        expect(document.querySelector('input[name="otp"]')).toBeInTheDocument();
+        expect(
+          document.querySelector('input[name="newPassword"]')
+        ).not.toBeInTheDocument();
+      });
+    });
   });
 
   describe('Password Reset Submission', () => {
     it('should call API with correct data on successful submission', async () => {
       renderForgotPassword();
 
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      apiClient.post.mockResolvedValueOnce({
+        data: { success: true, message: 'OTP sent' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      await waitFor(() => {
+        const otpInput = document.querySelector('input[name="otp"]');
+        fireEvent.change(otpInput, { target: { value: '123456' } });
+      });
+
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
+
+      await waitFor(() => {
+        const newPasswordInput = document.querySelector(
+          'input[name="newPassword"]'
+        );
+        const confirmPasswordInput = document.querySelector(
+          'input[name="confirmPassword"]'
+        );
+        fireEvent.change(newPasswordInput, {
+          target: { value: 'Password123!' },
+        });
+        fireEvent.change(confirmPasswordInput, {
+          target: { value: 'Password123!' },
+        });
+      });
+
       apiClient.post.mockResolvedValueOnce({
         data: { success: true, message: 'Password reset successfully' },
       });
 
-      fireEvent.change(document.querySelector('input[name="email"]'), {
-        target: { value: 'test@example.com' },
-      });
-      fireEvent.change(document.querySelector('input[name="newPassword"]'), {
-        target: { value: 'Password123!' },
-      });
-      fireEvent.change(document.querySelector('input[name="otp"]'), {
-        target: { value: '123456' },
-      });
-
-      const submitButton = screen.getByRole('button', {
+      const resetButton = screen.getByRole('button', {
         name: /reset password/i,
       });
-      fireEvent.click(submitButton);
+      fireEvent.click(resetButton);
 
       await waitFor(() => {
         expect(apiClient.post).toHaveBeenCalledWith(
@@ -158,60 +429,106 @@ describe('ForgotPassword Component', () => {
       });
     });
 
-    it('should navigate to login after successful reset', async () => {
-      vi.useFakeTimers();
+    it('should navigate to login after successful password reset', async () => {
+      renderForgotPassword();
+
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      apiClient.post.mockResolvedValueOnce({
+        data: { success: true, message: 'OTP sent' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      await waitFor(() => {
+        const otpInput = document.querySelector('input[name="otp"]');
+        fireEvent.change(otpInput, { target: { value: '123456' } });
+      });
+
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
+
+      await waitFor(() => {
+        const newPasswordInput = document.querySelector(
+          'input[name="newPassword"]'
+        );
+        const confirmPasswordInput = document.querySelector(
+          'input[name="confirmPassword"]'
+        );
+        fireEvent.change(newPasswordInput, {
+          target: { value: 'Password123!' },
+        });
+        fireEvent.change(confirmPasswordInput, {
+          target: { value: 'Password123!' },
+        });
+      });
 
       apiClient.post.mockResolvedValueOnce({
         data: { success: true, message: 'Password reset successfully' },
       });
 
-      renderForgotPassword();
-
-      fireEvent.change(document.querySelector('input[name="email"]'), {
-        target: { value: 'test@example.com' },
+      const resetButton = screen.getByRole('button', {
+        name: /reset password/i,
       });
-      fireEvent.change(document.querySelector('input[name="newPassword"]'), {
-        target: { value: 'Password123!' },
-      });
-      fireEvent.change(document.querySelector('input[name="otp"]'), {
-        target: { value: '123456' },
-      });
+      fireEvent.click(resetButton);
 
-      fireEvent.click(screen.getByRole('button', { name: /reset password/i }));
-
-      // Process the API response
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(0);
-      });
-
-      // Advance timers for the 2s redirect
-      act(() => {
-        vi.advanceTimersByTime(2000);
-      });
-
-      expect(mockNavigate).toHaveBeenCalledWith('/signin');
+      // Wait for navigation to be called (after 2s timeout in component)
+      await waitFor(
+        () => {
+          expect(mockNavigate).toHaveBeenCalledWith('/signin');
+        },
+        { timeout: 3000 }
+      );
     });
 
     it('should show error message on API failure', async () => {
+      renderForgotPassword();
+
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      apiClient.post.mockResolvedValueOnce({
+        data: { success: true, message: 'OTP sent' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      await waitFor(() => {
+        const otpInput = document.querySelector('input[name="otp"]');
+        fireEvent.change(otpInput, { target: { value: '123456' } });
+      });
+
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
+
+      await waitFor(() => {
+        const newPasswordInput = document.querySelector(
+          'input[name="newPassword"]'
+        );
+        const confirmPasswordInput = document.querySelector(
+          'input[name="confirmPassword"]'
+        );
+        fireEvent.change(newPasswordInput, {
+          target: { value: 'Password123!' },
+        });
+        fireEvent.change(confirmPasswordInput, {
+          target: { value: 'Password123!' },
+        });
+      });
+
       apiClient.post.mockRejectedValueOnce({
         response: {
           data: { message: 'Invalid OTP' },
         },
       });
 
-      renderForgotPassword();
-
-      fireEvent.change(document.querySelector('input[name="email"]'), {
-        target: { value: 'test@example.com' },
+      const resetButton = screen.getByRole('button', {
+        name: /reset password/i,
       });
-      fireEvent.change(document.querySelector('input[name="newPassword"]'), {
-        target: { value: 'Password123!' },
-      });
-      fireEvent.change(document.querySelector('input[name="otp"]'), {
-        target: { value: '123456' },
-      });
-
-      fireEvent.click(screen.getByRole('button', { name: /reset password/i }));
+      fireEvent.click(resetButton);
 
       expect(await screen.findByText(/Invalid OTP/i)).toBeInTheDocument();
     });
