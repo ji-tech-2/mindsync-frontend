@@ -112,6 +112,7 @@
 html {
   overflow-x: hidden;
   font-size: 16px;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -121,9 +122,6 @@ body {
   line-height: var(--line-height-normal);
   color: var(--color-text-light);
   margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-width: 320px;
   min-height: 100vh;
   position: relative;
