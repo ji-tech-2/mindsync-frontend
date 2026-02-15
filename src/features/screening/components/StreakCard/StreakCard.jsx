@@ -1,6 +1,44 @@
 import React, { useState } from 'react';
 import styles from './StreakCard.module.css';
 
+/**
+ * Check if a specific day of the week has been completed.
+ * @param {number} index - Day index (0=Mon, 6=Sun)
+ * @param {Array} completedDays - Array of date strings (YYYY-MM-DD)
+ * @returns {boolean}
+ */
+function isDayCompleted(index, completedDays) {
+  if (!completedDays || completedDays.length === 0) return false;
+
+  const now = new Date();
+
+  // Calculate start of current week (Monday)
+  const startOfWeek = new Date(now);
+  const currentDay = now.getDay();
+  const diff = (currentDay === 0 ? -6 : 1) - currentDay;
+  startOfWeek.setDate(now.getDate() + diff);
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  // Build date for the day being checked
+  const checkDate = new Date(startOfWeek);
+  checkDate.setDate(startOfWeek.getDate() + index);
+
+  const checkDateStr = checkDate.toISOString().split('T')[0];
+  return completedDays.includes(checkDateStr);
+}
+
+/**
+ * Get current streak value and display unit based on view type.
+ */
+function getStreakData(data, viewType) {
+  const currentStreak =
+    viewType === 'daily'
+      ? data?.daily?.current || 0
+      : data?.weekly?.current || 0;
+  const unit = viewType === 'daily' ? 'days' : 'weeks';
+  return { currentStreak, unit };
+}
+
 export default function StreakCard({ data, loading, error }) {
   const [viewType, setViewType] = useState('daily');
 
@@ -46,41 +84,9 @@ export default function StreakCard({ data, loading, error }) {
     );
   }
 
-  // Data dari backend (predict.py)
-  const currentStreak =
-    viewType === 'daily'
-      ? data?.daily?.current || 0
-      : data?.weekly?.current || 0;
-
-  const unit = viewType === 'daily' ? 'days' : 'weeks';
+  const { currentStreak, unit } = getStreakData(data, viewType);
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-  // Logika untuk menentukan hari yang sudah "checked" di minggu ini
-  const isDayCompleted = (index) => {
-    // Gunakan data completed_days_this_week dari backend
-    const completedDays = data?.completed_days_this_week || [];
-
-    if (completedDays.length === 0) return false;
-
-    const now = new Date();
-
-    // Hitung awal minggu ini (Senin)
-    const startOfWeek = new Date(now);
-    const currentDay = now.getDay();
-    const diff = (currentDay === 0 ? -6 : 1) - currentDay; // Senin sebagai hari pertama
-    startOfWeek.setDate(now.getDate() + diff);
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    // Buat tanggal untuk hari yang sedang dicek
-    const checkDate = new Date(startOfWeek);
-    checkDate.setDate(startOfWeek.getDate() + index);
-
-    // Format tanggal sebagai YYYY-MM-DD untuk dibandingkan dengan data backend
-    const checkDateStr = checkDate.toISOString().split('T')[0];
-
-    // Check apakah tanggal ini ada dalam completed_days
-    return completedDays.includes(checkDateStr);
-  };
+  const completedDays = data.completed_days_this_week || [];
 
   return (
     <div className={styles.container}>
@@ -115,9 +121,9 @@ export default function StreakCard({ data, loading, error }) {
         {days.map((day, index) => (
           <div key={day} className={styles.dayItem}>
             <div
-              className={`${styles.dayCircle} ${isDayCompleted(index) ? styles.completed : ''}`}
+              className={`${styles.dayCircle} ${isDayCompleted(index, completedDays) ? styles.completed : ''}`}
             >
-              {isDayCompleted(index) ? '✓' : ''}
+              {isDayCompleted(index, completedDays) ? '✓' : ''}
             </div>
             <span className={styles.dayName}>{day}</span>
           </div>

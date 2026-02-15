@@ -14,5 +14,27 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.js',
     css: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html', 'lcov', 'json-summary'],
+      reportsDirectory: './coverage',
+      exclude: [
+        'node_modules/',
+        'src/test/',
+        '**/*.test.{js,jsx}',
+        '**/*.stories.{js,jsx}',
+        '*.config.js',
+        'dist/',
+        '.storybook/',
+      ],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 75,
+        statements: 80,
+      },
+      all: true,
+      include: ['src/**/*.{js,jsx}'],
+    },
   },
 });

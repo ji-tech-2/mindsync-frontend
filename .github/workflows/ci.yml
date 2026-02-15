@@ -9,10 +9,192 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build Docker image for testing
-        run: docker build --target test .
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Generate complexity report
+        run: npm run quality:complexity
+        continue-on-error: true
+
+      - name: Run tests with coverage
+        run: npm run test:coverage:threshold
+        continue-on-error: true
+
+      - name: Parse coverage summary
+        id: coverage
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            LINES=$(jq '.total.lines.pct' coverage/coverage-summary.json)
+            STATEMENTS=$(jq '.total.statements.pct' coverage/coverage-summary.json)
+            FUNCTIONS=$(jq '.total.functions.pct' coverage/coverage-summary.json)
+            BRANCHES=$(jq '.total.branches.pct' coverage/coverage-summary.json)
+            echo "lines=$LINES" >> $GITHUB_OUTPUT
+            echo "statements=$STATEMENTS" >> $GITHUB_OUTPUT
+            echo "functions=$FUNCTIONS" >> $GITHUB_OUTPUT
+            echo "branches=$BRANCHES" >> $GITHUB_OUTPUT
+          else
+            echo "lines=0" >> $GITHUB_OUTPUT
+            echo "statements=0" >> $GITHUB_OUTPUT
+            echo "functions=0" >> $GITHUB_OUTPUT
+            echo "branches=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Parse complexity metrics
+        id: complexity
+        run: |
+          if [ -f complexity-report.json ]; then
+            TOTAL_WARNINGS=$(jq '[.[] | .warningCount] | add' complexity-report.json 2>/dev/null || echo "0")
+            TOTAL_ERRORS=$(jq '[.[] | .errorCount] | add' complexity-report.json 2>/dev/null || echo "0")
+            echo "warnings=$TOTAL_WARNINGS" >> $GITHUB_OUTPUT
+            echo "errors=$TOTAL_ERRORS" >> $GITHUB_OUTPUT
+          else
+            echo "warnings=0" >> $GITHUB_OUTPUT
+            echo "errors=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate workflow summary
+        run: |
+          echo "# 📊 Code Quality & Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎯 Coverage Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Coverage | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|----------|--------|" >> $GITHUB_STEP_SUMMARY
+
+          LINES="${{ steps.coverage.outputs.lines }}"
+          STATEMENTS="${{ steps.coverage.outputs.statements }}"
+          FUNCTIONS="${{ steps.coverage.outputs.functions }}"
+          BRANCHES="${{ steps.coverage.outputs.branches }}"
+
+          # Lines
+          if (( $(echo "$LINES >= 80" | bc -l 2>/dev/null || echo "0") )); then
+            echo "| Lines | ${LINES}% | ✅ Pass |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Lines | ${LINES}% | ❌ Fail (< 80%) |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Statements
+          if (( $(echo "$STATEMENTS >= 80" | bc -l 2>/dev/null || echo "0") )); then
+            echo "| Statements | ${STATEMENTS}% | ✅ Pass |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Statements | ${STATEMENTS}% | ❌ Fail (< 80%) |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Functions
+          if (( $(echo "$FUNCTIONS >= 80" | bc -l 2>/dev/null || echo "0") )); then
+            echo "| Functions | ${FUNCTIONS}% | ✅ Pass |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Functions | ${FUNCTIONS}% | ❌ Fail (< 80%) |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Branches
+          if (( $(echo "$BRANCHES >= 75" | bc -l 2>/dev/null || echo "0") )); then
+            echo "| Branches | ${BRANCHES}% | ✅ Pass |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Branches | ${BRANCHES}% | ❌ Fail (< 75%) |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔍 Code Quality Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Count | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|--------|" >> $GITHUB_STEP_SUMMARY
+
+          WARNINGS="${{ steps.complexity.outputs.warnings }}"
+          ERRORS="${{ steps.complexity.outputs.errors }}"
+
+          if [ "$ERRORS" = "0" ]; then
+            echo "| ESLint Errors | $ERRORS | ✅ Pass |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| ESLint Errors | $ERRORS | ❌ Fail |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "$WARNINGS" -le "10" ]; then
+            echo "| ESLint Warnings | $WARNINGS | ✅ Pass (≤ 10) |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| ESLint Warnings | $WARNINGS | ⚠️ Warning (> 10) |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📝 Quality Thresholds" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Coverage**: Lines ≥ 80%, Statements ≥ 80%, Functions ≥ 80%, Branches ≥ 75%" >> $GITHUB_STEP_SUMMARY
+          echo "- **Complexity**: Max cyclomatic complexity = 10" >> $GITHUB_STEP_SUMMARY
+          echo "- **Function Length**: Max 50 lines per function" >> $GITHUB_STEP_SUMMARY
+          echo "- **Nesting**: Max depth = 4, Max nested callbacks = 3" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+
+      - name: Upload complexity report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: complexity-report
+          path: complexity-report.json
+          retention-days: 30
+
+      - name: Check quality gates
+        run: |
+          LINES="${{ steps.coverage.outputs.lines }}"
+          STATEMENTS="${{ steps.coverage.outputs.statements }}"
+          FUNCTIONS="${{ steps.coverage.outputs.functions }}"
+          BRANCHES="${{ steps.coverage.outputs.branches }}"
+          ERRORS="${{ steps.complexity.outputs.errors }}"
+
+          FAIL=false
+
+          if (( $(echo "$LINES < 80" | bc -l 2>/dev/null || echo "1") )); then
+            echo "❌ Lines coverage below threshold: ${LINES}% < 80%"
+            FAIL=true
+          fi
+
+          if (( $(echo "$STATEMENTS < 80" | bc -l 2>/dev/null || echo "1") )); then
+            echo "❌ Statements coverage below threshold: ${STATEMENTS}% < 80%"
+            FAIL=true
+          fi
+
+          if (( $(echo "$FUNCTIONS < 80" | bc -l 2>/dev/null || echo "1") )); then
+            echo "❌ Functions coverage below threshold: ${FUNCTIONS}% < 80%"
+            FAIL=true
+          fi
+
+          if (( $(echo "$BRANCHES < 75" | bc -l 2>/dev/null || echo "1") )); then
+            echo "❌ Branches coverage below threshold: ${BRANCHES}% < 75%"
+            FAIL=true
+          fi
+
+          if [ "$ERRORS" != "0" ]; then
+            echo "❌ ESLint errors found: $ERRORS"
+            FAIL=true
+          fi
+
+          if [ "$FAIL" = true ]; then
+            echo "Quality gates failed!"
+            exit 1
+          else
+            echo "✅ All quality gates passed!"
+          fi

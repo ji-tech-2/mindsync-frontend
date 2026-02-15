@@ -66,6 +66,7 @@ vi.mock('@/config/api', () => ({
     dailySuggestion: vi.fn((userId) => `http://api.test/suggestion/${userId}`),
     streak: vi.fn((userId) => `http://api.test/streak/${userId}`),
   },
+  fetchScreeningHistory: vi.fn(),
 }));
 
 import { TokenManager } from '@/config/api';

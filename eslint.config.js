@@ -10,9 +10,10 @@ import prettierConfig from 'eslint-config-prettier';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'node_modules', 'coverage']),
   {
     files: ['**/*.{js,jsx}'],
+    ignores: ['**/*.test.{js,jsx}', '**/*.spec.{js,jsx}'],
     extends: [
       js.configs.recommended,
       reactHooks.configs.flat.recommended,
@@ -36,9 +37,39 @@ export default defineConfig([
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
       'prettier/prettier': 'error',
+      complexity: ['warn', { max: 15 }],
+      'max-depth': ['warn', { max: 4 }],
+      'max-lines-per-function': [
+        'warn',
+        { max: 50, skipBlankLines: true, skipComments: true },
+      ],
+      'max-nested-callbacks': ['warn', { max: 3 }],
+      'max-params': ['warn', { max: 4 }],
+    },
+  },
+  {
+    files: ['**/*.test.{js,jsx}', '**/*.spec.{js,jsx}'],
+    extends: [js.configs.recommended, reactHooks.configs.flat.recommended],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    plugins: {
+      prettier,
+    },
+    rules: {
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'prettier/prettier': 'error',
     },
   },
   prettierConfig,
-  ...storybook.configs['flat/recommended'],
   ...storybook.configs['flat/recommended'],
 ]);

@@ -6,9 +6,23 @@ RUN npm install
 COPY . .
 
 FROM base AS test
+# Run format check
 RUN npm run format:check
+
+# Run linting with complexity checks
 RUN npm run lint
-RUN npm test
+
+# Generate complexity report
+RUN npm run quality:complexity || true
+
+# Run tests with coverage
+RUN npm run test:coverage:threshold
+
+# Display coverage summary
+RUN if [ -f coverage/coverage-summary.json ]; then \
+  echo "=== Coverage Report ===" && \
+  cat coverage/coverage-summary.json | head -20; \
+fi
 
 FROM base AS build
 RUN npm run build
