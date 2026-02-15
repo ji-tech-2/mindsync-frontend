@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
 import { pollPredictionResult } from '@/services';
 import { Button } from '@/components';
-import { Advice } from '@/components';
+import Advice from '../components/Advice';
 import ScoreDisplay from '../components/ScoreDisplay';
 import StatusBadge from '../components/StatusBadge';
 import styles from './Result.module.css';

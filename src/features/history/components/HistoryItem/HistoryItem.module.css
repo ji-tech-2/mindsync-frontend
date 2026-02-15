@@ -1,0 +1,125 @@
+/* HistoryItem Component Styles */
+
+.historyItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 2px solid transparent;
+  gap: var(--space-md);
+}
+
+.historyItem:hover,
+.historyItem:active {
+  border-color: var(--color-primary);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1;
+}
+
+.date {
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-light);
+  line-height: var(--line-height-normal);
+}
+
+.scoreRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2xs);
+}
+
+.score {
+  font-family: var(--font-body);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+.scoreMax {
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.badge {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: white;
+  white-space: nowrap;
+}
+
+/* Status Badge Colors - Using Semantic Colors */
+.healthy {
+  background-color: var(--color-green);
+}
+
+.average {
+  background-color: var(--color-yellow);
+}
+
+.notHealthy {
+  background-color: var(--color-orange);
+}
+
+.dangerous {
+  background-color: var(--color-red);
+}
+
+.unknown {
+  background-color: var(--color-text-muted);
+}
+
+.arrow {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  transition: color var(--transition-fast);
+}
+
+.historyItem:hover .arrow {
+  color: var(--color-primary);
+}
+
+/* Responsive */
+@media (width <= 768px) {
+  .historyItem {
+    padding: var(--space-md);
+  }
+
+  .date {
+    font-size: var(--font-size-sm);
+  }
+
+  .score {
+    font-size: var(--font-size-xl);
+  }
+
+  .badge {
+    font-size: var(--font-size-sm);
+    padding: var(--space-2xs) var(--space-sm);
+  }
+
+  .actions {
+    gap: var(--space-sm);
+  }
+}

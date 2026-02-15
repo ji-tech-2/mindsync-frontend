@@ -65,15 +65,15 @@
 
 .buttonContainer {
   display: flex;
+  width: 100%;
   gap: var(--space-md);
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   flex-shrink: 0;
 }
 
 .backButtonWrapper {
-  /* Reserve space for back button so next button stays on right */
-  flex: 0 0 auto;
+  width: 100%;
 }
 
 /* Responsive adjustments */
@@ -117,6 +117,16 @@
   }
 
   .buttonContainer {
-    gap: var(--space-sm);
+    gap: var(--space-xs);
+  }
+
+  .backButtonWrapper {
+    width: 110px;
+    min-width: 110px;
+  }
+
+  .nextButton {
+    width: 110px;
+    min-width: 110px;
   }
 }

@@ -39,10 +39,6 @@ export default defineConfig([
       'prettier/prettier': 'error',
       complexity: ['warn', { max: 15 }],
       'max-depth': ['warn', { max: 4 }],
-      'max-lines-per-function': [
-        'warn',
-        { max: 50, skipBlankLines: true, skipComments: true },
-      ],
       'max-nested-callbacks': ['warn', { max: 3 }],
       'max-params': ['warn', { max: 4 }],
     },

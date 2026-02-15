@@ -445,6 +445,8 @@ export default function Screening() {
                   onClick={handleBack}
                   icon={<FontAwesomeIcon icon={faChevronLeft} />}
                   aria-label="Back"
+                  className={styles.backButton}
+                  fullWidth
                 >
                   Back
                 </Button>
@@ -458,6 +460,7 @@ export default function Screening() {
               icon={<FontAwesomeIcon icon={faChevronRight} />}
               iconPosition="right"
               className={styles.nextButton}
+              fullWidth
             >
               {isLoading ? 'Submitting...' : isLastQuestion ? 'Finish' : 'Next'}
             </Button>

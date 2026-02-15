@@ -12,6 +12,19 @@
   min-height: 280px;
 }
 
+.minimal {
+  min-height: unset;
+  gap: 0;
+  height: 100%;
+  padding: 0;
+}
+
+.minimal .chart-wrapper {
+  min-height: unset;
+  height: 100%;
+  flex: 1;
+}
+
 /* Header */
 .chart-header {
   display: flex;
