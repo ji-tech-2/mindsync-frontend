@@ -10,6 +10,8 @@ import {
   ReferenceLine,
 } from 'recharts';
 import styles from './WeeklyChart.module.css';
+import Card from '../Card';
+import Button from '../Button';
 
 // Category thresholds from Flask model (model.py categorize_mental_health_score)
 const THRESHOLDS = { DANGEROUS: 12, NOT_HEALTHY: 28.6, AVERAGE: 61.4 };
@@ -85,170 +87,108 @@ const CustomTooltip = ({ active, payload }) => {
  */
 export default function WeeklyChart({
   data = [],
-  title = 'Weekly Activity',
+  title = 'Weekly Chart',
   dataKey = 'value',
   navigate = null,
   compact = false,
 }) {
-  // If no data available, show message
-  if (!data || data.length === 0) {
-    return (
-      <div className={styles['weekly-chart-container']}>
-        <div className={styles['chart-header']}>
-          <h3>{title}</h3>
-          {navigate && (
-            <button
-              className={styles['history-button']}
-              onClick={() => navigate('/history')}
-            >
-              📜 History
-            </button>
-          )}
-        </div>
-        <div className={styles['no-data']}>
-          <div className={styles['no-data-icon']}>📊</div>
-          <p>No data to display yet</p>
-          <span className={styles['no-data-hint']}>
-            Data will appear after completing a screening
-          </span>
-        </div>
-      </div>
-    );
-  }
+  const hasData = data && data.length > 0;
 
   return (
-    <div
-      className={`${styles['weekly-chart-container']} ${compact ? styles['compact'] : ''}`}
-    >
-      <div className={styles['chart-header']}>
-        <h3>{title}</h3>
-        {navigate && (
-          <button
-            className={styles['history-button']}
-            onClick={() => navigate('/history')}
-          >
-            📜 History
-          </button>
+    <Card>
+      <div
+        className={`${styles['weekly-chart-container']} ${compact ? styles['compact'] : ''}`}
+      >
+        <div className={styles['chart-header']}>
+          <h2>{title}</h2>
+          {navigate && (
+            <Button iconOnly icon="↗" onClick={() => navigate('/history')} />
+          )}
+        </div>
+
+        {!hasData ? (
+          <div className={styles['no-data']}>
+            <div className={styles['no-data-icon']}>📊</div>
+            <p>No data to display yet</p>
+            <span className={styles['no-data-hint']}>
+              Data will appear after completing a screening
+            </span>
+          </div>
+        ) : (
+          <div className={styles['chart-wrapper']}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={data.map((entry) =>
+                  entry.hasData === false ? { ...entry, [dataKey]: 5 } : entry
+                )}
+                margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#e0e0e0"
+                  strokeOpacity={0.5}
+                />
+                <XAxis
+                  dataKey="day"
+                  tick={{ fill: '#666', fontSize: 12, fontWeight: 500 }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#e0e0e0' }}
+                  interval={0}
+                />
+                <YAxis
+                  domain={[0, 100]}
+                  tick={{ fill: '#666', fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#e0e0e0' }}
+                  width={35}
+                />
+                <Tooltip
+                  content={<CustomTooltip />}
+                  cursor={{ fill: 'rgba(0, 0, 0, 0.05)', radius: 8 }}
+                />
+                <ReferenceLine
+                  y={THRESHOLDS.DANGEROUS}
+                  stroke={COLORS.DANGEROUS}
+                  strokeDasharray="4 4"
+                  strokeOpacity={0.6}
+                />
+                <ReferenceLine
+                  y={THRESHOLDS.NOT_HEALTHY}
+                  stroke={COLORS.NOT_HEALTHY}
+                  strokeDasharray="4 4"
+                  strokeOpacity={0.6}
+                />
+                <ReferenceLine
+                  y={THRESHOLDS.AVERAGE}
+                  stroke={COLORS.HEALTHY}
+                  strokeDasharray="4 4"
+                  strokeOpacity={0.6}
+                />
+                <Bar
+                  dataKey={dataKey}
+                  radius={[8, 8, 0, 0]}
+                  maxBarSize={50}
+                  isAnimationActive={true}
+                  animationDuration={800}
+                >
+                  {Array.isArray(data) &&
+                    data.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={
+                          entry.hasData === false
+                            ? NO_DATA_COLOR
+                            : getBarColor(entry[dataKey])
+                        }
+                        fillOpacity={entry.hasData === false ? 0.5 : 1}
+                      />
+                    ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         )}
       </div>
-
-      {/* Legend */}
-      <div className={styles['chart-legend']}>
-        <div className={styles['legend-item']}>
-          <span
-            className={styles['legend-color']}
-            style={{ background: COLORS.HEALTHY }}
-          ></span>
-          <span>Healthy (&gt;61.4)</span>
-        </div>
-        <div className={styles['legend-item']}>
-          <span
-            className={styles['legend-color']}
-            style={{ background: COLORS.AVERAGE }}
-          ></span>
-          <span>Average (28.6-61.4)</span>
-        </div>
-        <div className={styles['legend-item']}>
-          <span
-            className={styles['legend-color']}
-            style={{ background: COLORS.NOT_HEALTHY }}
-          ></span>
-          <span>Not Healthy (12-28.6)</span>
-        </div>
-        <div className={styles['legend-item']}>
-          <span
-            className={styles['legend-color']}
-            style={{ background: COLORS.DANGEROUS }}
-          ></span>
-          <span>Dangerous (≤12)</span>
-        </div>
-        <div className={styles['legend-item']}>
-          <span
-            className={styles['legend-color']}
-            style={{ background: '#D0D0D0' }}
-          ></span>
-          <span>No data</span>
-        </div>
-      </div>
-
-      <div style={{ flex: 1, minHeight: compact ? 160 : 200 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={data.map((entry) =>
-              entry.hasData === false ? { ...entry, [dataKey]: 5 } : entry
-            )}
-            margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
-          >
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="#e0e0e0"
-              strokeOpacity={0.5}
-            />
-            <XAxis
-              dataKey="day"
-              tick={{ fill: '#666', fontSize: 12, fontWeight: 500 }}
-              tickLine={false}
-              axisLine={{ stroke: '#e0e0e0' }}
-              interval={0}
-            />
-            <YAxis
-              domain={[0, 100]}
-              tick={{ fill: '#666', fontSize: 11 }}
-              tickLine={false}
-              axisLine={{ stroke: '#e0e0e0' }}
-              width={35}
-            />
-            <Tooltip
-              content={<CustomTooltip />}
-              cursor={{ fill: 'rgba(0, 0, 0, 0.05)', radius: 8 }}
-            />
-            <ReferenceLine
-              y={THRESHOLDS.DANGEROUS}
-              stroke={COLORS.DANGEROUS}
-              strokeDasharray="4 4"
-              strokeOpacity={0.6}
-            />
-            <ReferenceLine
-              y={THRESHOLDS.NOT_HEALTHY}
-              stroke={COLORS.NOT_HEALTHY}
-              strokeDasharray="4 4"
-              strokeOpacity={0.6}
-            />
-            <ReferenceLine
-              y={THRESHOLDS.AVERAGE}
-              stroke={COLORS.HEALTHY}
-              strokeDasharray="4 4"
-              strokeOpacity={0.6}
-            />
-            <Bar
-              dataKey={dataKey}
-              radius={[8, 8, 0, 0]}
-              maxBarSize={50}
-              isAnimationActive={true}
-              animationDuration={800}
-            >
-              {Array.isArray(data) &&
-                data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={
-                      entry.hasData === false
-                        ? NO_DATA_COLOR
-                        : getBarColor(entry[dataKey])
-                    }
-                    fillOpacity={entry.hasData === false ? 0.5 : 1}
-                  />
-                ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      <div className={styles['chart-footer']}>
-        <div className={styles['chart-info']}>
-          <span className={styles['info-icon']}>ℹ️</span>
-          <span className={styles['info-text']}>Last 7 days data</span>
-        </div>
-      </div>
-    </div>
+    </Card>
   );
 }
