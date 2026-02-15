@@ -1,0 +1,186 @@
+/* Dashboard Layout - Using CSS Modules and Design System Variables */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg) var(--space-3xl);
+}
+
+/* ======================================= */
+
+/* Header Section */
+
+/* ======================================= */
+
+.header {
+  padding: var(--space-3xl) var(--space-lg);
+  background:
+    linear-gradient(to bottom, rgb(92 86 67 / 30%), rgb(92 86 67 / 30%)),
+    url('@/assets/background.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position-y: 140%;
+  margin-bottom: var(--space-3xl);
+  position: relative;
+  left: 50%;
+  right: 50%;
+  width: 100vw;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  box-shadow: var(--shadow-lg);
+}
+
+.headerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.greeting {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-dark);
+  margin: 0;
+  text-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  color: var(--color-text-dark);
+  margin: 0;
+  font-weight: var(--font-weight-regular);
+  opacity: 0.95;
+}
+
+/* ======================================= */
+
+/* Main Content Grid */
+
+/* ======================================= */
+
+.content {
+  display: grid;
+}
+
+.upperSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* ======================================= */
+
+/* Section Title */
+
+/* ======================================= */
+
+.sectionTitle {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-light);
+  margin: var(--space-3xl) 0 var(--space-lg);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+/* ======================================= */
+
+/* Critical Factors Grid */
+
+/* ======================================= */
+
+.criticalFactorsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-xl);
+}
+
+/* ======================================= */
+
+/* Responsive Design */
+
+/* ======================================= */
+
+/* Tablet and below */
+@media (width <= 1024px) {
+  .upperSection {
+    grid-template-columns: 1fr;
+  }
+
+  .greeting {
+    font-size: var(--font-size-3xl);
+  }
+
+  .subtitle {
+    font-size: var(--font-size-lg);
+  }
+
+  .criticalFactorsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+/* Mobile */
+@media (width <= 768px) {
+  .container {
+    padding: 0 var(--space-md) var(--space-2xl);
+  }
+
+  .header {
+    padding: var(--space-2xl) var(--space-md);
+    margin-bottom: var(--space-2xl);
+  }
+
+  .greeting {
+    font-size: var(--font-size-2xl);
+  }
+
+  .subtitle {
+    font-size: var(--font-size-md);
+  }
+
+  .content {
+    gap: var(--space-lg);
+  }
+
+  .leftColumn {
+    gap: var(--space-lg);
+  }
+
+  .upperSection {
+    gap: var(--space-lg);
+  }
+
+  .sectionTitle {
+    font-size: var(--font-size-2xl);
+    margin: var(--space-lg) 0 var(--space-md);
+  }
+
+  .criticalFactorsGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+}
+
+/* Small mobile */
+@media (width <= 480px) {
+  .greeting {
+    font-size: var(--font-size-xl);
+  }
+
+  .subtitle {
+    font-size: var(--font-size-sm);
+  }
+}

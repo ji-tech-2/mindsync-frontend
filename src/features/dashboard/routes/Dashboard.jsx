@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../assets/dashboard.css';
-import { WeeklyChart } from '@/components';
+import styles from './Dashboard.module.css';
+import { WeeklyChart, Card, Button } from '@/components';
 import {
-  fetchScreeningHistory,
-  buildWeeklyChartFromHistory,
-  API_CONFIG,
-  API_URLS,
-} from '@/config/api';
+  getScreeningHistory,
+  getWeeklyCriticalFactors,
+  getDailySuggestion,
+  getStreak,
+} from '@/services';
+import { buildWeeklyChartFromHistory } from '@/utils/chartHelpers';
 import { useAuth } from '@/features/auth';
 import CriticalFactorCard from '../components/CriticalFactorCard';
 import DashboardSuggestion from '../components/DashboardSuggestion';
-import StreakCard from '@/features/screening/components/StreakCard';
+import StreakCard from '../components/StreakCard';
 
 // Mapping untuk nama faktor yang lebih bersahabat
 const FACTOR_MAP = {
@@ -66,8 +67,8 @@ export default function Dashboard() {
       const currentUserId = user?.userId || user?.id || user?.user_id;
       if (!currentUserId) return;
       try {
-        const response = await fetchScreeningHistory(currentUserId, 50, 0);
-        if (response.success && response.data) {
+        const response = await getScreeningHistory(currentUserId);
+        if (response.status === 'success' && response.data) {
           setWeeklyData(buildWeeklyChartFromHistory(response.data));
         }
       } catch (err) {
@@ -91,9 +92,7 @@ export default function Dashboard() {
   // Fetch critical factors dari API
   useEffect(() => {
     if (userId) {
-      const url = API_URLS.weeklyCriticalFactors(userId, 7);
-      fetch(url)
-        .then((res) => res.json())
+      getWeeklyCriticalFactors(userId)
         .then((data) => {
           if (data.status === 'success') {
             const factorsWithDesc = data.top_critical_factors.map((factor) => {
@@ -130,9 +129,7 @@ export default function Dashboard() {
   // Fetch daily suggestion dari API
   useEffect(() => {
     if (userId) {
-      const url = API_URLS.dailySuggestion(userId);
-      fetch(url)
-        .then((res) => res.json())
+      getDailySuggestion(userId)
         .then((data) => {
           console.log('💡 Daily suggestion response:', data);
 
@@ -151,9 +148,7 @@ export default function Dashboard() {
   // fetch streak data dari API
   useEffect(() => {
     if (userId) {
-      const url = API_URLS.streak(userId);
-      fetch(url)
-        .then((res) => res.json())
+      getStreak(userId)
         .then((data) => {
           console.log('🔥 Streak response data:', data);
           if (data.status === 'success') {
@@ -172,52 +167,48 @@ export default function Dashboard() {
   }, [userId]);
 
   return (
-    <div className="dashboard-container">
-      <header className="dashboard-header-full">
-        <div className="header-content">
-          <h1 className="dashboard-greeting">Hello, {userName}!</h1>
-          <p className="dashboard-subtitle">How are you feeling today?</p>
-          <button
-            className="cta-screening-btn"
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <div className={styles.headerContent}>
+          <h1 className={styles.greeting}>Hello, {userName}!</h1>
+          <p className={styles.subtitle}>How are you feeling today?</p>
+          <Button
+            variant="filled"
+            size="lg"
             onClick={() => navigate('/screening')}
           >
             Take Screening Now
-          </button>
+          </Button>
         </div>
       </header>
 
-      <div className="dashboard-content">
-        <div className="cards-upper-section">
-          <div className="cards-left-column">
-            <div className="card card-small streak-card">
-              <StreakCard
-                data={streakData}
-                loading={loadingStreak}
-                error={errorStreak}
-              />
-            </div>
+      <div className={styles.content}>
+        <div className={styles.upperSection}>
+          <div className={styles.leftColumn}>
+            <StreakCard
+              data={streakData}
+              loading={loadingStreak}
+              error={errorStreak}
+            />
 
-            {/* Card 2 - Daily Suggestion */}
-            <div className="card card-small daily-suggestion-card">
-              <h3 className="daily-suggestion-title">Daily Suggestion</h3>
+            <Card>
               <DashboardSuggestion
                 data={dailySuggestion}
                 loading={loadingSuggestion}
               />
-            </div>
+            </Card>
           </div>
-          <div className="card card-large card-chart">
-            <WeeklyChart
-              data={weeklyData}
-              title="Last 7 Days Trend"
-              navigate={navigate}
-              compact
-            />
-          </div>
+
+          <WeeklyChart
+            data={weeklyData}
+            title="Weekly Chart"
+            navigate={navigate}
+            compact
+          />
         </div>
 
-        <h2 className="section-title">Critical Factors</h2>
-        <div className="cards-lower-section">
+        <h2 className={styles.sectionTitle}>Critical Factors</h2>
+        <div className={styles.criticalFactorsGrid}>
           {[0, 1, 2].map((index) => (
             <CriticalFactorCard
               key={index}

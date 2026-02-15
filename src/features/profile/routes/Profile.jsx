@@ -4,7 +4,13 @@ import '../assets/profile.css';
 import { ProfileAvatar } from '@/components';
 import ProfileFieldRow from '../components/ProfileFieldRow';
 import { EditModal, FormInput, FormSelect, OTPInput } from '@/components';
-import apiClient, { TokenManager } from '@/config/api';
+import {
+  getProfile as getProfileService,
+  updateProfile as updateProfileService,
+  requestOTP as requestOTPService,
+  changePassword as changePasswordService,
+} from '@/services';
+import { TokenManager } from '@/utils/tokenManager';
 import { useAuth } from '@/features/auth';
 import { getPasswordError } from '@/utils/passwordValidation';
 import {
@@ -46,10 +52,10 @@ export default function Profile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await apiClient.get('/v0-1/auth-profile');
-        if (response.data.success) {
+        const data = await getProfileService();
+        if (data.success) {
           // Transform API values to display values
-          const apiData = response.data.data;
+          const apiData = data.data;
           setUser({
             ...apiData,
             gender: fromApiGender(apiData.gender),
@@ -110,17 +116,14 @@ export default function Profile() {
         }
 
         // Change password with OTP
-        const response = await apiClient.post(
-          '/v0-1/auth-profile/change-password',
-          {
-            email: user.email,
-            otp: formData.otp,
-            newPassword: formData.value,
-          }
+        const data = await changePasswordService(
+          user.email,
+          formData.otp,
+          formData.value
         );
 
-        if (response.data.success) {
-          setMessage({ type: 'success', text: response.data.message });
+        if (data.success) {
+          setMessage({ type: 'success', text: data.message });
           setTimeout(() => {
             closeModal();
           }, 1500);
@@ -139,11 +142,11 @@ export default function Profile() {
           updateData.workRmt = toApiWorkMode(formData.value);
         }
 
-        const response = await apiClient.put('/v0-1/auth-profile', updateData);
+        const response = await updateProfileService(updateData);
 
-        if (response.data.success) {
+        if (response.success) {
           // Transform API response to display values
-          const apiData = response.data.data;
+          const apiData = response.data;
           const updatedUser = {
             ...apiData,
             gender: fromApiGender(apiData.gender),
@@ -156,7 +159,7 @@ export default function Profile() {
           TokenManager.setUserData(apiData);
           updateUser(apiData);
 
-          setMessage({ type: 'success', text: response.data.message });
+          setMessage({ type: 'success', text: response.message });
           setTimeout(() => {
             closeModal();
           }, 1500);
@@ -178,12 +181,10 @@ export default function Profile() {
     setMessage({ type: '', text: '' });
 
     try {
-      const response = await apiClient.post('/v0-1/auth-profile/request-otp', {
-        email: user.email,
-      });
+      const data = await requestOTPService(user.email);
 
-      if (response.data.success) {
-        setMessage({ type: 'info', text: response.data.message });
+      if (data.success) {
+        setMessage({ type: 'info', text: data.message });
       }
     } catch (error) {
       console.error('Error sending OTP:', error);

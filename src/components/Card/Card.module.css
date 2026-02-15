@@ -9,6 +9,10 @@
   padding: var(--space-xl);
 }
 
+.clipOverflow {
+  overflow: hidden;
+}
+
 /* Background Color Variants */
 .variantSurface {
   background-color: var(--color-bg-surface);

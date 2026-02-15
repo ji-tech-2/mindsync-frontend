@@ -11,7 +11,7 @@ import {
   logout,
   requireAuth,
 } from './authHelper';
-import { TokenManager } from '@/config/api';
+import { TokenManager } from '@/utils/tokenManager';
 
 // Mock TokenManager
 vi.mock('@/config/api', () => ({

@@ -128,12 +128,7 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  background: linear-gradient(
-    135deg,
-    var(--color-bg-dark) 0%,
-    var(--color-bg-surface) 50%,
-    #d4c4a8 100%
-  );
+  background: var(--color-bg-light);
 }
 
 /* ======================================= */

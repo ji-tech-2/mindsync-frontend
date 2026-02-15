@@ -8,7 +8,12 @@
   padding: var(--space-2xl) var(--space-md);
   position: relative;
   overflow-x: hidden;
-  background: var(--color-bg-surface);
+  background:
+    linear-gradient(to bottom, rgb(92 86 67 / 40%), rgb(66 62 54 / 60%)),
+    url('@/assets/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 .card {

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
 import '../assets/screening.css';
-import { API_CONFIG, API_URLS } from '@/config/api';
+import { submitScreening as submitScreeningService } from '@/services';
 import {
   toApiGender,
   toApiOccupation,
@@ -38,61 +38,6 @@ function transformToJSON(screeningData, userId = null) {
 
   return payload;
 }
-
-async function sendToFlask(data, flaskURL = 'http://localhost:5000/predict') {
-  try {
-    console.log(flaskURL);
-    const response = await fetch(flaskURL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return { success: true, data: result };
-  } catch (error) {
-    console.error('Error sending to Flask:', error);
-    return { success: false, error: error.message };
-  }
-}
-
-// ============= FUNGSI SESSION STORAGE =============
-
-// Simpan data ke session
-
-// function saveToSession(key, data) {
-//   try {
-//     const sessionData = {
-//       ...data,
-//       timestamp: new Date().toISOString(),
-//       session_id: generateSessionId()
-//     };
-
-//     // Simpan sebagai JSON string
-//     const dataString = JSON.stringify(sessionData);
-
-//     // Gunakan in-memory storage (bukan sessionStorage karena tidak didukung)
-//     window._appSession = window._appSession || {};
-//     window._appSession[key] = dataString;
-
-//     console.log("✅ Data saved to session:", key);
-//     return true;
-//   } catch (error) {
-//     console.error("❌ Error saving to session:", error);
-//     return false;
-//   }
-// }
-
-// // Generate unique session ID
-// function generateSessionId() {
-//   return 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-// }
 
 // ============= COMPONENT =============
 
@@ -332,10 +277,10 @@ export default function Screening() {
       console.log('📤 Data yang dikirim ke Flask:', transformedData);
       console.log('👤 User ID:', userId || '[Guest - No user_id]');
 
-      const result = await sendToFlask(transformedData, API_URLS.predict);
+      const result = await submitScreeningService(transformedData);
 
       if (result.success) {
-        navigate(`/result/${result.data.prediction_id}`);
+        navigate(`/result/${result.prediction_id}`);
       } else {
         setErrorMsg('Failed to send data to server: ' + result.error);
         setIsLoading(false);

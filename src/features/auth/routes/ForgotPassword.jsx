@@ -1,6 +1,9 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '@/config/api';
+import {
+  requestOTP as requestOTPService,
+  changePassword as changePasswordService,
+} from '@/services';
 import { getPasswordError } from '@/utils/passwordValidation';
 import { TextField, Button, Message, Link } from '@/components';
 import PasswordField from '../components/PasswordField';
@@ -168,12 +171,10 @@ export default function ForgotPassword() {
     setErrors({});
 
     try {
-      const response = await apiClient.post('/v0-1/auth-profile/request-otp', {
-        email: form.email,
-      });
+      const data = await requestOTPService(form.email);
 
-      if (response.data.success) {
-        setMessage(response.data.message || 'OTP sent successfully!');
+      if (data.success) {
+        setMessage(data.message || 'OTP sent successfully!');
         setIsError(false);
         // Proceed to next stage only if not resending
         if (!isResend) {
@@ -214,21 +215,18 @@ export default function ForgotPassword() {
     setIsError(false);
 
     try {
-      const response = await apiClient.post(
-        '/v0-1/auth-profile/change-password',
-        {
-          email: form.email,
-          otp: form.otp,
-          newPassword: form.newPassword,
-        }
+      const data = await changePasswordService(
+        form.email,
+        form.otp,
+        form.newPassword
       );
 
-      if (response.data.success) {
+      if (data.success) {
         setMessage('Password reset successfully! Redirecting to login...');
         setIsError(false);
         navigate('/signin');
       } else {
-        setMessage(response.data.message || 'Failed to reset password');
+        setMessage(data.message || 'Failed to reset password');
         setIsError(true);
       }
     } catch (error) {

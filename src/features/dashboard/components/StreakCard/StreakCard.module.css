@@ -1,0 +1,179 @@
+/* StreakCard Styles - Using Design System Variables */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-lg);
+}
+
+.streakInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.icon {
+  font-size: 2.5rem;
+}
+
+.number {
+  font-family: var(--font-body);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-light);
+  line-height: var(--line-height-tight);
+  margin: 0;
+}
+
+.unit {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-light);
+}
+
+.label {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-md);
+}
+
+/* Days Row */
+.daysRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-xl);
+  gap: var(--space-xs);
+}
+
+.dayItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: 1;
+}
+
+.dayCircle {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-text-muted);
+  color: var(--color-text-dark);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  transition: background-color var(--transition-base);
+  opacity: 0.4;
+}
+
+.completed {
+  background-color: var(--color-primary);
+  opacity: 1;
+}
+
+.dayName {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+/* Loading, Error, Empty States */
+.loading,
+.error,
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 12.5rem;
+}
+
+.loadingContent,
+.errorContent,
+.emptyContent {
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.loadingContent .icon,
+.errorContent .icon,
+.emptyContent .icon {
+  display: block;
+  font-size: 3rem;
+  margin-bottom: var(--space-sm);
+}
+
+.loadingContent p,
+.errorContent p {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  margin: var(--space-xs) 0;
+  color: var(--color-text-light);
+}
+
+.errorContent small {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2xs);
+}
+
+.emptyContent {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.emptyContent .icon {
+  font-size: 2.5rem;
+  margin-bottom: 0;
+}
+
+.emptyContent .label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Responsive Design */
+@media (width <= 768px) {
+  .header {
+    flex-direction: column;
+    gap: var(--space-md);
+    align-items: stretch;
+  }
+
+  .dayCircle {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.75rem;
+  }
+
+  .dayName {
+    font-size: 0.625rem;
+  }
+}
+
+@media (width <= 480px) {
+  .icon {
+    font-size: 2rem;
+  }
+
+  .number {
+    font-size: var(--font-size-2xl);
+  }
+
+  .daysRow {
+    gap: var(--space-2xs);
+  }
+
+  .dayCircle {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .dayName {
+    font-size: 0.5rem;
+  }
+}

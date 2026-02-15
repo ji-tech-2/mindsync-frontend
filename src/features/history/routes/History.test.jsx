@@ -2,11 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import History from './History';
-import * as apiModule from '@/config/api';
+import * as servicesModule from '@/services';
+import * as chartHelpersModule from '@/utils/chartHelpers';
 import * as authModule from '@/features/auth';
 
-// Mock the API functions
-vi.mock('@/config/api');
+// Mock the modules
+vi.mock('@/services');
+vi.mock('@/utils/chartHelpers');
 vi.mock('@/features/auth');
 
 // Mock useNavigate
@@ -49,11 +51,14 @@ describe('History Component', () => {
 
     it('should load history when user is logged in', async () => {
       vi.spyOn(authModule, 'useAuth').mockReturnValue({ user: { userId: 1 } });
-      vi.spyOn(apiModule, 'fetchScreeningHistory').mockResolvedValue({
-        success: true,
+      vi.spyOn(servicesModule, 'getScreeningHistory').mockResolvedValue({
+        status: 'success',
         data: [],
       });
-      vi.spyOn(apiModule, 'buildWeeklyChartFromHistory').mockReturnValue([]);
+      vi.spyOn(
+        chartHelpersModule,
+        'buildWeeklyChartFromHistory'
+      ).mockReturnValue([]);
 
       render(
         <MemoryRouter>
@@ -70,11 +75,14 @@ describe('History Component', () => {
   describe('Empty State', () => {
     it('should display empty state when no history', async () => {
       vi.spyOn(authModule, 'useAuth').mockReturnValue({ user: { userId: 1 } });
-      vi.spyOn(apiModule, 'fetchScreeningHistory').mockResolvedValue({
-        success: true,
+      vi.spyOn(servicesModule, 'getScreeningHistory').mockResolvedValue({
+        status: 'success',
         data: [],
       });
-      vi.spyOn(apiModule, 'buildWeeklyChartFromHistory').mockReturnValue([]);
+      vi.spyOn(
+        chartHelpersModule,
+        'buildWeeklyChartFromHistory'
+      ).mockReturnValue([]);
 
       render(
         <MemoryRouter>
@@ -111,11 +119,14 @@ describe('History Component', () => {
         },
       ];
 
-      vi.spyOn(apiModule, 'fetchScreeningHistory').mockResolvedValue({
-        success: true,
+      vi.spyOn(servicesModule, 'getScreeningHistory').mockResolvedValue({
+        status: 'success',
         data: mockData,
       });
-      vi.spyOn(apiModule, 'buildWeeklyChartFromHistory').mockReturnValue([
+      vi.spyOn(
+        chartHelpersModule,
+        'buildWeeklyChartFromHistory'
+      ).mockReturnValue([
         { date: '2024-01-15', value: 75 },
         { date: '2024-01-14', value: 60 },
       ]);
@@ -145,11 +156,14 @@ describe('History Component', () => {
         },
       ];
 
-      vi.spyOn(apiModule, 'fetchScreeningHistory').mockResolvedValue({
-        success: true,
+      vi.spyOn(servicesModule, 'getScreeningHistory').mockResolvedValue({
+        status: 'success',
         data: mockData,
       });
-      vi.spyOn(apiModule, 'buildWeeklyChartFromHistory').mockReturnValue([]);
+      vi.spyOn(
+        chartHelpersModule,
+        'buildWeeklyChartFromHistory'
+      ).mockReturnValue([]);
 
       const { container } = render(
         <MemoryRouter>
@@ -166,11 +180,14 @@ describe('History Component', () => {
   describe('Navigation', () => {
     it('should navigate to dashboard', async () => {
       vi.spyOn(authModule, 'useAuth').mockReturnValue({ user: { userId: 1 } });
-      vi.spyOn(apiModule, 'fetchScreeningHistory').mockResolvedValue({
-        success: true,
+      vi.spyOn(servicesModule, 'getScreeningHistory').mockResolvedValue({
+        status: 'success',
         data: [],
       });
-      vi.spyOn(apiModule, 'buildWeeklyChartFromHistory').mockReturnValue([]);
+      vi.spyOn(
+        chartHelpersModule,
+        'buildWeeklyChartFromHistory'
+      ).mockReturnValue([]);
 
       render(
         <MemoryRouter>
@@ -190,7 +207,7 @@ describe('History Component', () => {
   describe('Error Handling', () => {
     it('should handle API failure gracefully', async () => {
       vi.spyOn(authModule, 'useAuth').mockReturnValue({ user: { userId: 1 } });
-      vi.spyOn(apiModule, 'fetchScreeningHistory').mockRejectedValue(
+      vi.spyOn(servicesModule, 'getScreeningHistory').mockRejectedValue(
         new Error('Network error')
       );
 
@@ -207,11 +224,14 @@ describe('History Component', () => {
 
     it('should handle response without success flag', async () => {
       vi.spyOn(authModule, 'useAuth').mockReturnValue({ user: { userId: 1 } });
-      vi.spyOn(apiModule, 'fetchScreeningHistory').mockResolvedValue({
+      vi.spyOn(servicesModule, 'getScreeningHistory').mockResolvedValue({
         success: false,
         error: 'Failed to fetch',
       });
-      vi.spyOn(apiModule, 'buildWeeklyChartFromHistory').mockReturnValue([]);
+      vi.spyOn(
+        chartHelpersModule,
+        'buildWeeklyChartFromHistory'
+      ).mockReturnValue([]);
 
       render(
         <MemoryRouter>
@@ -226,8 +246,8 @@ describe('History Component', () => {
 
     it('should handle missing user ID', async () => {
       vi.spyOn(authModule, 'useAuth').mockReturnValue({ user: {} });
-      vi.spyOn(apiModule, 'fetchScreeningHistory').mockResolvedValue({
-        success: true,
+      vi.spyOn(servicesModule, 'getScreeningHistory').mockResolvedValue({
+        status: 'success',
         data: [],
       });
 
@@ -249,12 +269,15 @@ describe('History Component', () => {
         user: { userId: 123 },
       });
       const fetchSpy = vi
-        .spyOn(apiModule, 'fetchScreeningHistory')
+        .spyOn(servicesModule, 'getScreeningHistory')
         .mockResolvedValue({
-          success: true,
+          status: 'success',
           data: [],
         });
-      vi.spyOn(apiModule, 'buildWeeklyChartFromHistory').mockReturnValue([]);
+      vi.spyOn(
+        chartHelpersModule,
+        'buildWeeklyChartFromHistory'
+      ).mockReturnValue([]);
 
       render(
         <MemoryRouter>
@@ -270,12 +293,15 @@ describe('History Component', () => {
     it('should use id field when userId not available', async () => {
       vi.spyOn(authModule, 'useAuth').mockReturnValue({ user: { id: 456 } });
       const fetchSpy = vi
-        .spyOn(apiModule, 'fetchScreeningHistory')
+        .spyOn(servicesModule, 'getScreeningHistory')
         .mockResolvedValue({
-          success: true,
+          status: 'success',
           data: [],
         });
-      vi.spyOn(apiModule, 'buildWeeklyChartFromHistory').mockReturnValue([]);
+      vi.spyOn(
+        chartHelpersModule,
+        'buildWeeklyChartFromHistory'
+      ).mockReturnValue([]);
 
       render(
         <MemoryRouter>
@@ -293,12 +319,15 @@ describe('History Component', () => {
         user: { user_id: 789 },
       });
       const fetchSpy = vi
-        .spyOn(apiModule, 'fetchScreeningHistory')
+        .spyOn(servicesModule, 'getScreeningHistory')
         .mockResolvedValue({
-          success: true,
+          status: 'success',
           data: [],
         });
-      vi.spyOn(apiModule, 'buildWeeklyChartFromHistory').mockReturnValue([]);
+      vi.spyOn(
+        chartHelpersModule,
+        'buildWeeklyChartFromHistory'
+      ).mockReturnValue([]);
 
       render(
         <MemoryRouter>
@@ -327,11 +356,14 @@ describe('History Component', () => {
         },
       ];
 
-      vi.spyOn(apiModule, 'fetchScreeningHistory').mockResolvedValue({
-        success: true,
+      vi.spyOn(servicesModule, 'getScreeningHistory').mockResolvedValue({
+        status: 'success',
         data: mockData,
       });
-      vi.spyOn(apiModule, 'buildWeeklyChartFromHistory').mockReturnValue([]);
+      vi.spyOn(
+        chartHelpersModule,
+        'buildWeeklyChartFromHistory'
+      ).mockReturnValue([]);
 
       const { container } = render(
         <MemoryRouter>

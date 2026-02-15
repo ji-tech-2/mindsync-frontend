@@ -1,79 +1,91 @@
-.suggestionContainer {
-  border-radius: 12px;
-  padding: 10px 20px;
+/* DashboardSuggestion Styles - Using Design System Variables */
+
+.container {
   display: flex;
   flex-direction: column;
-  height: 305px;
-  overflow-y: auto;
-  scrollbar-width: thin;
+  gap: var(--space-lg);
+}
+
+.title {
+  font-family: var(--font-body);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-light);
+  margin: 0;
+  line-height: var(--line-height-tight);
 }
 
 .suggestionList {
   list-style: none;
   padding: 0;
   margin: 0;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
 
 .suggestionItem {
-  position: relative;
-  padding-left: 28px;
-  margin-bottom: 14px;
-  font-size: 0.95rem;
-  color: #4a4a4a;
-  line-height: 1.5;
-  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  font-size: var(--font-size-md);
+  color: var(--color-text-light);
+  line-height: var(--line-height-normal);
 }
 
-.suggestionItem::before {
-  content: '✨';
-  position: absolute;
-  left: 0;
-  top: 0;
-  font-size: 1rem;
+.icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .text {
-  margin: auto;
-  font-size: 1.02rem;
-  color: #4a4a4a;
-  line-height: 1.6;
-  font-weight: 500;
+  flex: 1;
+  font-weight: var(--font-weight-regular);
+}
+
+/* Loading and Empty States */
+.loadingState,
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 8rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-md);
   text-align: center;
 }
 
+/* Responsive Design */
 @media (width <= 768px) {
-  .suggestionContainer {
-    padding: 10px 15px;
-    height: auto;
-    max-height: 350px;
+  .title {
+    font-size: var(--font-size-xl);
   }
 
-  .text {
-    font-size: 0.95rem;
+  .suggestionItem {
+    font-size: var(--font-size-sm);
+    gap: var(--space-sm);
+  }
+
+  .icon {
+    font-size: 1.25rem;
   }
 }
 
 @media (width <= 480px) {
-  .suggestionContainer {
-    padding: 10px 12px;
-    height: auto;
-    max-height: 300px;
-    border-radius: 10px;
+  .container {
+    gap: var(--space-md);
   }
 
-  .suggestionItem {
-    font-size: 0.85rem;
-    padding-left: 24px;
-    margin-bottom: 10px;
+  .title {
+    font-size: var(--font-size-lg);
   }
 
-  .suggestionItem::before {
-    font-size: 0.9rem;
+  .suggestionList {
+    gap: var(--space-sm);
   }
 
-  .text {
-    font-size: 0.9rem;
-    line-height: 1.4;
+  .icon {
+    font-size: 1rem;
   }
 }

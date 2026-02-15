@@ -1,0 +1,244 @@
+/* Home Page Layout - Using CSS Modules and Design System Variables */
+
+/* ======================================= */
+
+/* Hero Section */
+
+/* ======================================= */
+
+.hero {
+  background:
+    linear-gradient(to bottom, rgb(92 86 67 / 30%), rgb(92 86 67 / 30%)),
+    url('@/assets/background.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position-y: 140%;
+  padding: var(--space-3xl) var(--space-lg);
+  position: relative;
+  left: 50%;
+  right: 50%;
+  width: 100vw;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: var(--space-3xl);
+}
+
+.heroContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xl);
+}
+
+.heroTitle {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-dark);
+  margin: 0;
+  line-height: var(--line-height-tight);
+  text-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.heroSubtitle {
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  color: var(--color-text-dark);
+  margin: 0;
+  font-weight: var(--font-weight-regular);
+  opacity: 0.95;
+  max-width: 600px;
+  line-height: var(--line-height-normal);
+}
+
+.heroCtas {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+/* ======================================= */
+
+/* Main Content */
+
+/* ======================================= */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg) var(--space-3xl);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xl);
+}
+
+/* ======================================= */
+
+/* Features Section */
+
+/* ======================================= */
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-xl);
+}
+
+.featureCard {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.featureIcon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.featureTitle {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-light);
+  margin: 0;
+}
+
+.featureDescription {
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}
+
+/* ======================================= */
+
+/* Section */
+
+/* ======================================= */
+
+.section {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.sectionTitle {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-light);
+  margin: 0;
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.sectionDescription {
+  font-family: var(--font-body);
+  font-size: var(--font-size-lg);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-normal);
+  margin: 0;
+  max-width: 700px;
+}
+
+/* ======================================= */
+
+/* Responsive Design */
+
+/* ======================================= */
+
+/* Tablet and below */
+@media (width <= 1024px) {
+  .heroTitle {
+    font-size: var(--font-size-3xl);
+  }
+
+  .heroSubtitle {
+    font-size: var(--font-size-lg);
+  }
+
+  .featuresGrid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+
+  .sectionTitle {
+    font-size: var(--font-size-2xl);
+  }
+
+  .sectionDescription {
+    font-size: var(--font-size-md);
+  }
+}
+
+/* Mobile */
+@media (width <= 768px) {
+  .hero {
+    padding: var(--space-2xl) var(--space-md);
+    margin-bottom: var(--space-2xl);
+  }
+
+  .heroContent {
+    gap: var(--space-lg);
+  }
+
+  .heroTitle {
+    font-size: var(--font-size-2xl);
+  }
+
+  .heroSubtitle {
+    font-size: var(--font-size-md);
+  }
+
+  .heroCtas {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .container {
+    padding: 0 var(--space-md) var(--space-2xl);
+  }
+
+  .content {
+    gap: var(--space-2xl);
+  }
+
+  .featuresGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  .sectionTitle {
+    font-size: var(--font-size-xl);
+  }
+
+  .sectionDescription {
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* Small mobile */
+@media (width <= 480px) {
+  .heroTitle {
+    font-size: var(--font-size-xl);
+  }
+
+  .heroSubtitle {
+    font-size: var(--font-size-sm);
+  }
+
+  .featureIcon {
+    font-size: 2.5rem;
+  }
+}

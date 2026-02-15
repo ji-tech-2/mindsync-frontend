@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
-import { pollPredictionResult } from '../api/pollingHelper.js';
-import { API_CONFIG } from '@/config/api.js';
+import { pollPredictionResult } from '@/services';
 import { Advice } from '@/components';
 import '../assets/result.css';
 
@@ -53,7 +52,7 @@ const ResultPage = () => {
 
       try {
         // Callback for partial results (Stage 1: Numeric model ready)
-        const handlePartialResult = (partialData) => {
+        (partialData) => {
           console.log('📊 Partial result received:', partialData);
           setLoadingStage(2);
           setHasPartialResult(true);
@@ -73,11 +72,8 @@ const ResultPage = () => {
         // Start polling with partial result callback
         const pollResult = await pollPredictionResult(
           predictionId,
-          API_CONFIG.BASE_URL,
-          API_CONFIG.RESULT_ENDPOINT,
-          API_CONFIG.POLLING.MAX_ATTEMPTS,
-          API_CONFIG.POLLING.INTERVAL_MS,
-          handlePartialResult
+          120, // maxAttempts
+          1000 // intervalMs
         );
 
         if (pollResult.success) {
@@ -154,8 +150,8 @@ const ResultPage = () => {
     // Function to continue polling for advice
     const pollForAdvice = async (predictionId) => {
       let adviceAttempts = 0;
-      const maxAdviceAttempts = API_CONFIG.POLLING.MAX_ATTEMPTS;
-      const pollInterval = API_CONFIG.POLLING.INTERVAL_MS;
+      const maxAdviceAttempts = 120;
+      const pollInterval = 1000;
 
       const pollUntilReady = async () => {
         adviceAttempts++;
@@ -166,8 +162,6 @@ const ResultPage = () => {
         try {
           const pollResult = await pollPredictionResult(
             predictionId,
-            API_CONFIG.BASE_URL,
-            API_CONFIG.RESULT_ENDPOINT,
             1, // Only 1 attempt per call, we handle retries here
             pollInterval
           );

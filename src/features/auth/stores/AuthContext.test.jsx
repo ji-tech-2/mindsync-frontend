@@ -9,7 +9,7 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import { useAuth } from '../hooks/useAuth';
-import { TokenManager } from '@/config/api';
+import { TokenManager } from '@/utils/tokenManager';
 
 // Mock TokenManager
 vi.mock('@/config/api', () => ({

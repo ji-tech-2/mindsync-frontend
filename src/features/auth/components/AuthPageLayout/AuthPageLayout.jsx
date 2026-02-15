@@ -13,7 +13,13 @@ import styles from './AuthPageLayout.module.css';
 function AuthPageLayout({ children }) {
   return (
     <div className={styles.wrapper}>
-      <Card padded elevation="md" variant="light" className={styles.card}>
+      <Card
+        padded
+        clipOverflow={false}
+        elevation="md"
+        variant="light"
+        className={styles.card}
+      >
         {children}
       </Card>
     </div>

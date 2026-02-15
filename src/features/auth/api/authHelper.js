@@ -8,7 +8,7 @@
  * the useAuth() hook from AuthContext for reactive state updates.
  */
 
-import { TokenManager } from '@/config/api';
+import { TokenManager } from '@/utils/tokenManager';
 
 /**
  * Check if user is currently authenticated

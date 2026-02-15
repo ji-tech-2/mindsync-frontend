@@ -15,7 +15,8 @@ import React, {
   useRef,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TokenManager } from '@/config/api';
+import { TokenManager } from '@/utils/tokenManager';
+import { getProfile } from '@/services';
 
 // Create the context
 const AuthContext = createContext(null);
@@ -47,19 +48,39 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const logoutTimeoutRef = useRef(null);
 
-  // Initialize auth state on mount
+  // Initialize auth state on mount - restore session from HttpOnly cookie
   useEffect(() => {
-    const initializeAuth = () => {
-      const userData = TokenManager.getUserData();
+    const initializeAuth = async () => {
+      try {
+        // First check if we have user data in memory (fast path)
+        const cachedUserData = TokenManager.getUserData();
+        if (cachedUserData) {
+          const normalizedUser = normalizeUser(cachedUserData);
+          setUser(normalizedUser);
+          setIsLoading(false);
+          return;
+        }
 
-      if (userData) {
-        const normalizedUser = normalizeUser(userData);
-        setUser(normalizedUser);
-      } else {
+        // No cached data - validate session with backend using HttpOnly cookie
+        console.log('🔐 Validating session with backend...');
+        const response = await getProfile();
+
+        if (response.success && response.data) {
+          const normalizedUser = normalizeUser(response.data);
+          TokenManager.setUserData(normalizedUser);
+          setUser(normalizedUser);
+          console.log('✅ Session restored for:', normalizedUser.email);
+        } else {
+          setUser(null);
+        }
+      } catch {
+        // Session invalid or expired - user not logged in
+        console.log('❌ No valid session found');
+        TokenManager.clearUserData();
         setUser(null);
+      } finally {
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     };
 
     initializeAuth();

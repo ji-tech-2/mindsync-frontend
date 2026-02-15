@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import styles from './StreakCard.module.css';
+import Card from '@/components/Card';
+import SegmentedControl from '@/components/SegmentedControl';
 
 /**
  * Check if a specific day of the week has been completed.
@@ -45,42 +47,29 @@ export default function StreakCard({ data, loading, error }) {
   // Loading state
   if (loading) {
     return (
-      <div className={`${styles.container} ${styles.loading}`}>
-        <div className={styles.loadingContent}>
-          <span className={styles.icon}>🔥</span>
-          <p>Loading Streak...</p>
+      <Card>
+        <div className={styles.loading}>
+          <div className={styles.loadingContent}>
+            <span className={styles.icon}>🔥</span>
+            <p>Loading Streak...</p>
+          </div>
         </div>
-      </div>
+      </Card>
     );
   }
 
   // Error state
   if (error) {
     return (
-      <div className={`${styles.container} ${styles.error}`}>
-        <div className={styles.errorContent}>
-          <span className={styles.icon}>❌</span>
-          <p>Failed to load streak data</p>
-          <small>{error}</small>
-        </div>
-      </div>
-    );
-  }
-
-  // Empty state - no data available
-  if (!data || (!data.daily && !data.weekly)) {
-    return (
-      <div className={`${styles.container} ${styles.empty}`}>
-        <div className={styles.emptyContent}>
-          <span className={styles.icon}>🔥</span>
-          <div>
-            <h2 className={styles.number}>
-              0 <span className={styles.unit}>days</span>
-            </h2>
-            <p className={styles.label}>Start your first screening!</p>
+      <Card>
+        <div className={styles.error}>
+          <div className={styles.errorContent}>
+            <span className={styles.icon}>❌</span>
+            <p>Failed to load streak data</p>
+            <small>{error}</small>
           </div>
         </div>
-      </div>
+      </Card>
     );
   }
 
@@ -88,8 +77,13 @@ export default function StreakCard({ data, loading, error }) {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const completedDays = data.completed_days_this_week || [];
 
+  const segmentOptions = [
+    { label: 'Daily', value: 'daily' },
+    { label: 'Weekly', value: 'weekly' },
+  ];
+
   return (
-    <div className={styles.container}>
+    <Card>
       <div className={styles.header}>
         <div className={styles.streakInfo}>
           <span className={styles.icon}>🔥</span>
@@ -101,20 +95,12 @@ export default function StreakCard({ data, loading, error }) {
           </div>
         </div>
 
-        <div className={styles.toggleContainer}>
-          <button
-            className={`${styles.toggleBtn} ${viewType === 'daily' ? styles.activeToggle : ''}`}
-            onClick={() => setViewType('daily')}
-          >
-            Daily
-          </button>
-          <button
-            className={`${styles.toggleBtn} ${viewType === 'weekly' ? styles.activeToggle : ''}`}
-            onClick={() => setViewType('weekly')}
-          >
-            Weekly
-          </button>
-        </div>
+        <SegmentedControl
+          options={segmentOptions}
+          value={viewType}
+          onChange={setViewType}
+          size="sm"
+        />
       </div>
 
       <div className={styles.daysRow}>
@@ -129,6 +115,6 @@ export default function StreakCard({ data, loading, error }) {
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }
