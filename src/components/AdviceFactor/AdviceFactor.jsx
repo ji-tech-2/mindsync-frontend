@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
+import CollapsibleCard from '../CollapsibleCard';
 import styles from './AdviceFactor.module.css';
 
 const AdviceFactor = ({ factorKey, factorData }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   const formatTitle = (key) => {
     return key
       .replace('num__', '')
@@ -15,39 +14,37 @@ const AdviceFactor = ({ factorKey, factorData }) => {
   };
 
   return (
-    <div className={styles.card}>
-      <div className={styles.header} onClick={() => setIsExpanded(!isExpanded)}>
-        <h3 className={styles.title}>{formatTitle(factorKey)}</h3>
-        <span className={styles.icon}>{isExpanded ? '−' : '+'}</span>
-      </div>
+    <CollapsibleCard title={formatTitle(factorKey)}>
+      <div className={styles.content}>
+        <ul className={styles.list}>
+          {factorData.advices.map((item, index) => (
+            <li key={index} className={styles.listItem}>
+              {item}
+            </li>
+          ))}
+        </ul>
 
-      {isExpanded && (
-        <div className={styles.content}>
-          <ul className={styles.list}>
-            {factorData.advices.map((item, index) => (
-              <li key={index} className={styles.listItem}>
-                {item}
-              </li>
-            ))}
-          </ul>
-
-          <div className={styles.refSection}>
-            <p className={styles.refTitle}>Sources & References</p>
-            {factorData.references.map((ref, index) => (
-              <a
-                key={index}
-                href={ref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.refLink}
-              >
-                Resource {index + 1}
-              </a>
-            ))}
+        {factorData.references && factorData.references.length > 0 && (
+          <div className={styles.referenceSection}>
+            <h4 className={styles.refTitle}>References:</h4>
+            <ul className={styles.refList}>
+              {factorData.references.map((ref, idx) => (
+                <li key={idx} className={styles.refItem}>
+                  <a
+                    href={typeof ref === 'object' ? ref.url : ref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.refLink}
+                  >
+                    Resource {idx + 1}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </CollapsibleCard>
   );
 };
 

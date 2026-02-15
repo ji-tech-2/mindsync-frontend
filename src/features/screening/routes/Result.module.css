@@ -1,0 +1,213 @@
+.resultPage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-light);
+}
+
+.container {
+  flex: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-lg);
+  width: 100%;
+}
+
+/* Header Section */
+.header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.header h1 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-medium);
+  font-style: italic;
+  color: var(--color-text-light);
+  margin-bottom: var(--space-sm);
+  line-height: var(--line-height-tighter);
+}
+
+.header p {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+/* Score Section */
+.scoreSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-3xl);
+}
+
+/* Content Section */
+.contentSection {
+  margin-bottom: var(--space-2xl);
+}
+
+.sectionTitle {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-light);
+  text-align: center;
+  margin-bottom: var(--space-lg);
+  line-height: var(--line-height-tight);
+}
+
+.disclaimer {
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-light);
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto var(--space-2xl);
+}
+
+/* Loading States */
+.loading {
+  text-align: center;
+  padding: var(--space-3xl);
+}
+
+.loadingSpinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--color-primary-light);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  animation: spin 1s linear infinite;
+  margin: 0 auto var(--space-lg);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading h2 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-light);
+  margin-bottom: var(--space-sm);
+}
+
+.loading p {
+  font-size: var(--font-size-md);
+  color: var(--color-text-muted);
+}
+
+/* Error State */
+.error {
+  text-align: center;
+  padding: var(--space-3xl);
+}
+
+.error h2 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-error);
+  margin-bottom: var(--space-md);
+}
+
+.error p {
+  font-size: var(--font-size-md);
+  color: var(--color-text-light);
+  margin-bottom: var(--space-xl);
+}
+
+/* Auth Locked Section */
+.authLocked {
+  text-align: center;
+  padding: var(--space-2xl);
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--space-2xl);
+}
+
+.authLocked h3 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-light);
+  margin-bottom: var(--space-md);
+}
+
+.authLocked p {
+  font-size: var(--font-size-md);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-xl);
+  line-height: var(--line-height-normal);
+}
+
+/* Button Groups */
+.buttonGroup {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: var(--space-xl);
+}
+
+/* Footer Actions */
+.footer {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  margin-top: var(--space-3xl);
+  padding-bottom: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+/* Responsive Design */
+@media (width <= 768px) {
+  .container {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .header h1 {
+    font-size: var(--font-size-3xl);
+  }
+
+  .header p {
+    font-size: var(--font-size-md);
+  }
+
+  .sectionTitle {
+    font-size: var(--font-size-2xl);
+  }
+
+  .disclaimer {
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (width <= 640px) {
+  .container {
+    padding: var(--space-lg) var(--space-sm);
+  }
+
+  .header h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .sectionTitle {
+    font-size: var(--font-size-xl);
+  }
+
+  .buttonGroup,
+  .footer {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .buttonGroup > *,
+  .footer > * {
+    width: 100%;
+  }
+}

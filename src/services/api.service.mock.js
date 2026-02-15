@@ -315,33 +315,116 @@ export async function getPredictionResult(predictionId) {
     result: {
       prediction_score: screening.prediction_score,
       health_level: screening.health_level,
-      wellness_analysis: [
-        'Your mental wellness score indicates ' +
-          screening.health_level +
-          ' level.',
-        'Consider maintaining a balanced lifestyle with regular exercise and adequate sleep.',
-        'Social connections play a crucial role in mental well-being.',
-      ],
-      advice: {
-        factors: {
-          'Sleep Quality': {
-            advices: [
-              'Try to maintain a consistent sleep schedule.',
-              'Create a relaxing bedtime routine.',
-            ],
-            references: ['Sleep Foundation', 'NIH Sleep Studies'],
+      wellness_analysis: {
+        areas_for_improvement: [
+          {
+            coefficient: -7.708023045106089,
+            feature: 'num__stress_level_0_10',
+            gap: -13.476303537230262,
+            healthy_value: 1.261078271424113,
+            impact_score: 103.87565822781556,
+            user_value: 14.737381808654375,
           },
-          'Stress Level': {
+          {
+            coefficient: 1.3923502241791008,
+            feature: 'num__exercise_minutes_per_week',
+            gap: 21.59400647241156,
+            healthy_value: 0.0705779658016611,
+            impact_score: 30.06641975278719,
+            user_value: -21.5234285066099,
+          },
+          {
+            coefficient: -0.6968952607036991,
+            feature: 'num__age sleep_hours',
+            gap: -14.72104484465572,
+            healthy_value: 0.4084028258779459,
+            impact_score: 10.259026384847195,
+            user_value: 15.129447670533667,
+          },
+        ],
+        strengths: [
+          {
+            coefficient: 0.6065220827316351,
+            feature: 'num__work_screen_hours leisure_screen_hours',
+            gap: -12.879865517309193,
+            healthy_value: 1.47691134538777,
+            impact_score: -7.811922858861741,
+            user_value: 14.356776862696963,
+          },
+          {
+            coefficient: -3.662036609502586,
+            feature: 'num__stress_level_0_10 productivity_0_100',
+            gap: 1.5366830521824395,
+            healthy_value: 0.1910586846886553,
+            impact_score: -5.627389594294266,
+            user_value: -1.3456243674937842,
+          },
+        ],
+      },
+      advice: {
+        description:
+          "It's wonderful to see your strong foundation for well-being. Even with a solid base, it's completely normal to experience fluctuations and face challenges in areas like managing stress, maintaining consistent physical activity, and optimizing sleep patterns. Acknowledging these aspects is a significant step towards nurturing your overall health, and we're here to support you in refining these vital areas.",
+        factors: {
+          'num__age sleep_hours': {
             advices: [
-              'Practice mindfulness or meditation daily.',
-              'Take regular breaks during work.',
+              'Establish a consistent sleep schedule, going to bed and waking up at roughly the same time each day, even on weekends.',
+              "Create a relaxing bedtime routine, such as reading, taking a warm bath, or listening to calming music, to signal to your body it's time to wind down.",
+              'Optimize your sleep environment by ensuring your bedroom is dark, quiet, cool, and free from electronic devices.',
             ],
-            references: ['APA Stress Management', 'Mayo Clinic'],
+            references: [
+              {
+                title: '5 Ways to Get Better Sleep',
+                url: 'https://www.mayoclinichealthsystem.org/hometown-health/speaking-of-health/5-ways-to-get-better-sleep',
+              },
+              {
+                title: 'Sleep Hygiene',
+                url: 'https://www.sleepfoundation.org/sleep-hygiene',
+              },
+              {
+                title: 'About Sleep',
+                url: 'https://www.cdc.gov/sleep/about/index.html',
+              },
+            ],
+          },
+          num__exercise_minutes_per_week: {
+            advices: [
+              'Start with short, manageable bursts of activity (e.g., 10-minute walks) and gradually increase duration or intensity as you feel comfortable.',
+              "Find an activity you genuinely enjoy, whether it's dancing, gardening, cycling, or team sports, to make consistency easier.",
+              'Incorporate movement into your daily routine by taking stairs, parking further away, or doing quick stretches during breaks.',
+            ],
+            references: [
+              {
+                title: 'Physical Activity Fact Sheet',
+                url: 'https://www.who.int/news-room/fact-sheets/detail/physical-activity',
+              },
+              {
+                title: 'Boost Your Health with Activity Snacks',
+                url: 'https://newsnetwork.mayoclinic.org/discussion/mayo-clinic-minute-boost-your-health-and-productivity-with-activity-snacks/',
+              },
+            ],
+          },
+          num__stress_level_0_10: {
+            advices: [
+              'Practice mindfulness or deep breathing exercises for 5-10 minutes daily to calm your nervous system.',
+              'Identify your main stressors and explore practical strategies to mitigate or manage them, such as time management or setting boundaries.',
+              'Engage in hobbies or activities you enjoy to create a mental break and foster a sense of accomplishment and joy.',
+            ],
+            references: [
+              {
+                title: 'Tips for Managing Stress',
+                url: 'https://www.apa.org/topics/stress/tips',
+              },
+              {
+                title: 'Caring for Your Mental Health',
+                url: 'https://www.nimh.nih.gov/health/topics/caring-for-your-mental-health',
+              },
+            ],
           },
         },
       },
     },
     created_at: screening.created_at,
+    completed_at: new Date().toISOString(),
     numeric_completed_at: new Date(Date.now() - 2000).toISOString(),
     advisory_completed_at: new Date().toISOString(),
   };

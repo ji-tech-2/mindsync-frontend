@@ -1,5 +1,6 @@
 export { default as Button } from './Button';
 export { default as Card } from './Card';
+export { default as CollapsibleCard } from './CollapsibleCard';
 export { default as DateField } from './DateField';
 export { default as Dropdown } from './Dropdown';
 export { default as Message } from './Message';
