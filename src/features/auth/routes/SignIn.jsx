@@ -2,13 +2,17 @@ import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { signIn as signInService } from '@/services';
-import { Button, TextField, Message, Link } from '@/components';
+import {
+  Button,
+  TextField,
+  Message,
+  Link,
+  FormContainer,
+  FormSection,
+} from '@/components';
 import PasswordField from '../components/PasswordField';
 import AuthPageLayout from '../components/AuthPageLayout';
 import PageHeader from '../components/PageHeader';
-import FormContainer from '../components/FormContainer';
-import FormSection from '../components/FormSection';
-import ErrorAlert from '../components/ErrorAlert';
 import {
   validateSignInField,
   validateSignInForm,
@@ -192,7 +196,9 @@ export default function SignIn() {
       )}
 
       {/* Show error messages */}
-      <ErrorAlert message={message} show={isSignInErrorMessage(message)} />
+      {isSignInErrorMessage(message) && (
+        <Message type="error">{message}</Message>
+      )}
     </AuthPageLayout>
   );
 }

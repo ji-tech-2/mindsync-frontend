@@ -1,15 +1,33 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
-import '../assets/screening.css';
 import { submitScreening as submitScreeningService } from '@/services';
 import {
   toApiGender,
   toApiOccupation,
   toApiWorkMode,
 } from '@/utils/fieldMappings';
+import {
+  Card,
+  Button,
+  TextField,
+  StageContainer,
+  FormSection,
+  Message,
+} from '@/components';
+import MultipleChoice from '../components/MultipleChoice';
+import Slider from '../components/Slider';
+import QuestionLayout from '../components/QuestionLayout';
+import ProgressBar from '../components/ProgressBar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faChevronLeft,
+  faChevronRight,
+} from '@fortawesome/free-solid-svg-icons';
+import logoSubmark from '@/assets/logo-submark.svg';
+import styles from './Screening.module.css';
 
-// ============= FUNGSI TRANSFORM & KIRIM =============
+// ============= TRANSFORM & SUBMIT FUNCTIONS =============
 
 function transformToJSON(screeningData, userId = null) {
   const payload = {
@@ -17,7 +35,6 @@ function transformToJSON(screeningData, userId = null) {
     gender: toApiGender(screeningData.gender),
     occupation: toApiOccupation(screeningData.occupation),
     work_mode: toApiWorkMode(screeningData.work_mode),
-    // screen_time_hours: parseFloat(screeningData.screen_time_hours),
     work_screen_hours: parseFloat(screeningData.work_screen_hours),
     leisure_screen_hours: parseFloat(screeningData.leisure_screen_hours),
     sleep_hours: parseFloat(screeningData.sleep_hours),
@@ -31,7 +48,6 @@ function transformToJSON(screeningData, userId = null) {
     mental_wellness_index_0_100: null,
   };
 
-  // Add user_id if available (for database storage)
   if (userId) {
     payload.user_id = userId;
   }
@@ -39,135 +55,135 @@ function transformToJSON(screeningData, userId = null) {
   return payload;
 }
 
-// ============= COMPONENT =============
+// ============= QUESTION DEFINITIONS =============
+
+const QUESTION_TYPES = {
+  NUMBER: 'number',
+  MULTIPLE_CHOICE: 'multipleChoice',
+  SLIDER: 'slider',
+};
+
+const questions = [
+  {
+    key: 'age',
+    question: 'How old are you?',
+    type: QUESTION_TYPES.NUMBER,
+    placeholder: 'e.g. 25',
+    min: 16,
+    max: 100,
+  },
+  {
+    key: 'gender',
+    question: 'What is your gender?',
+    type: QUESTION_TYPES.MULTIPLE_CHOICE,
+    options: ['Male', 'Female'],
+  },
+  {
+    key: 'occupation',
+    question: 'What is your current employment status?',
+    type: QUESTION_TYPES.MULTIPLE_CHOICE,
+    options: ['Employed', 'Unemployed', 'Student', 'Freelancer', 'Retired'],
+  },
+  {
+    key: 'work_mode',
+    question: 'What is your work mode?',
+    type: QUESTION_TYPES.MULTIPLE_CHOICE,
+    options: ['Remote', 'Hybrid', 'On-site', 'Unemployed'],
+  },
+  {
+    key: 'work_screen_hours',
+    question: 'How many hours of screen time for work per day?',
+    type: QUESTION_TYPES.NUMBER,
+    placeholder: 'e.g. 6',
+    min: 0,
+    max: 24,
+  },
+  {
+    key: 'leisure_screen_hours',
+    question: 'How many hours of screen time for leisure per day?',
+    type: QUESTION_TYPES.NUMBER,
+    placeholder: 'e.g. 2',
+    min: 0,
+    max: 24,
+  },
+  {
+    key: 'sleep_hours',
+    question: 'How many hours of sleep do you get on average per day?',
+    type: QUESTION_TYPES.NUMBER,
+    placeholder: 'e.g. 7',
+    min: 0,
+    max: 24,
+  },
+  {
+    key: 'sleep_quality_1_5',
+    question: 'How is your sleep quality?',
+    type: QUESTION_TYPES.SLIDER,
+    min: 1,
+    max: 5,
+    step: 1,
+    minLabel: 'Poor',
+    maxLabel: 'Excellent',
+  },
+  {
+    key: 'stress_level_0_10',
+    question: 'How high is your stress level?',
+    type: QUESTION_TYPES.SLIDER,
+    min: 0,
+    max: 10,
+    step: 1,
+    minLabel: 'No stress',
+    maxLabel: 'Very stressed',
+  },
+  {
+    key: 'productivity_0_100',
+    question: 'What is your productivity level?',
+    type: QUESTION_TYPES.SLIDER,
+    min: 0,
+    max: 100,
+    step: 5,
+    minLabel: '0%',
+    maxLabel: '100%',
+  },
+  {
+    key: 'exercise_minutes_per_week',
+    question: 'How many minutes do you exercise per week?',
+    type: QUESTION_TYPES.NUMBER,
+    placeholder: 'e.g. 150',
+    min: 0,
+    max: 10080,
+  },
+  {
+    key: 'social_hours_per_week',
+    question: 'How many hours do you socialize per week?',
+    type: QUESTION_TYPES.NUMBER,
+    placeholder: 'e.g. 10',
+    min: 0,
+    max: 168,
+  },
+];
+
+// ============= MAIN COMPONENT =============
 
 export default function Screening() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Get userId from authenticated user
-  const userId = user?.userId || user?.id || null;
-
-  const questions = [
-    {
-      key: 'age',
-      question: 'How old are you?',
-      type: 'number',
-      placeholder: 'Enter your age',
-      min: 16,
-      max: 100,
-    },
-    {
-      key: 'gender',
-      question: 'What is your gender?',
-      type: 'select',
-      options: ['Male', 'Female'],
-    },
-    {
-      key: 'occupation',
-      question: 'What is your current employment status?',
-      type: 'select',
-      options: ['Employed', 'Unemployed', 'Student', 'Freelancer', 'Retired'],
-    },
-    {
-      key: 'work_mode',
-      question: 'What is your work mode?',
-      type: 'select',
-      options: ['Remote', 'Hybrid', 'On-site', 'Unemployed'],
-    },
-    // {
-    //   key: "screen_time_hours",
-    //   question: "Berapa total waktu screen time Anda per hari (dalam jam)?",
-    //   type: "number",
-    //   placeholder: "Contoh: 8",
-    //   min: 0,
-    //   max: 24
-    // },
-    {
-      key: 'work_screen_hours',
-      question: 'How many hours of screen time for work?',
-      type: 'number',
-      placeholder: 'e.g. 6',
-      min: 0,
-      max: 24,
-    },
-    {
-      key: 'leisure_screen_hours',
-      question: 'How many hours of screen time for leisure?',
-      type: 'number',
-      placeholder: 'e.g. 2',
-      min: 0,
-      max: 24,
-    },
-    {
-      key: 'sleep_hours',
-      question: 'How many hours of sleep do you get on average per day?',
-      type: 'number',
-      placeholder: 'e.g. 7',
-      min: 0,
-      max: 24,
-    },
-    {
-      key: 'sleep_quality_1_5',
-      question: 'How is your sleep quality (scale 1–5)?',
-      type: 'select',
-      options: [1, 2, 3, 4, 5],
-    },
-    {
-      key: 'stress_level_0_10',
-      question: 'How high is your stress level (scale 0–10)?',
-      type: 'number',
-      placeholder: '0 = no stress, 10 = very stressed',
-      min: 0,
-      max: 10,
-    },
-    {
-      key: 'productivity_0_100',
-      question: 'What is your productivity level (0–100)?',
-      type: 'number',
-      placeholder: 'e.g. 75',
-      min: 0,
-      max: 100,
-    },
-    {
-      key: 'exercise_minutes_per_week',
-      question: 'How many minutes do you exercise per week?',
-      type: 'number',
-      placeholder: 'e.g. 150',
-      min: 0,
-      max: 10080,
-    },
-    {
-      key: 'social_hours_per_week',
-      question: 'How many hours do you socialize per week?',
-      type: 'number',
-      placeholder: 'e.g. 10',
-      min: 0,
-      max: 168,
-    },
-  ];
-
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [allAnswers, setAllAnswers] = useState({});
-  const [currentAnswer, setCurrentAnswer] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [answers, setAnswers] = useState({});
+  const [errors, setErrors] = useState({});
+  const [isGoingBack, setIsGoingBack] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  // Helper function to check if a question should be skipped
-  const shouldSkipQuestion = (questionIndex, answers) => {
+  // Helper to check if a question should be skipped
+  const shouldSkipQuestion = (questionIndex, currentAnswers) => {
     const question = questions[questionIndex];
-
-    // Include current answer if checking current or future questions
-    const answersToCheck = {
-      ...answers,
-      ...(currentAnswer && currentQ ? { [currentQ.key]: currentAnswer } : {}),
-    };
 
     // Skip work_mode and work_screen_hours if occupation is Unemployed or Retired
     if (
       (question.key === 'work_mode' || question.key === 'work_screen_hours') &&
-      (answersToCheck.occupation === 'Unemployed' ||
-        answersToCheck.occupation === 'Retired')
+      (currentAnswers.occupation === 'Unemployed' ||
+        currentAnswers.occupation === 'Retired')
     ) {
       return true;
     }
@@ -175,17 +191,51 @@ export default function Screening() {
     return false;
   };
 
+  // Find next non-skipped question index
+  const findNextQuestionIndex = (fromIndex, currentAnswers) => {
+    let nextIndex = fromIndex + 1;
+    while (
+      nextIndex < questions.length &&
+      shouldSkipQuestion(nextIndex, currentAnswers)
+    ) {
+      nextIndex++;
+    }
+    return nextIndex;
+  };
+
+  // Find previous non-skipped question index
+  const findPreviousQuestionIndex = (fromIndex, currentAnswers) => {
+    let prevIndex = fromIndex - 1;
+    while (prevIndex >= 0 && shouldSkipQuestion(prevIndex, currentAnswers)) {
+      prevIndex--;
+    }
+    return prevIndex;
+  };
+
   const currentQ = questions[currentIndex];
   const isLastQuestion = currentIndex === questions.length - 1;
-  const progress = ((currentIndex + 1) / questions.length) * 100;
 
-  const validateInput = (value, question) => {
-    if (!value) {
-      return 'Answer cannot be empty!';
+  // Calculate progress (only for non-skipped questions)
+  const totalQuestions = questions.filter(
+    (_, idx) => !shouldSkipQuestion(idx, answers)
+  ).length;
+  const answeredQuestions = questions
+    .slice(0, currentIndex + 1)
+    .filter((_, idx) => !shouldSkipQuestion(idx, answers)).length;
+  const progress = (answeredQuestions / totalQuestions) * 100;
+
+  // Validation
+  const validateAnswer = (question, value) => {
+    if (value === '' || value === null || value === undefined) {
+      return 'This field is required';
     }
 
-    if (question.type === 'number') {
+    if (question.type === QUESTION_TYPES.NUMBER) {
       const num = Number(value);
+
+      if (isNaN(num)) {
+        return 'Please enter a valid number';
+      }
 
       if (question.min !== undefined && num < question.min) {
         return `Minimum value is ${question.min}`;
@@ -199,170 +249,219 @@ export default function Screening() {
     return '';
   };
 
-  const onInputChange = (e) => {
-    setCurrentAnswer(e.target.value);
+  // Handle answer change
+  const handleAnswerChange = (value) => {
+    const updatedAnswers = {
+      ...answers,
+      [currentQ.key]: value,
+    };
+    setAnswers(updatedAnswers);
+    setErrors({ ...errors, [currentQ.key]: '' });
     setErrorMsg('');
   };
 
-  // Find next non-skipped question index
-  const findNextQuestionIndex = (fromIndex, answers) => {
-    let nextIndex = fromIndex + 1;
-    while (
-      nextIndex < questions.length &&
-      shouldSkipQuestion(nextIndex, answers)
-    ) {
-      nextIndex++;
-    }
-    return nextIndex;
-  };
+  // Handle next
+  const handleNext = async (overrideValue, overrideAnswers) => {
+    const valueToValidate = overrideValue ?? answers[currentQ.key];
+    const answersToUse = overrideAnswers ?? answers;
 
-  // Find previous non-skipped question index
-  const findPreviousQuestionIndex = (fromIndex, answers) => {
-    let prevIndex = fromIndex - 1;
-    while (prevIndex >= 0 && shouldSkipQuestion(prevIndex, answers)) {
-      prevIndex--;
-    }
-    return prevIndex;
-  };
-
-  const onNext = async () => {
-    const error = validateInput(currentAnswer, currentQ);
+    const error = validateAnswer(currentQ, valueToValidate);
 
     if (error) {
+      setErrors({ ...errors, [currentQ.key]: error });
       setErrorMsg(error);
       return;
     }
 
     const updatedAnswers = {
-      ...allAnswers,
-      [currentQ.key]: currentAnswer,
+      ...answersToUse,
+      [currentQ.key]: valueToValidate,
     };
 
     // Auto-set work_mode and work_screen_hours if occupation is Unemployed or Retired
     if (
       currentQ.key === 'occupation' &&
-      (currentAnswer === 'Unemployed' || currentAnswer === 'Retired')
+      (valueToValidate === 'Unemployed' || valueToValidate === 'Retired')
     ) {
       updatedAnswers.work_mode = 'Unemployed';
       updatedAnswers.work_screen_hours = '0';
     }
 
-    setAllAnswers(updatedAnswers);
+    setAnswers(updatedAnswers);
+    setIsGoingBack(false);
 
     if (isLastQuestion) {
       await submitScreening(updatedAnswers);
     } else {
       const nextIndex = findNextQuestionIndex(currentIndex, updatedAnswers);
-      setCurrentIndex(nextIndex);
-      setCurrentAnswer('');
+      if (nextIndex < questions.length) {
+        setCurrentIndex(nextIndex);
+        setErrorMsg('');
+      }
     }
   };
 
-  const submitScreening = async (answers) => {
+  // Handle back
+  const handleBack = () => {
+    setErrorMsg('');
+    setIsGoingBack(true);
+    const prevIndex = findPreviousQuestionIndex(currentIndex, answers);
+
+    if (prevIndex >= 0) {
+      setCurrentIndex(prevIndex);
+    }
+  };
+
+  // Submit screening
+  const submitScreening = async (finalAnswers) => {
     setIsLoading(true);
 
     try {
-      const transformedData = transformToJSON(answers);
+      const transformedData = transformToJSON(finalAnswers);
 
       if (user) {
         const uid = user?.userId || user?.id || user?.user_id;
         if (uid) {
           transformedData.user_id = uid;
-          console.log('✅ User logged in, adding user_id:', uid);
         }
-      } else {
-        console.log('⚠️ User not logged in, screening will be anonymous');
       }
-
-      console.log('📤 Data yang dikirim ke Flask:', transformedData);
-      console.log('👤 User ID:', userId || '[Guest - No user_id]');
 
       const result = await submitScreeningService(transformedData);
 
       if (result.success) {
         navigate(`/result/${result.prediction_id}`);
       } else {
-        setErrorMsg('Failed to send data to server: ' + result.error);
+        setErrorMsg('Failed to submit screening: ' + result.error);
         setIsLoading(false);
       }
     } catch (error) {
-      console.error('Error:', error);
       setErrorMsg('An error occurred: ' + error.message);
       setIsLoading(false);
     }
   };
 
-  const onBack = () => {
-    setErrorMsg('');
-    const prevIndex = findPreviousQuestionIndex(currentIndex, allAnswers);
+  // Render input based on question type
+  const renderInput = (question) => {
+    const currentValue = answers[question.key];
+    const hasError = !!errors[question.key];
 
-    // Safety check to prevent going below 0
-    if (prevIndex < 0) return;
+    switch (question.type) {
+      case QUESTION_TYPES.NUMBER:
+        return (
+          <TextField
+            type="number"
+            value={currentValue || ''}
+            onChange={(e) => handleAnswerChange(e.target.value)}
+            placeholder={question.placeholder}
+            disabled={isLoading}
+            error={hasError}
+            fullWidth
+          />
+        );
 
-    const prevKey = questions[prevIndex].key;
+      case QUESTION_TYPES.MULTIPLE_CHOICE:
+        return (
+          <MultipleChoice
+            options={question.options}
+            value={currentValue}
+            onChange={handleAnswerChange}
+            disabled={isLoading}
+            error={hasError}
+          />
+        );
 
-    setCurrentIndex(prevIndex);
-    setCurrentAnswer(allAnswers[prevKey] || '');
+      case QUESTION_TYPES.SLIDER:
+        return (
+          <Slider
+            min={question.min}
+            max={question.max}
+            step={question.step}
+            value={currentValue || question.min}
+            onChange={handleAnswerChange}
+            minLabel={question.minLabel}
+            maxLabel={question.maxLabel}
+            disabled={isLoading}
+            error={hasError}
+          />
+        );
+
+      default:
+        return null;
+    }
   };
 
+  // Create stages for StageContainer
+  const stages = questions.map((question, index) => (
+    <QuestionLayout key={question.key} question={question.question}>
+      <FormSection>{renderInput(question)}</FormSection>
+      {currentIndex === index && errorMsg && (
+        <Message type="error" className={styles.message}>
+          {errorMsg}
+        </Message>
+      )}
+    </QuestionLayout>
+  ));
+
   return (
-    <div className="screening-wrapper">
-      <div className="screening-container">
-        <div className="progress-bar-container">
-          <div className="progress-bar" style={{ width: `${progress}%` }} />
-        </div>
-
-        <h2>{currentQ.question}</h2>
-
-        <div className="input-container">
-          {currentQ.type === 'number' && (
-            <input
-              type="number"
-              value={currentAnswer}
-              onChange={onInputChange}
-              placeholder={currentQ.placeholder}
-              min={currentQ.min}
-              max={currentQ.max}
-              className={errorMsg ? 'input-error' : ''}
-              disabled={isLoading}
-            />
-          )}
-
-          {currentQ.type === 'select' && (
-            <select
-              value={currentAnswer}
-              onChange={onInputChange}
-              className={errorMsg ? 'input-error' : ''}
-              disabled={isLoading}
-            >
-              <option value="">-- Select one --</option>
-              {currentQ.options.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-          )}
-
-          {errorMsg && <div className="error-message">{errorMsg}</div>}
-        </div>
-
-        <div className="button-container">
-          {currentIndex > 0 && !isLoading && (
-            <button className="btn-back" onClick={onBack}>
-              Back
-            </button>
-          )}
-
-          <button
-            className={`btn-next ${currentIndex === 0 ? 'single-button' : ''}`}
-            onClick={onNext}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Processing...' : isLastQuestion ? 'Finish' : 'Next'}
-          </button>
-        </div>
+    <>
+      <div className={styles.header}>
+        <Button
+          variant="outlined"
+          onClick={() => navigate('/dashboard')}
+          icon={<FontAwesomeIcon icon={faChevronLeft} />}
+          className={styles.exitButton}
+        >
+          Exit
+        </Button>
+        <img src={logoSubmark} alt="MindSync" className={styles.logo} />
       </div>
-    </div>
+
+      <div className={styles.wrapper}>
+        <Card
+          padded
+          clipOverflow={false}
+          elevation="lg"
+          variant="light"
+          className={styles.card}
+        >
+          <ProgressBar progress={progress} className={styles.progressBar} />
+
+          <div className={styles.contentArea}>
+            <StageContainer
+              stages={stages}
+              currentStage={currentIndex}
+              isGoingBack={isGoingBack}
+              animateHeight={false}
+            />
+          </div>
+
+          <div className={styles.buttonContainer}>
+            <div className={styles.backButtonWrapper}>
+              {currentIndex > 0 && !isLoading && (
+                <Button
+                  variant="outlined"
+                  onClick={handleBack}
+                  icon={<FontAwesomeIcon icon={faChevronLeft} />}
+                  aria-label="Back"
+                >
+                  Back
+                </Button>
+              )}
+            </div>
+
+            <Button
+              variant="filled"
+              onClick={() => handleNext()}
+              disabled={isLoading || !answers[currentQ.key]}
+              icon={<FontAwesomeIcon icon={faChevronRight} />}
+              iconPosition="right"
+              className={styles.nextButton}
+            >
+              {isLoading ? 'Submitting...' : isLastQuestion ? 'Finish' : 'Next'}
+            </Button>
+          </div>
+        </Card>
+      </div>
+    </>
   );
 }

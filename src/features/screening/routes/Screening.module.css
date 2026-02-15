@@ -1,0 +1,122 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: var(--space-lg);
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-lg);
+  margin: 0 auto;
+  z-index: 100;
+}
+
+.exitButton {
+  /* Ensure button styles are applied */
+}
+
+.logo {
+  height: 40px;
+  width: auto;
+}
+
+.card {
+  max-width: 600px;
+  width: 100%;
+  min-height: 300px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  box-sizing: border-box;
+}
+
+.progressBar {
+  flex-shrink: 0;
+}
+
+.contentArea {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.message {
+  flex-shrink: 0;
+  text-align: center;
+  width: 100%;
+  margin-top: var(--space-xs);
+}
+
+.buttonContainer {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.backButtonWrapper {
+  /* Reserve space for back button so next button stays on right */
+  flex: 0 0 auto;
+}
+
+/* Responsive adjustments */
+@media (width <= 768px) {
+  .wrapper {
+    padding: var(--space-md);
+    padding-top: calc(52px + var(--space-lg));
+  }
+
+  .header {
+    padding: var(--space-md);
+  }
+
+  .logo {
+    height: 32px;
+  }
+
+  .card {
+    max-width: 100%;
+    min-height: 400px;
+  }
+}
+
+@media (width <= 480px) {
+  .wrapper {
+    padding: var(--space-sm);
+    padding-top: calc(48px + var(--space-md));
+    min-height: 100dvh; /* Use dvh for better mobile support */
+  }
+
+  .header {
+    padding: var(--space-sm);
+  }
+
+  .logo {
+    height: 28px;
+  }
+
+  .card {
+    gap: var(--space-md);
+  }
+
+  .buttonContainer {
+    gap: var(--space-sm);
+  }
+}

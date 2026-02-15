@@ -5,14 +5,18 @@ import {
   changePassword as changePasswordService,
 } from '@/services';
 import { getPasswordError } from '@/utils/passwordValidation';
-import { TextField, Button, Message, Link } from '@/components';
+import {
+  TextField,
+  Button,
+  Message,
+  Link,
+  FormContainer,
+  FormSection,
+  StageContainer,
+} from '@/components';
 import PasswordField from '../components/PasswordField';
 import AuthPageLayout from '../components/AuthPageLayout';
 import PageHeader from '../components/PageHeader';
-import FormContainer from '../components/FormContainer';
-import FormSection from '../components/FormSection';
-import ErrorAlert from '../components/ErrorAlert';
-import StageContainer from '../components/StageContainer';
 import BackButton from '../components/BackButton';
 import { validateForgotPasswordField } from '../utils/forgotPasswordHelpers';
 
@@ -401,7 +405,7 @@ export default function ForgotPassword() {
         Remember your password? <Link href="/signin">Back to Sign In</Link>
       </p>
 
-      <ErrorAlert message={message} show={isError} />
+      {isError && <Message type="error">{message}</Message>}
     </AuthPageLayout>
   );
 }

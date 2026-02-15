@@ -9,14 +9,13 @@ import {
   DateField,
   Message,
   Link,
+  FormContainer,
+  FormSection,
+  StageContainer,
 } from '@/components';
 import PasswordField from '../components/PasswordField';
 import AuthPageLayout from '../components/AuthPageLayout';
 import PageHeader from '../components/PageHeader';
-import FormContainer from '../components/FormContainer';
-import FormSection from '../components/FormSection';
-import ErrorAlert from '../components/ErrorAlert';
-import StageContainer from '../components/StageContainer';
 import BackButton from '../components/BackButton';
 import {
   genderOptions,
@@ -502,7 +501,9 @@ export default function SignUp() {
         Already have an account? <Link href="/signin">Sign In Here</Link>
       </p>
 
-      <ErrorAlert message={message} show={isSignUpErrorMessage(message)} />
+      {isSignUpErrorMessage(message) && (
+        <Message type="error">{message}</Message>
+      )}
     </AuthPageLayout>
   );
 }
