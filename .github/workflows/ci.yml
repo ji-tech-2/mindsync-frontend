@@ -28,15 +28,12 @@ jobs:
 
       - name: Run linter
         run: npm run lint
-        continue-on-error: true
 
       - name: Generate complexity report
         run: npm run quality:complexity
-        continue-on-error: true
 
       - name: Run tests with coverage
         run: npm run test:coverage:threshold
-        continue-on-error: true
 
       - name: Parse coverage summary
         id: coverage
