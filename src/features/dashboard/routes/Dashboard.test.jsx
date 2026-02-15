@@ -69,7 +69,7 @@ vi.mock('@/config/api', () => ({
   fetchScreeningHistory: vi.fn(),
 }));
 
-import { TokenManager } from '@/config/api';
+import { TokenManager } from '@/utils/tokenManager';
 
 const mockFactorsResponse = {
   status: 'success',

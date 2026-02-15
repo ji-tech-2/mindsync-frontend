@@ -15,7 +15,7 @@ import React, {
   useRef,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TokenManager } from '@/config/api';
+import { TokenManager } from '@/utils/tokenManager';
 
 // Create the context
 const AuthContext = createContext(null);

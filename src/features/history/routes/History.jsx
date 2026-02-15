@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
 import { WeeklyChart } from '@/components';
-import {
-  fetchScreeningHistory,
-  buildWeeklyChartFromHistory,
-} from '@/config/api';
+import { getScreeningHistory } from '@/services';
+import { buildWeeklyChartFromHistory } from '@/utils/chartHelpers';
 import '../assets/history.css';
 
 export default function History() {
@@ -39,9 +37,9 @@ export default function History() {
       setIsLoading(true);
 
       try {
-        const response = await fetchScreeningHistory(userId, 50, 0);
+        const response = await getScreeningHistory(userId);
 
-        if (response.success && response.data) {
+        if (response.status === 'success' && response.data) {
           console.log('✅ Screening history loaded:', response.data);
 
           // Transform API data to match frontend format

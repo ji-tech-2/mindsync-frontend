@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './CriticalFactorCard.module.css';
+import Card from '@/components/Card';
 
 const CriticalFactorCard = ({ data, loading }) => {
   const getFactorImage = (rawName) => {
@@ -15,33 +16,35 @@ const CriticalFactorCard = ({ data, loading }) => {
   // 1. Cek loading dulu
   if (loading) {
     return (
-      <div className={styles.loadingState}>Menganalisis Faktor Kritis...</div>
+      <Card>
+        <div className={styles.loadingState}>Menganalisis Faktor Kritis...</div>
+      </Card>
     );
   }
 
   // 2. Cek apakah data ada
   if (!data) {
     return (
-      <div className={`${styles.cardContainer} ${styles.emptyCardState}`}>
+      <Card padded={false}>
         <div className={styles.imageHeader}>
           <div className={styles.placeholderImg}></div>
         </div>
-        <div className={styles.headerInfo}>
-          <h3 className={styles.factorName}>No Analysis Yet</h3>
-        </div>
         <div className={styles.content}>
+          <div className={styles.headerInfo}>
+            <h3 className={styles.factorName}>No Analysis Yet</h3>
+          </div>
           <p className={styles.description}>
             Please take the assessment first to discover and analyze your
             critical wellness factors.
           </p>
         </div>
-      </div>
+      </Card>
     );
   }
 
   // 3. Jika data ada, baru jalankan return ini
   return (
-    <div className={styles.cardContainer}>
+    <Card padded={false}>
       <div className={styles.imageHeader}>
         <img
           src={getFactorImage(data.raw_name)}
@@ -50,11 +53,11 @@ const CriticalFactorCard = ({ data, loading }) => {
         />
       </div>
 
-      <div className={styles.headerInfo}>
-        <h3 className={styles.factorName}>{data.factor_name}</h3>
-      </div>
-
       <div className={styles.content}>
+        <div className={styles.headerInfo}>
+          <h3 className={styles.factorName}>{data.factor_name}</h3>
+        </div>
+
         {data.description ? (
           <p className={styles.description}>{data.description}</p>
         ) : (
@@ -81,7 +84,7 @@ const CriticalFactorCard = ({ data, loading }) => {
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 };
 

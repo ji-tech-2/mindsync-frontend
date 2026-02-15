@@ -1,110 +1,84 @@
-.container {
-  width: 100%;
-  min-height: 100%;
-  box-sizing: border-box;
-  background-color: #f5f2e8;
-  border-radius: 24px;
-  padding: 50px 54px 10px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 5%);
-}
+/* StreakCard Styles - Using Design System Variables */
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-lg);
 }
 
 .streakInfo {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-md);
 }
 
 .icon {
-  font-size: 40px;
+  font-size: 2.5rem;
 }
 
 .number {
-  font-size: 36px;
-  font-weight: 800;
-  color: #333;
-  line-height: 1;
+  font-family: var(--font-body);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-light);
+  line-height: var(--line-height-tight);
   margin: 0;
 }
 
 .unit {
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-light);
 }
 
 .label {
-  color: #777;
-  font-weight: 500;
-  margin: 4px 0 0;
-}
-
-.toggleContainer {
-  background-color: #8ba063;
-  padding: 4px;
-  border-radius: 50px;
-  display: flex;
-  gap: 4px;
-}
-
-.toggleBtn {
-  background: none;
-  border: none;
-  padding: 6px 16px;
-  border-radius: 50px;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.activeToggle {
-  background-color: white;
-  color: #8ba063;
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-md);
+  margin: var(--space-2xs) 0 0;
 }
 
 /* Days Row */
 .daysRow {
   display: flex;
   justify-content: space-between;
-  margin-top: 24px;
+  margin-top: var(--space-xl);
+  gap: var(--space-xs);
 }
 
 .dayItem {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-xs);
+  flex: 1;
 }
 
 .dayCircle {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #d1d5db; /* Default Gray */
-  color: white;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
+  background-color: var(--color-text-muted);
+  color: var(--color-text-dark);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  transition: background-color var(--transition-base);
+  opacity: 0.4;
 }
 
 .completed {
-  background-color: #8ba063; /* Hijau Sukses */
+  background-color: var(--color-success);
+  opacity: 1;
 }
 
 .dayName {
-  font-size: 12px;
-  font-weight: 600;
-  color: #6b7280;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
 }
 
 /* Loading, Error, Empty States */
@@ -114,75 +88,93 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 200px;
+  min-height: 12.5rem;
 }
 
 .loadingContent,
 .errorContent,
 .emptyContent {
   text-align: center;
-  color: #777;
+  color: var(--color-text-muted);
 }
 
 .loadingContent .icon,
 .errorContent .icon,
 .emptyContent .icon {
   display: block;
-  font-size: 48px;
-  margin-bottom: 12px;
+  font-size: 3rem;
+  margin-bottom: var(--space-sm);
 }
 
 .loadingContent p,
 .errorContent p {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 8px 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  margin: var(--space-xs) 0;
+  color: var(--color-text-light);
 }
 
 .errorContent small {
   display: block;
-  font-size: 12px;
-  color: #999;
-  margin-top: 4px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2xs);
 }
 
 .emptyContent {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-md);
 }
 
 .emptyContent .icon {
-  font-size: 40px;
+  font-size: 2.5rem;
   margin-bottom: 0;
 }
 
 .emptyContent .label {
-  color: #999;
-  font-size: 14px;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
 
-@media (width <= 480px) {
-  .container {
-    padding: 30px;
-  }
-
+/* Responsive Design */
+@media (width <= 768px) {
   .header {
     flex-direction: column;
-    align-items: flex-start;
+    gap: var(--space-md);
+    align-items: stretch;
   }
 
-  .toggleContainer {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .toggleBtn {
-    flex: 1;
-    text-align: center;
+  .dayCircle {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.75rem;
   }
 
   .dayName {
-    font-size: 10px;
+    font-size: 0.625rem;
+  }
+}
+
+@media (width <= 480px) {
+  .icon {
+    font-size: 2rem;
+  }
+
+  .number {
+    font-size: var(--font-size-2xl);
+  }
+
+  .daysRow {
+    gap: var(--space-2xs);
+  }
+
+  .dayCircle {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .dayName {
+    font-size: 0.5rem;
   }
 }

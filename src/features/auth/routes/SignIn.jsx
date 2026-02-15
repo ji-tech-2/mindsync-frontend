@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import apiClient, { API_CONFIG } from '@/config/api';
+import { signIn as signInService } from '@/services';
 import { Button, TextField, Message, Link } from '@/components';
 import PasswordField from '../components/PasswordField';
 import AuthPageLayout from '../components/AuthPageLayout';
@@ -95,12 +95,7 @@ export default function SignIn() {
     // Backend response: { success: true, user: { email, name, userId } }
     // Authentication via httpOnly cookie (no token in response)
     try {
-      const response = await apiClient.post(API_CONFIG.AUTH_LOGIN, {
-        email: form.email,
-        password: form.password,
-      });
-
-      const data = response.data;
+      const data = await signInService(form.email, form.password);
 
       if (data.success && data.user) {
         setMessage('Sign in successful!');

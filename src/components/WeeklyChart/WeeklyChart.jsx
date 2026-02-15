@@ -17,12 +17,20 @@ const THRESHOLDS = { DANGEROUS: 12, NOT_HEALTHY: 28.6, AVERAGE: 61.4 };
 // Gray color for days without data
 const NO_DATA_COLOR = '#D0D0D0';
 
+// Color constants using CSS variables
+const COLORS = {
+  HEALTHY: '#10b981', // var(--color-green)
+  AVERAGE: '#f59e0b', // var(--color-yellow)
+  NOT_HEALTHY: '#f97316', // var(--color-orange)
+  DANGEROUS: '#ef4444', // var(--color-red)
+};
+
 // Get bar color based on model category
 const getBarColor = (value) => {
-  if (value > THRESHOLDS.AVERAGE) return '#4CAF50'; // Healthy - Green
-  if (value > THRESHOLDS.NOT_HEALTHY) return '#FFC107'; // Average - Yellow
-  if (value > THRESHOLDS.DANGEROUS) return '#FF9800'; // Not Healthy - Orange
-  return '#F44336'; // Dangerous - Red
+  if (value > THRESHOLDS.AVERAGE) return COLORS.HEALTHY; // Healthy - Green
+  if (value > THRESHOLDS.NOT_HEALTHY) return COLORS.AVERAGE; // Average - Yellow
+  if (value > THRESHOLDS.DANGEROUS) return COLORS.NOT_HEALTHY; // Not Healthy - Orange
+  return COLORS.DANGEROUS; // Dangerous - Red
 };
 
 // Get health status label
@@ -129,28 +137,28 @@ export default function WeeklyChart({
         <div className={styles['legend-item']}>
           <span
             className={styles['legend-color']}
-            style={{ background: '#4CAF50' }}
+            style={{ background: COLORS.HEALTHY }}
           ></span>
           <span>Healthy (&gt;61.4)</span>
         </div>
         <div className={styles['legend-item']}>
           <span
             className={styles['legend-color']}
-            style={{ background: '#FFC107' }}
+            style={{ background: COLORS.AVERAGE }}
           ></span>
           <span>Average (28.6-61.4)</span>
         </div>
         <div className={styles['legend-item']}>
           <span
             className={styles['legend-color']}
-            style={{ background: '#FF9800' }}
+            style={{ background: COLORS.NOT_HEALTHY }}
           ></span>
           <span>Not Healthy (12-28.6)</span>
         </div>
         <div className={styles['legend-item']}>
           <span
             className={styles['legend-color']}
-            style={{ background: '#F44336' }}
+            style={{ background: COLORS.DANGEROUS }}
           ></span>
           <span>Dangerous (≤12)</span>
         </div>
@@ -196,19 +204,19 @@ export default function WeeklyChart({
             />
             <ReferenceLine
               y={THRESHOLDS.DANGEROUS}
-              stroke="#F44336"
+              stroke={COLORS.DANGEROUS}
               strokeDasharray="4 4"
               strokeOpacity={0.6}
             />
             <ReferenceLine
               y={THRESHOLDS.NOT_HEALTHY}
-              stroke="#FF9800"
+              stroke={COLORS.NOT_HEALTHY}
               strokeDasharray="4 4"
               strokeOpacity={0.6}
             />
             <ReferenceLine
               y={THRESHOLDS.AVERAGE}
-              stroke="#4CAF50"
+              stroke={COLORS.HEALTHY}
               strokeDasharray="4 4"
               strokeOpacity={0.6}
             />

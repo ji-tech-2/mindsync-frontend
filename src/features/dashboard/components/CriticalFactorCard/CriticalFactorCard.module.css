@@ -1,24 +1,10 @@
-.cardContainer {
-  background: #f2ede4;
-  border-radius: 30px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgb(0 0 0 / 5%);
-  transition: transform 0.3s ease;
-  height: 100%; /* Agar tinggi card seragam jika dalam grid */
-  display: flex;
-  flex-direction: column;
-  border: 1px solid rgb(0 0 0 / 3%);
-}
-
-.cardContainer:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgb(0 0 0 / 8%);
-}
+/* CriticalFactorCard Styles - Using Design System Variables */
 
 .imageHeader {
-  background: #c4c1b4;
-  height: 160px;
+  background: var(--color-text-muted);
+  height: 10rem;
   width: 100%;
+  overflow: hidden;
 }
 
 .factorImg {
@@ -27,8 +13,24 @@
   object-fit: cover;
 }
 
+.placeholderImg {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-light) 0%,
+    var(--color-bg-surface) 100%
+  );
+}
+
+.content {
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
 .headerInfo {
-  padding: 24px 24px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -36,56 +38,59 @@
 
 .factorName {
   margin: 0;
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: #454238;
-  letter-spacing: -0.02em;
+  font-family: var(--font-body);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-light);
+  letter-spacing: var(--letter-spacing-tight);
   text-align: center;
-}
-
-.content {
-  padding: 0 32px 32px;
-  flex-grow: 1; /* Supaya konten mengisi sisa ruang */
+  line-height: var(--line-height-tight);
 }
 
 .description {
-  font-size: 0.95rem;
-  line-height: 1.6;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
   text-align: center;
-  color: #454238;
-  margin-bottom: 20px;
-  opacity: 0.9;
+  color: var(--color-text-light);
+  margin: 0;
+  font-weight: var(--font-weight-regular);
 }
 
 .noSuggestions {
-  font-size: 0.9rem;
-  color: #8a8678;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
   text-align: center;
-  margin-top: 10px;
+  margin: 0;
+  font-weight: var(--font-weight-medium);
 }
 
 .referenceSection {
-  border-top: 1px solid rgb(0 0 0 / 8%);
-  padding-top: 16px;
+  border-top: var(--border-sm) solid var(--color-text-muted);
+  padding-top: var(--space-md);
+  margin-top: var(--space-md);
+  opacity: 0.6;
 }
 
 .refTitle {
-  font-weight: 700;
-  margin-bottom: 10px;
-  font-size: 0.9rem;
-  color: #454238;
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
 }
 
 .refList {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
 }
 
 .refItem {
-  font-size: 0.85rem;
-  margin-bottom: 6px;
-  padding-left: 20px;
+  font-size: var(--font-size-sm);
+  padding-left: var(--space-lg);
   position: relative;
 }
 
@@ -97,64 +102,63 @@
 }
 
 .refLink {
-  color: #5b4cdb;
+  color: var(--color-primary);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
+  transition: color var(--transition-fast);
+}
+
+.refLink:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
 }
 
 .loadingState {
-  padding: 40px;
+  padding: var(--space-3xl);
   text-align: center;
-  background: #f9f9f9;
-  border-radius: 30px;
-  color: #999;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
 }
 
+/* Responsive Design */
 @media (width <= 768px) {
-  .cardContainer {
-    border-radius: 24px;
-  }
-
   .imageHeader {
-    height: 140px;
+    height: 8.75rem;
   }
 
-  .headerInfo {
-    padding: 20px;
+  .content {
+    padding: var(--space-lg);
   }
 
   .factorName {
-    font-size: 1.2rem;
+    font-size: var(--font-size-lg);
   }
 
-  .innerContent {
-    padding: 0 24px 24px;
+  .description {
+    font-size: var(--font-size-sm);
   }
 }
 
 @media (width <= 480px) {
   .imageHeader {
-    height: 120px;
+    height: 7.5rem;
   }
 
-  .headerInfo {
-    padding: 16px;
+  .content {
+    padding: var(--space-md);
   }
 
   .factorName {
-    font-size: 1.1rem;
-  }
-
-  .innerContent {
-    padding: 0 20px 20px;
+    font-size: var(--font-size-md);
   }
 
   .description {
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     text-align: left;
   }
 
   .refItem {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
 }

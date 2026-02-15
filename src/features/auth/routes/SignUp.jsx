@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient, { API_CONFIG } from '@/config/api';
+import { register as registerService } from '@/services';
 import {
   Dropdown,
   TextField,
@@ -254,11 +254,7 @@ export default function SignUp() {
         toApiWorkMode
       );
 
-      const response = await apiClient.post(
-        API_CONFIG.AUTH_REGISTER,
-        formDataToSubmit
-      );
-      const result = response.data;
+      const result = await registerService(formDataToSubmit);
 
       if (result.success) {
         setMessage('Registration successful! Redirecting to login...');
