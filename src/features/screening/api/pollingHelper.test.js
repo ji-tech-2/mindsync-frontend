@@ -28,7 +28,7 @@ describe('pollPredictionResult', () => {
       const result = await pollPredictionResult(
         'test-prediction-id',
         'http://test-api.com',
-        '/v1/predictions',
+        '/v0-1/result',
         3,
         100
       );
@@ -80,7 +80,7 @@ describe('pollPredictionResult', () => {
       const partialResult = await pollPredictionResult(
         'test-prediction-id',
         'http://test-api.com',
-        '/v1/predictions',
+        '/v0-1/result',
         3,
         100
       );
@@ -96,7 +96,7 @@ describe('pollPredictionResult', () => {
       const readyResult = await pollPredictionResult(
         'test-prediction-id',
         'http://test-api.com',
-        '/v1/predictions',
+        '/v0-1/result',
         3,
         100
       );
@@ -189,7 +189,7 @@ describe('pollPredictionResult', () => {
       const result = await pollPredictionResult(
         'test-prediction-id',
         'http://test-api.com',
-        '/v1/predictions',
+        '/v0-1/result',
         5,
         10 // short interval for test
       );
@@ -213,7 +213,7 @@ describe('pollPredictionResult', () => {
         pollPredictionResult(
           'test-prediction-id',
           'http://test-api.com',
-          '/v1/predictions',
+          '/v0-1/result',
           3, // only 3 attempts
           10
         )
@@ -240,7 +240,7 @@ describe('pollPredictionResult', () => {
         pollPredictionResult(
           'test-prediction-id',
           'http://test-api.com',
-          '/v1/predictions',
+          '/v0-1/result',
           3,
           100
         )
@@ -262,7 +262,7 @@ describe('pollPredictionResult', () => {
         pollPredictionResult(
           'test-prediction-id',
           'http://test-api.com',
-          '/v1/predictions',
+          '/v0-1/result',
           3,
           100
         )
@@ -292,7 +292,7 @@ describe('pollPredictionResult', () => {
       const result = await pollPredictionResult(
         'test-prediction-id',
         'http://test-api.com',
-        '/v1/predictions',
+        '/v0-1/result',
         5,
         10
       );
@@ -308,7 +308,7 @@ describe('pollPredictionResult', () => {
         pollPredictionResult(
           'test-prediction-id',
           'http://test-api.com',
-          '/v1/predictions',
+          '/v0-1/result',
           3,
           10
         )
@@ -331,7 +331,7 @@ describe('pollPredictionResult', () => {
         pollPredictionResult(
           'test-prediction-id',
           'http://test-api.com',
-          '/v1/predictions',
+          '/v0-1/result',
           3,
           100
         )
@@ -361,13 +361,13 @@ describe('pollPredictionResult', () => {
       await pollPredictionResult(
         'abc123',
         'http://api.example.com',
-        '/v1/predictions',
+        '/v0-1/result',
         3,
         100
       );
 
       expect(fetch).toHaveBeenCalledWith(
-        'http://api.example.com/v1/predictions/abc123/result',
+        'http://api.example.com/v0-1/result/abc123',
         {
           method: 'GET',
           headers: {

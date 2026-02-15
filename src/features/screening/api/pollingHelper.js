@@ -3,9 +3,9 @@
  * 1. Fast Numeric Model (Flask) - Returns score & category quickly
  * 2. Slow Advisory Model (Gemini API) - Returns wellness analysis asynchronously
  *
- * Kong Gateway Routes (v1 API):
- * - POST /v1/predictions/create → Flask /predict ✅
- * - GET  /v1/predictions/{id}/result → Flask /result ✅
+ * Kong Gateway Routes:
+ * - POST /v0-1/model-predict → Flask /predict ✅
+ * - GET  /v0-1/model-result/{id} → Flask /result/{id} ✅
  *
  * Response Stages:
  * - Stage 1 (partial): { status: "partial", result: { prediction_score, health_level } }
@@ -69,7 +69,7 @@ function buildPartialResponse(data) {
  * Poll with callback support for partial results
  * @param {string} predictionId - The prediction ID to poll
  * @param {string} baseURL - Base URL for the API
- * @param {string} resultPath - Result endpoint path (v1: '/v1/predictions')
+ * @param {string} resultPath - Result endpoint path
  * @param {number} maxAttempts - Maximum polling attempts
  * @param {number} interval - Interval between polls in ms
  * @param {Function} onPartialResult - Callback for partial results (optional)
@@ -78,7 +78,7 @@ function buildPartialResponse(data) {
 export async function pollPredictionResult(
   predictionId,
   baseURL = 'https://api.mindsync.my',
-  resultPath = '/v1/predictions',
+  resultPath = '/v0-1/result',
   maxAttempts = 60,
   interval = 2000
 ) {
@@ -91,7 +91,7 @@ export async function pollPredictionResult(
     );
 
     try {
-      const pollUrl = `${baseURL}${resultPath}/${predictionId}/result`;
+      const pollUrl = `${baseURL}${resultPath}/${predictionId}`;
       console.log(`📡 Polling URL: ${pollUrl}`);
 
       const response = await fetch(pollUrl, {
