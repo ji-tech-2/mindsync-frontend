@@ -17,3 +17,8 @@ export { default as Navbar } from './Navbar';
 export { default as Footer } from './Footer';
 export { default as ProfileAvatar } from './ProfileAvatar';
 export { default as ProfileDropdown } from './ProfileDropdown';
+
+// Form components
+export { default as FormContainer } from './FormContainer';
+export { default as StageContainer } from './StageContainer';
+export { default as FormSection } from './FormSection';

@@ -1,0 +1,20 @@
+.progressBarContainer {
+  width: 100%;
+  height: 6px;
+  background-color: var(--color-primary-light);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.progressBar {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-primary-dark)
+  );
+  border-radius: var(--radius-full);
+  transition: width var(--transition-base);
+  box-shadow: 0 0 8px var(--color-primary);
+}

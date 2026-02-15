@@ -3,13 +3,21 @@ import styles from './Message.module.css';
 /**
  * Message Component - displays messages with different types (error, success, info)
  * @param {Object} props
- * @param {string} props.message - Message text to display
+ * @param {string} props.message - Message text to display (deprecated, use children)
+ * @param {React.ReactNode} props.children - Message content to display
  * @param {'error' | 'success' | 'info'} [props.type='info'] - Type of message (default: 'info')
+ * @param {string} props.className - Additional CSS classes
  */
-const Message = ({ message, type = 'info' }) => {
-  if (!message) return null;
+const Message = ({ message, children, type = 'info', className = '' }) => {
+  const content = children || message;
 
-  return <div className={`${styles.message} ${styles[type]}`}>{message}</div>;
+  if (!content) return null;
+
+  return (
+    <div className={`${styles.message} ${styles[type]} ${className}`}>
+      {content}
+    </div>
+  );
 };
 
 export default Message;
