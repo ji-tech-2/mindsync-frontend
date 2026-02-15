@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuth } from '@/features/auth';
-import '@/features/dashboard/assets/dashboard.css';
+import { Button, Card } from '@/components';
+import styles from './Home.module.css';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -22,35 +23,85 @@ export default function Home() {
   }
 
   return (
-    <div className="dashboard-container">
-      <header className="dashboard-header logged-out-header">
-        <div className="welcome-section">
-          <h1>Welcome</h1>
-          <p>Mental Wellness Advisor</p>
-          <p>Start your mental health journey today.</p>
+    <>
+      {/* Hero Section */}
+      <section className={styles.hero}>
+        <div className={styles.heroContent}>
+          <h1 className={styles.heroTitle}>Your Mental Health Companion</h1>
+          <p className={styles.heroSubtitle}>
+            Take control of your mental well-being with personalized screening,
+            expert insights, and science-backed recommendations
+          </p>
+          <div className={styles.heroCtas}>
+            <Button variant="filled" onClick={() => navigate('/signup')}>
+              Get Started
+            </Button>
+            <Button variant="filled" onClick={() => navigate('/screening')}>
+              Try Screening
+            </Button>
+          </div>
         </div>
-      </header>
+      </section>
 
-      <div className="quick-actions logged-out-actions">
-        <h2>Choose an Action</h2>
-        <div className="actions-grid two-columns">
-          <div className="action-card" onClick={() => navigate('/screening')}>
-            <div className="action-icon" style={{ background: '#7953c9' }}>
-              📝
-            </div>
-            <h3>Take Mental Health Test</h3>
-            <p>Start evaluating your mental condition without an account.</p>
+      {/* Main Content */}
+      <div className={styles.container}>
+        <div className={styles.content}>
+          {/* Features Section */}
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>How MindSync Helps You</h2>
+            <p className={styles.sectionDescription}>
+              Our evidence-based approach combines professional screening tools
+              with personalized insights to support your mental health journey
+            </p>
+          </section>
+
+          <div className={styles.featuresGrid}>
+            <Card>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>🧠</div>
+                <h3 className={styles.featureTitle}>Professional Screening</h3>
+                <p className={styles.featureDescription}>
+                  Access validated mental health assessments used by healthcare
+                  professionals worldwide
+                </p>
+              </div>
+            </Card>
+
+            <Card>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>📊</div>
+                <h3 className={styles.featureTitle}>Track Progress</h3>
+                <p className={styles.featureDescription}>
+                  Monitor your mental health journey with visual insights and
+                  weekly trends
+                </p>
+              </div>
+            </Card>
+
+            <Card>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>💡</div>
+                <h3 className={styles.featureTitle}>Personalized Advice</h3>
+                <p className={styles.featureDescription}>
+                  Receive tailored recommendations based on your unique
+                  screening results
+                </p>
+              </div>
+            </Card>
           </div>
 
-          <div className="action-card" onClick={() => navigate('/signin')}>
-            <div className="action-icon" style={{ background: '#59c2e0' }}>
-              🔒
-            </div>
-            <h3>Login / Sign Up</h3>
-            <p>Sign up to save your results and history.</p>
-          </div>
+          {/* Why Section */}
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>Why Mental Health Matters</h2>
+            <p className={styles.sectionDescription}>
+              Mental health is just as important as physical health. Regular
+              screening helps identify concerns early, track improvements, and
+              maintain overall well-being. Start your journey today with a
+              quick, confidential assessment.
+            </p>
+          </section>
         </div>
       </div>
-    </div>
+    </>
   );
 }

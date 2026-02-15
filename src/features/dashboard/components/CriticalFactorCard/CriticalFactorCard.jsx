@@ -66,7 +66,7 @@ const CriticalFactorCard = ({ data, loading }) => {
 
         {data.references && data.references.length > 0 && (
           <div className={styles.referenceSection}>
-            <h4 className={styles.refTitle}>Sources & Resources:</h4>
+            <h4 className={styles.refTitle}>References:</h4>
             <ul className={styles.refList}>
               {data.references.map((ref, idx) => (
                 <li key={idx} className={styles.refItem}>

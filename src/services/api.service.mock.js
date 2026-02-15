@@ -11,6 +11,30 @@
 
 const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// LocalStorage keys for mock session
+const MOCK_SESSION_KEY = 'mock_isLoggedIn';
+
+// Helper functions for localStorage
+const getMockSession = () => {
+  try {
+    return localStorage.getItem(MOCK_SESSION_KEY) === 'true';
+  } catch {
+    return false;
+  }
+};
+
+const setMockSession = (value) => {
+  try {
+    if (value) {
+      localStorage.setItem(MOCK_SESSION_KEY, 'true');
+    } else {
+      localStorage.removeItem(MOCK_SESSION_KEY);
+    }
+  } catch (e) {
+    console.warn('Failed to update mock session in localStorage:', e);
+  }
+};
+
 const randomScore = () => Math.floor(Math.random() * 100);
 
 const randomCategory = () => {
@@ -33,7 +57,8 @@ let mockUser = {
 };
 
 // Track if user is "logged in" (simulates session)
-let isLoggedIn = true; // Start logged in for easier development
+// Initialize from localStorage to persist across page refreshes
+let isLoggedIn = getMockSession();
 
 // Mock screenings store
 let mockScreenings = [];
@@ -60,6 +85,7 @@ export async function signIn(email, password) {
   }
 
   isLoggedIn = true; // Mark user as logged in
+  setMockSession(true); // Persist to localStorage
 
   return {
     success: true,
@@ -140,6 +166,25 @@ export async function changePassword(email, otp, newPassword) {
   };
 }
 
+/**
+ * Logout user (mock)
+ * Note: Logout is primarily handled client-side by clearing tokens/storage,
+ * but this function simulates any server-side session cleanup
+ */
+export async function logout() {
+  await delay(300);
+
+  console.log('🎭 [MOCK] Logout');
+
+  isLoggedIn = false; // Clear mock session
+  setMockSession(false); // Remove from localStorage
+
+  return {
+    success: true,
+    message: 'Logged out successfully',
+  };
+}
+
 // ====================================
 // PROFILE SERVICES
 // ====================================
@@ -150,6 +195,9 @@ export async function changePassword(email, otp, newPassword) {
  */
 export async function getProfile() {
   await delay(400);
+
+  // Sync with localStorage in case it was cleared externally
+  isLoggedIn = getMockSession();
 
   console.log('🎭 [MOCK] Get profile (logged in:', isLoggedIn, ')');
 
@@ -436,11 +484,39 @@ export async function getStreak(userId) {
 
   console.log('🎭 [MOCK] Get streak:', userId);
 
+  // Calculate completed days for current week
+  const today = new Date();
+  const currentDay = today.getDay();
+  const startOfWeek = new Date(today);
+  const diff = (currentDay === 0 ? -6 : 1) - currentDay;
+  startOfWeek.setDate(today.getDate() + diff);
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  // Generate 2-4 random completed days this week
+  const completedDays = [];
+  const numCompletedDays = Math.floor(Math.random() * 3) + 2;
+  for (let i = 0; i < numCompletedDays; i++) {
+    const dayOffset = Math.floor(Math.random() * 7);
+    const completedDate = new Date(startOfWeek);
+    completedDate.setDate(startOfWeek.getDate() + dayOffset);
+    const dateStr = completedDate.toISOString().split('T')[0];
+    if (!completedDays.includes(dateStr)) {
+      completedDays.push(dateStr);
+    }
+  }
+
   return {
     status: 'success',
     data: {
-      current_streak: Math.floor(Math.random() * 30) + 1,
-      longest_streak: Math.floor(Math.random() * 60) + 10,
+      daily: {
+        current: Math.floor(Math.random() * 30) + 1,
+        longest: Math.floor(Math.random() * 60) + 10,
+      },
+      weekly: {
+        current: Math.floor(Math.random() * 15) + 1,
+        longest: Math.floor(Math.random() * 30) + 5,
+      },
+      completed_days_this_week: completedDays,
       total_screenings: Math.floor(Math.random() * 100) + 20,
       last_screening_date: new Date().toISOString(),
     },

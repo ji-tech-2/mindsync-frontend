@@ -89,7 +89,7 @@ const DashboardSuggestion = ({ data, loading }) => {
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.title}>Daily Suggestion</h3>
+      <h2>Daily Suggestion</h2>
       <ul className={styles.suggestionList}>
         {suggestions.map((item, index) => (
           <li key={index} className={styles.suggestionItem}>

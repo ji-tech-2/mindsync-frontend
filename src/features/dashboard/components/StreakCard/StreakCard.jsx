@@ -73,25 +73,6 @@ export default function StreakCard({ data, loading, error }) {
     );
   }
 
-  // Empty state - no data available
-  if (!data || (!data.daily && !data.weekly)) {
-    return (
-      <Card>
-        <div className={styles.empty}>
-          <div className={styles.emptyContent}>
-            <span className={styles.icon}>🔥</span>
-            <div>
-              <h2 className={styles.number}>
-                0 <span className={styles.unit}>days</span>
-              </h2>
-              <p className={styles.label}>Start your first screening!</p>
-            </div>
-          </div>
-        </div>
-      </Card>
-    );
-  }
-
   const { currentStreak, unit } = getStreakData(data, viewType);
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const completedDays = data.completed_days_this_week || [];

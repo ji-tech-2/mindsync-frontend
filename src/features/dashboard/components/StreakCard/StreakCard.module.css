@@ -36,7 +36,6 @@
   color: var(--color-text-muted);
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-md);
-  margin: var(--space-2xs) 0 0;
 }
 
 /* Days Row */
@@ -71,7 +70,7 @@
 }
 
 .completed {
-  background-color: var(--color-success);
+  background-color: var(--color-primary);
   opacity: 1;
 }
 

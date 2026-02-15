@@ -8,6 +8,7 @@ import styles from './Card.module.css';
  * @param {boolean} props.padded - Whether the card has padding (default: true)
  * @param {string} props.elevation - Shadow elevation level: 'md' (default), 'lg', or 'none' for no shadow
  * @param {string} props.variant - Background color variant: 'surface' (default), 'light', or 'dark'
+ * @param {boolean} props.clipOverflow - Whether to clip overflow content (default: true)
  * @param {string} props.className - Additional CSS classes
  */
 const Card = ({
@@ -15,12 +16,14 @@ const Card = ({
   padded = true,
   elevation = 'md',
   variant = 'surface',
+  clipOverflow = true,
   className = '',
   ...rest
 }) => {
   const cardClass = [
     styles.card,
     padded && styles.padded,
+    clipOverflow && styles.clipOverflow,
     elevation &&
       styles[
         `elevation${elevation.charAt(0).toUpperCase() + elevation.slice(1)}`

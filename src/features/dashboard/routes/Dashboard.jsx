@@ -12,7 +12,7 @@ import { buildWeeklyChartFromHistory } from '@/utils/chartHelpers';
 import { useAuth } from '@/features/auth';
 import CriticalFactorCard from '../components/CriticalFactorCard';
 import DashboardSuggestion from '../components/DashboardSuggestion';
-import StreakCard from '@/features/screening/components/StreakCard';
+import StreakCard from '../components/StreakCard';
 
 // Mapping untuk nama faktor yang lebih bersahabat
 const FACTOR_MAP = {
@@ -175,7 +175,6 @@ export default function Dashboard() {
           <Button
             variant="filled"
             size="lg"
-            icon="←"
             onClick={() => navigate('/screening')}
           >
             Take Screening Now
@@ -200,14 +199,12 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          <Card>
-            <WeeklyChart
-              data={weeklyData}
-              title="Last 7 Days Trend"
-              navigate={navigate}
-              compact
-            />
-          </Card>
+          <WeeklyChart
+            data={weeklyData}
+            title="Weekly Chart"
+            navigate={navigate}
+            compact
+          />
         </div>
 
         <h2 className={styles.sectionTitle}>Critical Factors</h2>
