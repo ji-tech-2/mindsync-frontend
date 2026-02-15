@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
 import { pollPredictionResult } from '@/services';
+import { Button } from '@/components';
 import { Advice } from '@/components';
-import '../assets/result.css';
+import ScoreDisplay from '../components/ScoreDisplay';
+import StatusBadge from '../components/StatusBadge';
+import styles from './Result.module.css';
 
 const ResultPage = () => {
   const navigate = useNavigate();
@@ -214,37 +217,17 @@ const ResultPage = () => {
     loadResult();
   }, [predictionId, navigate]);
 
-  const getScoreColor = (category) => {
-    if (category === 'dangerous') return '#FF4757';
-    if (category === 'not healthy') return '#FFA502';
-    if (category === 'average') return '#FFD93D';
-    return '#6BCB77';
-  };
-
-  const getCategoryLabel = (category) => {
-    if (category === 'dangerous') return 'Dangerous';
-    if (category === 'not healthy') return 'Not Healthy';
-    if (category === 'average') return 'Average';
-    return 'Healthy';
-  };
-
   // Show loading if data is not ready or still polling
   if (isPolling && loadingStage === 1) {
     return (
-      <div className="result-container">
-        <div className="result-loading">
-          <div className="loading-spinner"></div>
-          <h2>Analyzing Your Data...</h2>
-          <p>Please wait a moment, we are processing your screening results</p>
-          <div className="loading-progress">
-            <div className="progress-step active">
-              <span className="step-number">1</span>
-              <span className="step-label">Calculating Mental Score</span>
-            </div>
-            <div className="progress-step">
-              <span className="step-number">2</span>
-              <span className="step-label">Analyzing Results</span>
-            </div>
+      <div className={styles.resultPage}>
+        <div className={styles.container}>
+          <div className={styles.loading}>
+            <div className={styles.loadingSpinner}></div>
+            <h2>Analyzing Your Data...</h2>
+            <p>
+              Please wait a moment, we are processing your screening results
+            </p>
           </div>
         </div>
       </div>
@@ -254,20 +237,19 @@ const ResultPage = () => {
   // Show error if polling failed
   if (pollingError) {
     return (
-      <div className="result-container">
-        <div className="result-error">
-          <h2>⚠️ An Error Occurred</h2>
-          <p>{pollingError}</p>
-          <div className="result-footer">
-            <button
-              className="btn btn-primary"
-              onClick={() => navigate('/screening')}
-            >
-              Try Again
-            </button>
-            <button className="btn btn-outline" onClick={() => navigate('/')}>
-              Back to Home
-            </button>
+      <div className={styles.resultPage}>
+        <div className={styles.container}>
+          <div className={styles.error}>
+            <h2>⚠️ An Error Occurred</h2>
+            <p>{pollingError}</p>
+            <div className={styles.buttonGroup}>
+              <Button variant="filled" onClick={() => navigate('/screening')}>
+                Try Again
+              </Button>
+              <Button variant="outlined" onClick={() => navigate('/')}>
+                Back to Home
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -276,76 +258,69 @@ const ResultPage = () => {
 
   // Show loading if data is not ready yet
   if (!resultData) {
-    return <div className="result-loading">Loading analysis results...</div>;
+    return (
+      <div className={styles.resultPage}>
+        <div className={styles.container}>
+          <div className={styles.loading}>
+            <p>Loading analysis results...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const score = resultData.mentalWellnessScore;
-  const scoreColor = getScoreColor(resultData.category);
 
   return (
-    <div className="result-container">
-      {/* Header */}
-      <div className="result-header">
-        <h1>Your Mental Health Score</h1>
-        <p>Based on your screening answers</p>
-      </div>
+    <div className={styles.resultPage}>
+      <div className={styles.container}>
+        {/* Header */}
+        <header className={styles.header}>
+          <h1>Your Mental Health Score</h1>
+          <p>Based on your screening answers</p>
+        </header>
 
-      {/* Score Circle - Always Shown */}
-      <div className="score-section">
-        <div
-          className="score-circle"
-          style={{ borderColor: scoreColor, color: scoreColor }}
-        >
-          <div className="score-value">{score.toFixed(1)}</div>
-          <div className="score-max">/100</div>
+        {/* Score Display */}
+        <div className={styles.scoreSection}>
+          <ScoreDisplay score={score} category={resultData.category} />
+          <StatusBadge category={resultData.category} />
         </div>
-        <div className="score-category" style={{ backgroundColor: scoreColor }}>
-          {getCategoryLabel(resultData.category)}
-        </div>
-      </div>
 
-      {/* Advice Section - Only for authenticated users */}
-      {user ? (
-        <Advice
-          resultData={resultData}
-          adviceData={adviceData}
-          isLoading={isLoadingAdvice}
-        />
-      ) : (
-        <div className="advice-locked">
-          <h3>🔒 Personal Advice Locked</h3>
-          <p>
-            Sign in or register to view personalized mental health advice based
-            on your results.
-          </p>
-          <div className="auth-buttons">
-            <button
-              className="btn btn-primary"
-              onClick={() => navigate('/signin')}
-            >
-              Sign In
-            </button>
-            <button
-              className="btn btn-outline"
-              onClick={() => navigate('/register')}
-            >
-              Register
-            </button>
-          </div>
-        </div>
-      )}
+        {/* Content Section */}
+        <section className={styles.contentSection}>
+          {user ? (
+            <Advice adviceData={adviceData} isLoading={isLoadingAdvice} />
+          ) : (
+            <div className={styles.authLocked}>
+              <h3>🔒 Personal Advice Locked</h3>
+              <p>
+                Sign in or register to view personalized mental health advice
+                based on your results.
+              </p>
+              <div className={styles.buttonGroup}>
+                <Button variant="filled" onClick={() => navigate('/signin')}>
+                  Sign In
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate('/register')}
+                >
+                  Register
+                </Button>
+              </div>
+            </div>
+          )}
+        </section>
 
-      {/* Footer Action */}
-      <div className="result-footer">
-        <button
-          className="btn btn-primary"
-          onClick={() => navigate('/screening')}
-        >
-          Retake Test
-        </button>
-        <button className="btn btn-outline" onClick={() => navigate('/')}>
-          Back to Home
-        </button>
+        {/* Footer Actions */}
+        <div className={styles.footer}>
+          <Button variant="outlined" onClick={() => navigate('/screening')}>
+            Retake Test
+          </Button>
+          <Button variant="filled" onClick={() => navigate('/')}>
+            Back to Home
+          </Button>
+        </div>
       </div>
     </div>
   );

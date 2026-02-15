@@ -1,0 +1,81 @@
+.collapsibleCard {
+  overflow: visible;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-lg);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border-radius: var(--radius-lg);
+}
+
+.header:hover {
+  background-color: rgb(134 153 89 / 5%);
+}
+
+.header:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.title {
+  font-family: var(--font-body);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-light);
+  text-align: left;
+  margin: 0;
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--color-primary);
+  transition: transform var(--transition-base);
+}
+
+.iconExpanded {
+  transform: rotate(180deg);
+}
+
+.content {
+  padding: 0 var(--space-lg) var(--space-lg) var(--space-lg);
+  animation: slide-down var(--transition-base);
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (width <= 640px) {
+  .header {
+    padding: var(--space-md);
+  }
+
+  .title {
+    font-size: var(--font-size-md);
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .content {
+    padding: 0 var(--space-md) var(--space-md) var(--space-md);
+  }
+}

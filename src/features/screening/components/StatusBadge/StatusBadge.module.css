@@ -1,0 +1,34 @@
+.statusBadge {
+  display: inline-block;
+  padding: var(--space-sm) var(--space-xl);
+  border-radius: var(--radius-xl);
+  font-family: var(--font-body);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: white;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-fast);
+}
+
+.statusBadge:hover {
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (width <= 640px) {
+  .statusBadge {
+    padding: var(--space-xs) var(--space-lg);
+    font-size: var(--font-size-md);
+  }
+}
+
+@media (width <= 480px) {
+  .statusBadge {
+    padding: var(--space-xs) var(--space-md);
+    font-size: var(--font-size-sm);
+    letter-spacing: 0.05em;
+  }
+}

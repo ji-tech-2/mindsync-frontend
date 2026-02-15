@@ -414,7 +414,7 @@ export default function Screening() {
           icon={<FontAwesomeIcon icon={faChevronLeft} />}
           className={styles.exitButton}
         >
-          Exit
+          Back to Home
         </Button>
         <img src={logoSubmark} alt="MindSync" className={styles.logo} />
       </div>

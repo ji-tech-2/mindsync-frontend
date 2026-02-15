@@ -28,7 +28,6 @@
 
 .slider {
   appearance: none;
-  appearance: none;
   width: 100%;
   height: 8px;
   border-radius: var(--radius-full);
@@ -43,7 +42,6 @@
 
 /* Webkit browsers (Chrome, Safari, Edge) */
 .slider::-webkit-slider-thumb {
-  appearance: none;
   appearance: none;
   width: 24px;
   height: 24px;
