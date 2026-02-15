@@ -1,30 +1,30 @@
 /**
  * API Route Constants
  *
- * Centralized API endpoint definitions.
+ * Centralized API endpoint definitions for v1 API.
  * All routes are relative to the base URL configured in the axios client.
  */
 
 export const API_ROUTES = {
   // Authentication
-  AUTH_LOGIN: '/v0-1/auth-login',
-  AUTH_REGISTER: '/v0-1/auth-register',
+  AUTH_LOGIN: '/v1/auth/login',
+  AUTH_REGISTER: '/v1/auth/register',
 
   // Profile
-  PROFILE: '/v0-1/auth-profile',
-  PROFILE_REQUEST_OTP: '/v0-1/auth-profile/request-otp',
-  PROFILE_CHANGE_PASSWORD: '/v0-1/auth-profile/change-password',
+  PROFILE: '/v1/users', // Append /{userId}/profile
+  PROFILE_REQUEST_OTP: '/v1/users', // Append /{userId}/request-otp
+  PROFILE_CHANGE_PASSWORD: '/v1/users', // Append /{userId}/change-password
 
   // Screening/Prediction
-  PREDICT: '/v0-1/model-predict',
-  RESULT: '/v0-1/model-result', // Append /{predictionId}
+  PREDICT: '/v1/predictions/create',
+  RESULT: '/v1/predictions', // Append /{predictionId}/result
 
   // Dashboard Data
-  HISTORY: '/v0-1/model-history', // Append /{userId}
-  WEEKLY_CHART: '/v0-1/model-weekly-chart', // Append /{userId}
-  STREAK: '/v0-1/model-streak', // Append /{userId}
-  CRITICAL_FACTORS: '/v0-1/model-critical-factors', // Append /{userId}
-  DAILY_SUGGESTION: '/v0-1/model-daily-suggestion', // Append /{userId}
+  HISTORY: '/v1/users', // Append /{userId}/history
+  WEEKLY_CHART: '/v1/users', // Append /{userId}/weekly-chart
+  STREAK: '/v1/users', // Append /{userId}/streaks
+  CRITICAL_FACTORS: '/v1/users', // Append /{userId}/weekly-factors
+  DAILY_SUGGESTION: '/v1/users', // Append /{userId}/daily-suggestions
 };
 
 // Polling configuration
