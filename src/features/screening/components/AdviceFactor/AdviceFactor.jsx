@@ -1,5 +1,5 @@
 import React from 'react';
-import CollapsibleCard from '../CollapsibleCard';
+import CollapsibleCard from '@/components/CollapsibleCard';
 import styles from './AdviceFactor.module.css';
 
 const AdviceFactor = ({ factorKey, factorData }) => {

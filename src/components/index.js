@@ -12,8 +12,6 @@ export { default as SegmentedControl } from './SegmentedControl';
 export { default as TextField } from './TextField';
 export { default as EditModal } from './EditModal';
 export { default as WeeklyChart } from './WeeklyChart';
-export { default as Advice } from './Advice';
-export { default as AdviceFactor } from './AdviceFactor';
 export { default as Navbar } from './Navbar';
 export { default as Footer } from './Footer';
 export { default as ProfileAvatar } from './ProfileAvatar';
