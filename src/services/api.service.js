@@ -7,7 +7,6 @@
 
 import apiClient from '@/config/api';
 import { API_ROUTES } from '@/config/apiRoutes';
-import { TokenManager } from '@/utils/tokenManager';
 
 // ====================================
 // AUTHENTICATION SERVICES
@@ -38,22 +37,23 @@ export async function register(userData) {
 }
 
 /**
+ * Logout user (clears server-side session/cookie)
+ * @returns {Promise} Response with logout status
+ */
+export async function logout() {
+  const response = await apiClient.post(API_ROUTES.AUTH_LOGOUT);
+  return response.data;
+}
+
+/**
  * Request OTP for password reset or verification
  * @param {string} email - User email
  * @returns {Promise} Response with OTP status
  */
 export async function requestOTP(email) {
-  const userData = TokenManager.getUserData();
-  const userId = userData?.userId;
-
-  if (!userId) {
-    throw new Error('User ID not found. Please login again.');
-  }
-
-  const response = await apiClient.post(
-    `${API_ROUTES.PROFILE_REQUEST_OTP}/${userId}/request-otp`,
-    { email }
-  );
+  const response = await apiClient.post(API_ROUTES.PROFILE_REQUEST_OTP, {
+    email,
+  });
   return response.data;
 }
 
@@ -65,17 +65,11 @@ export async function requestOTP(email) {
  * @returns {Promise} Response with status
  */
 export async function changePassword(email, otp, newPassword) {
-  const userData = TokenManager.getUserData();
-  const userId = userData?.userId;
-
-  if (!userId) {
-    throw new Error('User ID not found. Please login again.');
-  }
-
-  const response = await apiClient.post(
-    `${API_ROUTES.PROFILE_CHANGE_PASSWORD}/${userId}/change-password`,
-    { email, otp, newPassword }
-  );
+  const response = await apiClient.post(API_ROUTES.PROFILE_CHANGE_PASSWORD, {
+    email,
+    otp,
+    newPassword,
+  });
   return response.data;
 }
 
@@ -88,16 +82,7 @@ export async function changePassword(email, otp, newPassword) {
  * @returns {Promise} Response with user profile data
  */
 export async function getProfile() {
-  const userData = TokenManager.getUserData();
-  const userId = userData?.userId;
-
-  if (!userId) {
-    throw new Error('User ID not found. Please login again.');
-  }
-
-  const response = await apiClient.get(
-    `${API_ROUTES.PROFILE}/${userId}/profile`
-  );
+  const response = await apiClient.get(API_ROUTES.PROFILE);
   return response.data;
 }
 
@@ -107,17 +92,7 @@ export async function getProfile() {
  * @returns {Promise} Response with updated profile
  */
 export async function updateProfile(updateData) {
-  const userData = TokenManager.getUserData();
-  const userId = userData?.userId;
-
-  if (!userId) {
-    throw new Error('User ID not found. Please login again.');
-  }
-
-  const response = await apiClient.put(
-    `${API_ROUTES.PROFILE}/${userId}/profile`,
-    updateData
-  );
+  const response = await apiClient.put(API_ROUTES.PROFILE, updateData);
   return response.data;
 }
 
