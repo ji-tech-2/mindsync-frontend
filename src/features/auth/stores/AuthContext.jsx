@@ -16,7 +16,7 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TokenManager } from '@/utils/tokenManager';
-import { getProfile } from '@/services';
+import { getProfile, logout as logoutService } from '@/services';
 
 // Create the context
 const AuthContext = createContext(null);
@@ -102,8 +102,13 @@ export const AuthProvider = ({ children }) => {
     setUser(normalizedUser);
   }, []);
 
-  // Simple logout function - just clears state (for programmatic use)
-  const logout = useCallback(() => {
+  // Simple logout function - clears server session and client state
+  const logout = useCallback(async () => {
+    try {
+      await logoutService();
+    } catch {
+      // Continue with client-side cleanup even if server call fails
+    }
     TokenManager.clearUserData();
     setUser(null);
   }, []);
@@ -119,7 +124,14 @@ export const AuthProvider = ({ children }) => {
 
     // Small delay before clearing auth state to allow navigation to begin
     // This prevents the current page from seeing the cleared auth state
-    logoutTimeoutRef.current = setTimeout(() => {
+    logoutTimeoutRef.current = setTimeout(async () => {
+      // Call server logout
+      try {
+        await logoutService();
+      } catch {
+        // Continue with client-side cleanup even if server call fails
+      }
+
       // Clear auth state
       TokenManager.clearUserData();
       setUser(null);

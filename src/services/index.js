@@ -31,6 +31,7 @@ export const {
   // Authentication
   signIn,
   register,
+  logout,
   requestOTP,
   changePassword,
 
