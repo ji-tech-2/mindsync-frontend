@@ -84,6 +84,8 @@ const CustomTooltip = ({ active, payload }) => {
  * - title: Chart title (optional)
  * - dataKey: Key for data value (default: 'value')
  * - navigate: Navigation function (optional)
+ * - compact: Compact layout (optional)
+ * - minimal: Minimal variant without title and button (optional)
  */
 export default function WeeklyChart({
   data = [],
@@ -91,20 +93,25 @@ export default function WeeklyChart({
   dataKey = 'value',
   navigate = null,
   compact = false,
+  minimal = false,
+  style = {},
+  ...rest
 }) {
   const hasData = data && data.length > 0;
 
   return (
-    <Card>
+    <Card style={style} {...rest}>
       <div
-        className={`${styles['weekly-chart-container']} ${compact ? styles['compact'] : ''}`}
+        className={`${styles['weekly-chart-container']} ${compact ? styles['compact'] : ''} ${minimal ? styles['minimal'] : ''}`}
       >
-        <div className={styles['chart-header']}>
-          <h2>{title}</h2>
-          {navigate && (
-            <Button iconOnly icon="↗" onClick={() => navigate('/history')} />
-          )}
-        </div>
+        {!minimal && (
+          <div className={styles['chart-header']}>
+            <h2>{title}</h2>
+            {navigate && (
+              <Button iconOnly icon="↗" onClick={() => navigate('/history')} />
+            )}
+          </div>
+        )}
 
         {!hasData ? (
           <div className={styles['no-data']}>
