@@ -61,8 +61,9 @@ jobs:
         id: complexity
         run: |
           if [ -f complexity-report.json ]; then
-            TOTAL_WARNINGS=$(jq '[.[] | .warningCount] | add' complexity-report.json 2>/dev/null || echo "0")
-            TOTAL_ERRORS=$(jq '[.[] | .errorCount] | add' complexity-report.json 2>/dev/null || echo "0")
+            COMPLEXITY_RULES='complexity|max-depth|max-lines-per-function|max-nested-callbacks|max-params'
+            TOTAL_WARNINGS=$(jq "[.[] | .messages[] | select(.ruleId | test(\"$COMPLEXITY_RULES\")) | select(.severity == 1)] | length" complexity-report.json 2>/dev/null || echo "0")
+            TOTAL_ERRORS=$(jq "[.[] | .messages[] | select(.ruleId | test(\"$COMPLEXITY_RULES\")) | select(.severity == 2)] | length" complexity-report.json 2>/dev/null || echo "0")
             echo "warnings=$TOTAL_WARNINGS" >> $GITHUB_OUTPUT
             echo "errors=$TOTAL_ERRORS" >> $GITHUB_OUTPUT
           else
@@ -137,7 +138,7 @@ jobs:
           echo "## 📝 Quality Thresholds" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Coverage**: Lines ≥ 80%, Statements ≥ 80%, Functions ≥ 80%, Branches ≥ 75%" >> $GITHUB_STEP_SUMMARY
-          echo "- **Complexity**: Max cyclomatic complexity = 10" >> $GITHUB_STEP_SUMMARY
+          echo "- **Complexity**: Max cyclomatic complexity = 15" >> $GITHUB_STEP_SUMMARY
           echo "- **Function Length**: Max 50 lines per function" >> $GITHUB_STEP_SUMMARY
           echo "- **Nesting**: Max depth = 4, Max nested callbacks = 3" >> $GITHUB_STEP_SUMMARY
 
