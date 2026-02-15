@@ -7,6 +7,7 @@
 
 import apiClient from '@/config/api';
 import { API_ROUTES } from '@/config/apiRoutes';
+import { TokenManager } from '@/utils/tokenManager';
 
 // ====================================
 // AUTHENTICATION SERVICES
@@ -42,9 +43,17 @@ export async function register(userData) {
  * @returns {Promise} Response with OTP status
  */
 export async function requestOTP(email) {
-  const response = await apiClient.post(API_ROUTES.PROFILE_REQUEST_OTP, {
-    email,
-  });
+  const userData = TokenManager.getUserData();
+  const userId = userData?.userId;
+
+  if (!userId) {
+    throw new Error('User ID not found. Please login again.');
+  }
+
+  const response = await apiClient.post(
+    `${API_ROUTES.PROFILE_REQUEST_OTP}/${userId}/request-otp`,
+    { email }
+  );
   return response.data;
 }
 
@@ -56,11 +65,17 @@ export async function requestOTP(email) {
  * @returns {Promise} Response with status
  */
 export async function changePassword(email, otp, newPassword) {
-  const response = await apiClient.post(API_ROUTES.PROFILE_CHANGE_PASSWORD, {
-    email,
-    otp,
-    newPassword,
-  });
+  const userData = TokenManager.getUserData();
+  const userId = userData?.userId;
+
+  if (!userId) {
+    throw new Error('User ID not found. Please login again.');
+  }
+
+  const response = await apiClient.post(
+    `${API_ROUTES.PROFILE_CHANGE_PASSWORD}/${userId}/change-password`,
+    { email, otp, newPassword }
+  );
   return response.data;
 }
 
@@ -73,7 +88,16 @@ export async function changePassword(email, otp, newPassword) {
  * @returns {Promise} Response with user profile data
  */
 export async function getProfile() {
-  const response = await apiClient.get(API_ROUTES.PROFILE);
+  const userData = TokenManager.getUserData();
+  const userId = userData?.userId;
+
+  if (!userId) {
+    throw new Error('User ID not found. Please login again.');
+  }
+
+  const response = await apiClient.get(
+    `${API_ROUTES.PROFILE}/${userId}/profile`
+  );
   return response.data;
 }
 
@@ -83,7 +107,17 @@ export async function getProfile() {
  * @returns {Promise} Response with updated profile
  */
 export async function updateProfile(updateData) {
-  const response = await apiClient.put(API_ROUTES.PROFILE, updateData);
+  const userData = TokenManager.getUserData();
+  const userId = userData?.userId;
+
+  if (!userId) {
+    throw new Error('User ID not found. Please login again.');
+  }
+
+  const response = await apiClient.put(
+    `${API_ROUTES.PROFILE}/${userId}/profile`,
+    updateData
+  );
   return response.data;
 }
 
@@ -107,7 +141,9 @@ export async function submitScreening(screeningData) {
  * @returns {Promise} Response with prediction result
  */
 export async function getPredictionResult(predictionId) {
-  const response = await apiClient.get(`${API_ROUTES.RESULT}/${predictionId}`);
+  const response = await apiClient.get(
+    `${API_ROUTES.RESULT}/${predictionId}/result`
+  );
   return response.data;
 }
 
@@ -196,7 +232,9 @@ export async function pollPredictionResult(
  * @returns {Promise} Response with screening history
  */
 export async function getScreeningHistory(userId) {
-  const response = await apiClient.get(`${API_ROUTES.HISTORY}/${userId}`);
+  const response = await apiClient.get(
+    `${API_ROUTES.HISTORY}/${userId}/history`
+  );
   return response.data;
 }
 
@@ -210,7 +248,9 @@ export async function getScreeningHistory(userId) {
  * @returns {Promise} Response with weekly chart data
  */
 export async function getWeeklyChart(userId) {
-  const response = await apiClient.get(`${API_ROUTES.WEEKLY_CHART}/${userId}`);
+  const response = await apiClient.get(
+    `${API_ROUTES.WEEKLY_CHART}/${userId}/weekly-chart`
+  );
   return response.data;
 }
 
@@ -220,7 +260,9 @@ export async function getWeeklyChart(userId) {
  * @returns {Promise} Response with streak data
  */
 export async function getStreak(userId) {
-  const response = await apiClient.get(`${API_ROUTES.STREAK}/${userId}`);
+  const response = await apiClient.get(
+    `${API_ROUTES.STREAK}/${userId}/streaks`
+  );
   return response.data;
 }
 
@@ -231,7 +273,7 @@ export async function getStreak(userId) {
  */
 export async function getWeeklyCriticalFactors(userId) {
   const response = await apiClient.get(
-    `${API_ROUTES.CRITICAL_FACTORS}/${userId}`
+    `${API_ROUTES.CRITICAL_FACTORS}/${userId}/weekly-factors`
   );
   return response.data;
 }
@@ -243,7 +285,7 @@ export async function getWeeklyCriticalFactors(userId) {
  */
 export async function getDailySuggestion(userId) {
   const response = await apiClient.get(
-    `${API_ROUTES.DAILY_SUGGESTION}/${userId}`
+    `${API_ROUTES.DAILY_SUGGESTION}/${userId}/daily-suggestions`
   );
   return response.data;
 }
