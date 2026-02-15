@@ -32,6 +32,9 @@ let mockUser = {
   dateOfBirth: '1995-05-15',
 };
 
+// Track if user is "logged in" (simulates session)
+let isLoggedIn = true; // Start logged in for easier development
+
 // Mock screenings store
 let mockScreenings = [];
 
@@ -55,6 +58,8 @@ export async function signIn(email, password) {
   if (password === 'wrongpassword') {
     throw new Error('Invalid email or password');
   }
+
+  isLoggedIn = true; // Mark user as logged in
 
   return {
     success: true,
@@ -141,11 +146,19 @@ export async function changePassword(email, otp, newPassword) {
 
 /**
  * Get user profile (mock)
+ * Also used for session validation
  */
 export async function getProfile() {
   await delay(400);
 
-  console.log('🎭 [MOCK] Get profile');
+  console.log('🎭 [MOCK] Get profile (logged in:', isLoggedIn, ')');
+
+  // Simulate session validation - throw 401 if not logged in
+  if (!isLoggedIn) {
+    const error = new Error('Unauthorized');
+    error.response = { status: 401 };
+    throw error;
+  }
 
   return {
     success: true,
