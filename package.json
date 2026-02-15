@@ -16,6 +16,9 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
+    "test:coverage:threshold": "vitest --coverage --run",
+    "quality:check": "npm run lint && npm run test:coverage:threshold",
+    "quality:complexity": "npx eslint . --format json --output-file complexity-report.json",
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -75,6 +78,8 @@
     "stylelint-config-standard": "^40.0.0",
     "stylelint-prettier": "^5.0.3",
     "vite": "^7.2.4",
-    "vitest": "^4.0.17"
+    "vitest": "^4.0.17",
+    "@vitest/coverage-v8": "^4.0.17",
+    "@vitest/ui": "^4.0.17"
   }
 }

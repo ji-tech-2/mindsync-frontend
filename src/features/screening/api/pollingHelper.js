@@ -12,6 +12,59 @@
  * - Stage 2 (ready): { status: "ready", result: { prediction_score, health_level, wellness_analysis } }
  */
 
+const KONG_ROUTE_ERROR =
+  'Backend configuration error: The polling endpoint is not configured in the API gateway. ' +
+  'Please contact backend team to add Kong route mapping for /result endpoint.';
+
+/**
+ * Check if the error message indicates a Kong gateway routing issue.
+ */
+function isKongRouteError(message) {
+  return message && message.includes('no Route matched');
+}
+
+/**
+ * Check if the error is non-retryable (should be thrown immediately).
+ */
+function isNonRetryableError(message) {
+  return (
+    message.includes('Timeout') ||
+    message.includes('not found') ||
+    message.includes('failed') ||
+    message.includes('Backend configuration error')
+  );
+}
+
+/**
+ * Build a successful polling response from status data.
+ */
+function buildReadyResponse(data) {
+  return {
+    success: true,
+    status: 'ready',
+    data: data.result,
+    metadata: {
+      created_at: data.created_at,
+      numeric_completed_at: data.numeric_completed_at,
+      advisory_completed_at: data.completed_at || data.advisory_completed_at,
+    },
+  };
+}
+
+/**
+ * Build a partial polling response.
+ */
+function buildPartialResponse(data) {
+  return {
+    success: true,
+    status: 'partial',
+    data: data.result,
+    metadata: {
+      created_at: data.created_at,
+    },
+  };
+}
+
 /**
  * Poll with callback support for partial results
  * @param {string} predictionId - The prediction ID to poll
@@ -50,92 +103,53 @@ export async function pollPredictionResult(
 
       const data = await response.json();
 
-      // Status: ready - prediction complete with advice
-      if (data.status === 'ready') {
-        console.log('✅ Prediction ready with advice:', data);
-        return {
-          success: true,
-          status: 'ready',
-          data: data.result,
-          metadata: {
-            created_at: data.created_at,
-            numeric_completed_at: data.numeric_completed_at,
-            advisory_completed_at:
-              data.completed_at || data.advisory_completed_at,
-          },
-        };
+      // Handle known statuses via dispatch map
+      const statusHandlers = {
+        ready: () => {
+          console.log('✅ Prediction ready with advice:', data);
+          return buildReadyResponse(data);
+        },
+        partial: () => {
+          console.log('⚡ Partial result ready (without advice):', data);
+          return buildPartialResponse(data);
+        },
+        processing: async () => {
+          console.log('⏳ Processing: Models not ready yet...');
+          if (attempts >= maxAttempts) {
+            throw new Error('Timeout: Prediction took too long to process');
+          }
+          await new Promise((resolve) => setTimeout(resolve, interval));
+          return poll();
+        },
+        error: () => {
+          console.error('❌ Prediction error:', data.error);
+          throw new Error(data.error || 'Prediction failed');
+        },
+        not_found: () => {
+          console.error('❌ Prediction ID not found');
+          throw new Error('Prediction ID not found');
+        },
+      };
+
+      const handler = statusHandlers[data.status];
+      if (handler) return handler();
+
+      // Check for Kong gateway route misconfiguration
+      if (isKongRouteError(data.message)) {
+        throw new Error(KONG_ROUTE_ERROR);
       }
 
-      // Status: partial - prediction ready but advice still processing
-      if (data.status === 'partial') {
-        console.log('⚡ Partial result ready (without advice):', data);
-        return {
-          success: true,
-          status: 'partial',
-          data: data.result,
-          metadata: {
-            created_at: data.created_at,
-          },
-        };
-      }
-
-      // Status: processing - continue polling
-      if (data.status === 'processing') {
-        console.log('⏳ Processing: Models not ready yet...');
-
-        if (attempts >= maxAttempts) {
-          throw new Error('Timeout: Prediction took too long to process');
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, interval));
-        return poll();
-      }
-
-      // Status: error - prediction failed
-      if (data.status === 'error') {
-        console.error('❌ Prediction error:', data.error);
-        throw new Error(data.error || 'Prediction failed');
-      }
-
-      // Status: not_found
-      if (data.status === 'not_found') {
-        console.error('❌ Prediction ID not found');
-        throw new Error('Prediction ID not found');
-      }
-
-      // Check if Kong gateway route is missing (common error)
-      if (data.message && data.message.includes('no Route matched')) {
-        console.error(
-          '❌ Kong gateway routing error - /result endpoint not configured'
-        );
-        throw new Error(
-          'Backend configuration error: The polling endpoint is not configured in the API gateway. ' +
-            'Please contact backend team to add Kong route mapping for /result endpoint.'
-        );
-      }
-
-      // Unknown status
       throw new Error(`Unknown status: ${data.status}`);
     } catch (error) {
-      // Check for Kong routing errors in catch block too
-      if (error.message && error.message.includes('no Route matched')) {
-        throw new Error(
-          'Backend configuration error: The polling endpoint is not configured in the API gateway. ' +
-            'Please contact backend team to add Kong route mapping for /result endpoint.'
-        );
+      if (isKongRouteError(error.message)) {
+        throw new Error(KONG_ROUTE_ERROR);
       }
 
-      // Network or other errors
-      if (
-        error.message.includes('Timeout') ||
-        error.message.includes('not found') ||
-        error.message.includes('failed') ||
-        error.message.includes('Backend configuration error')
-      ) {
+      if (isNonRetryableError(error.message)) {
         throw error;
       }
 
-      // For network errors, retry if not exceeded max attempts
+      // Network errors — retry if under max attempts
       if (attempts >= maxAttempts) {
         throw new Error('Network error: Failed to fetch prediction result');
       }

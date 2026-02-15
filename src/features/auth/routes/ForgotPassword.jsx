@@ -11,6 +11,7 @@ import FormSection from '../components/FormSection';
 import ErrorAlert from '../components/ErrorAlert';
 import StageContainer from '../components/StageContainer';
 import BackButton from '../components/BackButton';
+import { validateForgotPasswordField } from '../utils/forgotPasswordHelpers';
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
@@ -50,48 +51,7 @@ export default function ForgotPassword() {
   };
 
   const validateField = (fieldName) => {
-    const newErrors = { ...errors };
-
-    if (fieldName === 'email' || fieldName === 'all') {
-      if (!form.email.trim()) {
-        newErrors.email = 'Email is required';
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-        newErrors.email = 'Please enter a valid email address';
-      } else {
-        delete newErrors.email;
-      }
-    }
-
-    if (fieldName === 'otp' || fieldName === 'all') {
-      if (!form.otp.trim()) {
-        newErrors.otp = 'OTP is required';
-      } else {
-        delete newErrors.otp;
-      }
-    }
-
-    if (fieldName === 'newPassword' || fieldName === 'all') {
-      const passwordError = getPasswordError(form.newPassword);
-      if (!form.newPassword) {
-        newErrors.newPassword = 'New password is required';
-      } else if (passwordError) {
-        newErrors.newPassword = passwordError;
-      } else {
-        delete newErrors.newPassword;
-      }
-    }
-
-    if (fieldName === 'confirmPassword' || fieldName === 'all') {
-      if (!form.confirmPassword) {
-        newErrors.confirmPassword = 'Please confirm your password';
-      } else if (form.confirmPassword !== form.newPassword) {
-        newErrors.confirmPassword = 'Passwords do not match';
-      } else {
-        delete newErrors.confirmPassword;
-      }
-    }
-
-    setErrors(newErrors);
+    setErrors(validateForgotPasswordField(fieldName, form, errors));
   };
 
   // Stage 1: Email validation

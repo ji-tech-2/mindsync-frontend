@@ -20,6 +20,24 @@ import { TokenManager } from '@/config/api';
 // Create the context
 const AuthContext = createContext(null);
 
+/**
+ * Normalize user data to always include a stable userId field.
+ * Falls back through userId → id → user_id → temp ID.
+ */
+function normalizeUser(userData, fallbackData = {}) {
+  return {
+    ...userData,
+    userId:
+      userData.userId ||
+      userData.id ||
+      userData.user_id ||
+      fallbackData.userId ||
+      fallbackData.id ||
+      fallbackData.user_id ||
+      `temp_${Date.now()}`,
+  };
+}
+
 // AuthProvider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -35,15 +53,7 @@ export const AuthProvider = ({ children }) => {
       const userData = TokenManager.getUserData();
 
       if (userData) {
-        // Ensure user has userId field
-        const normalizedUser = {
-          ...userData,
-          userId:
-            userData.userId ||
-            userData.id ||
-            userData.user_id ||
-            `temp_${Date.now()}`,
-        };
+        const normalizedUser = normalizeUser(userData);
         setUser(normalizedUser);
       } else {
         setUser(null);
@@ -66,17 +76,7 @@ export const AuthProvider = ({ children }) => {
 
   // Login function
   const login = useCallback((userData) => {
-    // Ensure user has an ID field for consistency
-    const normalizedUser = {
-      ...userData,
-      // If userId doesn't exist, try id, or generate a temporary one
-      userId:
-        userData.userId ||
-        userData.id ||
-        userData.user_id ||
-        `temp_${Date.now()}`,
-    };
-
+    const normalizedUser = normalizeUser(userData);
     TokenManager.setUserData(normalizedUser);
     setUser(normalizedUser);
   }, []);
@@ -116,18 +116,7 @@ export const AuthProvider = ({ children }) => {
       ...existingUserData,
       ...userData,
     };
-    // Ensure user has a stable userId, consistent with login/initializeAuth
-    const normalizedUser = {
-      ...mergedUser,
-      userId:
-        mergedUser.userId ||
-        mergedUser.id ||
-        mergedUser.user_id ||
-        existingUserData.userId ||
-        existingUserData.id ||
-        existingUserData.user_id ||
-        `temp_${Date.now()}`,
-    };
+    const normalizedUser = normalizeUser(mergedUser, existingUserData);
     TokenManager.setUserData(normalizedUser);
     setUser(normalizedUser);
   }, []);

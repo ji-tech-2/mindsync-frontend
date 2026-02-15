@@ -305,45 +305,45 @@ export default function Screening() {
     setAllAnswers(updatedAnswers);
 
     if (isLastQuestion) {
-      setIsLoading(true);
-
-      try {
-        // 1. Transform data
-        const transformedData = transformToJSON(updatedAnswers);
-
-        // 2. Add user_id if user is logged in
-        if (user) {
-          const userId = user?.userId || user?.id || user?.user_id;
-          if (userId) {
-            transformedData.user_id = userId;
-            console.log('✅ User logged in, adding user_id:', userId);
-          }
-        } else {
-          console.log('⚠️ User not logged in, screening will be anonymous');
-        }
-
-        console.log('📤 Data yang dikirim ke Flask:', transformedData);
-        console.log('👤 User ID:', userId || '[Guest - No user_id]');
-
-        // 3. Kirim ke Flask API
-        const result = await sendToFlask(transformedData, API_URLS.predict);
-
-        if (result.success) {
-          navigate(`/result/${result.data.prediction_id}`);
-        } else {
-          // Gagal kirim ke Flask
-          setErrorMsg('Failed to send data to server: ' + result.error);
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        setErrorMsg('An error occurred: ' + error.message);
-        setIsLoading(false);
-      }
+      await submitScreening(updatedAnswers);
     } else {
       const nextIndex = findNextQuestionIndex(currentIndex, updatedAnswers);
       setCurrentIndex(nextIndex);
       setCurrentAnswer('');
+    }
+  };
+
+  const submitScreening = async (answers) => {
+    setIsLoading(true);
+
+    try {
+      const transformedData = transformToJSON(answers);
+
+      if (user) {
+        const uid = user?.userId || user?.id || user?.user_id;
+        if (uid) {
+          transformedData.user_id = uid;
+          console.log('✅ User logged in, adding user_id:', uid);
+        }
+      } else {
+        console.log('⚠️ User not logged in, screening will be anonymous');
+      }
+
+      console.log('📤 Data yang dikirim ke Flask:', transformedData);
+      console.log('👤 User ID:', userId || '[Guest - No user_id]');
+
+      const result = await sendToFlask(transformedData, API_URLS.predict);
+
+      if (result.success) {
+        navigate(`/result/${result.data.prediction_id}`);
+      } else {
+        setErrorMsg('Failed to send data to server: ' + result.error);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setErrorMsg('An error occurred: ' + error.message);
+      setIsLoading(false);
     }
   };
 

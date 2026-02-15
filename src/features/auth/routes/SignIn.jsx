@@ -9,6 +9,12 @@ import PageHeader from '../components/PageHeader';
 import FormContainer from '../components/FormContainer';
 import FormSection from '../components/FormSection';
 import ErrorAlert from '../components/ErrorAlert';
+import {
+  validateSignInField,
+  validateSignInForm,
+  scrollToFirstErrorField,
+  isSignInErrorMessage,
+} from '../utils/signInHelpers';
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -48,7 +54,7 @@ export default function SignIn() {
 
     // If field is already blurred, validate immediately with updated form
     if (blurredFields[name]) {
-      validateField(name, updatedForm);
+      setErrors(validateSignInField(name, updatedForm, errors));
     }
   }
 
@@ -58,104 +64,27 @@ export default function SignIn() {
   }
 
   function handleBlur(fieldName, updatedForm = null) {
-    // Mark field as blurred to show error on blur
     setBlurredFields({ ...blurredFields, [fieldName]: true });
-    // Validate the specific field with current form state
-    validateField(fieldName, updatedForm || form);
+    setErrors(validateSignInField(fieldName, updatedForm || form, errors));
   }
-
-  const validateField = (fieldName, currentForm) => {
-    const newErrors = { ...errors };
-
-    if (fieldName === 'email') {
-      if (!currentForm.email || !currentForm.email.trim()) {
-        newErrors.email = 'Email is required';
-      } else if (!validateEmail(currentForm.email)) {
-        newErrors.email =
-          'Please enter a valid email address (e.g., user@example.com)';
-      } else {
-        delete newErrors.email;
-      }
-    } else if (fieldName === 'password') {
-      if (!currentForm.password) {
-        newErrors.password = 'Password is required';
-      } else {
-        delete newErrors.password;
-      }
-    }
-
-    setErrors(newErrors);
-  };
-
-  // Validation functions
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const scrollToFirstError = (errorObj) => {
-    // Array of errors in order of form fields
-    const fieldErrors = [
-      { ref: emailRef, hasError: !!errorObj.email },
-      { ref: passwordRef, hasError: !!errorObj.password },
-    ];
-
-    // Find first field with error
-    const firstErrorField = fieldErrors.find((field) => field.hasError);
-
-    if (firstErrorField && firstErrorField.ref.current) {
-      // Scroll to the element (check if method exists for test compatibility)
-      if (typeof firstErrorField.ref.current.scrollIntoView === 'function') {
-        firstErrorField.ref.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      }
-
-      // Try to focus the element
-      if (firstErrorField.ref.current.querySelector('input')) {
-        firstErrorField.ref.current.querySelector('input').focus();
-      }
-    }
-  };
-
-  const validateFormSync = () => {
-    const newErrors = {};
-
-    // Email validation
-    if (!form.email || !form.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!validateEmail(form.email)) {
-      newErrors.email =
-        'Please enter a valid email address (e.g., user@example.com)';
-    }
-
-    // Password validation
-    if (!form.password) {
-      newErrors.password = 'Password is required';
-    }
-
-    return newErrors;
-  };
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    // Validate form synchronously to get errors immediately
-    const formErrors = validateFormSync();
+    const formErrors = validateSignInForm(form);
 
-    // Mark all fields as blurred to show all errors
     setBlurredFields({
       email: true,
       password: true,
     });
 
-    // Set errors state
     setErrors(formErrors);
 
-    // If there are errors, scroll to first error
     if (Object.keys(formErrors).length > 0) {
-      scrollToFirstError(formErrors);
+      scrollToFirstErrorField(formErrors, [
+        { ref: emailRef, hasError: !!formErrors.email },
+        { ref: passwordRef, hasError: !!formErrors.password },
+      ]);
       return;
     }
 
@@ -268,18 +197,7 @@ export default function SignIn() {
       )}
 
       {/* Show error messages */}
-      <ErrorAlert
-        message={message}
-        show={
-          message &&
-          !message.includes('successful') &&
-          (message.includes('failed') ||
-            message.includes('error') ||
-            message.includes('Error') ||
-            message.includes('credentials') ||
-            message.includes('Invalid'))
-        }
-      />
+      <ErrorAlert message={message} show={isSignInErrorMessage(message)} />
     </AuthPageLayout>
   );
 }

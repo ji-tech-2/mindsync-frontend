@@ -2,6 +2,56 @@ import { Link } from 'react-router-dom';
 import styles from './Button.module.css';
 
 /**
+ * Helper function to generate button class names
+ */
+function getButtonClasses({
+  variant,
+  size,
+  fullWidth,
+  bold,
+  disabled,
+  icon,
+  iconPosition,
+  iconOnly,
+  align,
+  className,
+}) {
+  return [
+    styles.button,
+    styles[variant],
+    size && styles[size],
+    fullWidth && styles.fullWidth,
+    bold && styles.bold,
+    disabled && styles.disabled,
+    icon && styles.hasIcon,
+    iconPosition === 'right' && styles.iconRight,
+    iconOnly && styles.iconOnly,
+    align === 'left' && styles.alignLeft,
+    align === 'left' && iconPosition === 'right' && styles.spaceBetween,
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+/**
+ * Render the inner content of a Button (icon + children).
+ */
+function renderButtonContent({ icon, iconPosition, iconOnly, children }) {
+  return (
+    <>
+      {iconPosition === 'left' && icon && (
+        <span className={styles.icon}>{icon}</span>
+      )}
+      {!iconOnly && children}
+      {iconPosition === 'right' && icon && (
+        <span className={styles.icon}>{icon}</span>
+      )}
+    </>
+  );
+}
+
+/**
  * Button Component (renders as <button> or <a> tag)
  * @param {Object} props
  * @param {string} props.variant - 'outlined', 'filled', 'light', 'ghost' (default: 'outlined')
@@ -36,34 +86,25 @@ function Button({
   type = 'button',
   ...rest
 }) {
-  const buttonClass = [
-    styles.button,
-    styles[variant],
-    size && styles[size],
-    fullWidth && styles.fullWidth,
-    bold && styles.bold,
-    disabled && styles.disabled,
-    icon && styles.hasIcon,
-    iconPosition === 'right' && styles.iconRight,
-    iconOnly && styles.iconOnly,
-    align === 'left' && styles.alignLeft,
-    align === 'left' && iconPosition === 'right' && styles.spaceBetween,
+  const buttonClass = getButtonClasses({
+    variant,
+    size,
+    fullWidth,
+    bold,
+    disabled,
+    icon,
+    iconPosition,
+    iconOnly,
+    align,
     className,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  });
 
-  const content = (
-    <>
-      {iconPosition === 'left' && icon && (
-        <span className={styles.icon}>{icon}</span>
-      )}
-      {!iconOnly && children}
-      {iconPosition === 'right' && icon && (
-        <span className={styles.icon}>{icon}</span>
-      )}
-    </>
-  );
+  const content = renderButtonContent({
+    icon,
+    iconPosition,
+    iconOnly,
+    children,
+  });
 
   // Handle disabled link clicks
   const handleClick = (e) => {
