@@ -424,6 +424,7 @@ export default function Screening() {
           padded
           clipOverflow={false}
           elevation="lg"
+          variant="light"
           className={styles.card}
         >
           <ProgressBar progress={progress} className={styles.progressBar} />

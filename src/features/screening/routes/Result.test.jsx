@@ -9,7 +9,7 @@ import * as pollingHelper from '../api/pollingHelper';
 vi.mock('@/config/api.js', () => ({
   API_CONFIG: {
     BASE_URL: 'http://test-api.com',
-    RESULT_ENDPOINT: '/v1/predictions',
+    RESULT_ENDPOINT: '/v0-1/result',
     POLLING: {
       MAX_ATTEMPTS: 60,
       INTERVAL_MS: 2000,
