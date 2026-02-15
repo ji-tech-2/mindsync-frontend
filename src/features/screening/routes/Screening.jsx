@@ -328,10 +328,13 @@ export default function Screening() {
 
       const result = await submitScreeningService(transformedData);
 
-      if (result.success) {
+      if (result.prediction_id) {
         navigate(`/result/${result.prediction_id}`);
       } else {
-        setErrorMsg('Failed to submit screening: ' + result.error);
+        setErrorMsg(
+          'Failed to submit screening: ' +
+            (result.error || result.message || 'Unknown error')
+        );
         setIsLoading(false);
       }
     } catch (error) {
