@@ -4,21 +4,23 @@ import {
   requestOTP as requestOTPService,
   resetPassword as resetPasswordService,
 } from '@/services';
-import { getPasswordError } from '@/utils/passwordValidation';
-import {
-  TextField,
-  Button,
-  Message,
-  Link,
-  FormContainer,
-  FormSection,
-  StageContainer,
-} from '@/components';
-import PasswordField from '../components/PasswordField';
+import { Message, Link, FormContainer, StageContainer } from '@/components';
 import AuthPageLayout from '../components/AuthPageLayout';
 import PageHeader from '../components/PageHeader';
-import BackButton from '../components/BackButton';
 import { validateForgotPasswordField } from '../utils/forgotPasswordHelpers';
+import {
+  getStageValidator,
+  getStageBlurredFields,
+  scrollToFirstError as scrollToError,
+  validateEmailStage,
+  handleOTPRequest,
+  handlePasswordReset,
+} from '../utils/forgotPasswordValidation';
+import {
+  EmailStage,
+  OTPStage,
+  PasswordStage,
+} from '../components/ForgotPasswordStages';
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
@@ -46,7 +48,6 @@ export default function ForgotPassword() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
@@ -61,65 +62,23 @@ export default function ForgotPassword() {
     setErrors(validateForgotPasswordField(fieldName, form, errors));
   };
 
-  // Stage 1: Email validation
-  const validateStage1 = () => {
-    const newErrors = {};
-    if (!form.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    return newErrors;
-  };
-
-  // Stage 2: OTP validation
-  const validateStage2 = () => {
-    const newErrors = {};
-    if (!form.otp.trim()) {
-      newErrors.otp = 'OTP is required';
-    }
-    return newErrors;
-  };
-
-  // Stage 3: Password validation
-  const validateStage3 = () => {
-    const newErrors = {};
-
-    const passwordError = getPasswordError(form.newPassword);
-    if (!form.newPassword) {
-      newErrors.newPassword = 'New password is required';
-    } else if (passwordError) {
-      newErrors.newPassword = passwordError;
-    }
-
-    if (!form.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
-    } else if (form.confirmPassword !== form.newPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    return newErrors;
-  };
+  const refs = { emailRef, otpRef, passwordRef };
 
   const handleNextStage = () => {
-    let stageErrors = {};
+    const validator = getStageValidator(currentStage, form);
+    const stageErrors = validator();
 
-    if (currentStage === 0) {
-      stageErrors = validateStage1();
-      setBlurredFields({ email: true });
-    } else if (currentStage === 1) {
-      stageErrors = validateStage2();
-      setBlurredFields((prev) => ({ ...prev, otp: true }));
-    }
-
+    setBlurredFields(getStageBlurredFields(currentStage, blurredFields));
     setErrors(stageErrors);
 
-    if (Object.keys(stageErrors).length === 0) {
-      setIsGoingBack(false);
-      setCurrentStage(currentStage + 1);
-    } else {
-      scrollToFirstError(stageErrors, currentStage);
+    const hasErrors = Object.keys(stageErrors).length > 0;
+    if (hasErrors) {
+      scrollToError(stageErrors, currentStage, refs);
+      return;
     }
+
+    setIsGoingBack(false);
+    setCurrentStage(currentStage + 1);
   };
 
   const handlePreviousStage = () => {
@@ -128,78 +87,54 @@ export default function ForgotPassword() {
     setErrors({});
   };
 
-  const scrollToFirstError = (errorObj, stage) => {
-    let refMap = {};
+  const validateAndCheckErrors = (isResend) => {
+    if (isResend) return null;
 
-    if (stage === 0) {
-      refMap = { email: emailRef };
-    } else if (stage === 1) {
-      refMap = { otp: otpRef };
-    } else if (stage === 2) {
-      refMap = { newPassword: passwordRef, confirmPassword: passwordRef };
+    const stage1Errors = validateEmailStage(form.email);
+    setBlurredFields({ email: true });
+
+    if (Object.keys(stage1Errors).length > 0) {
+      setErrors(stage1Errors);
+      return stage1Errors;
     }
-
-    const firstErrorField = Object.keys(errorObj)[0];
-    const ref = refMap[firstErrorField];
-
-    if (ref?.current) {
-      if (typeof ref.current.scrollIntoView === 'function') {
-        ref.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      }
-
-      if (ref.current.querySelector('input')) {
-        ref.current.querySelector('input').focus();
-      }
-    }
+    return null;
   };
 
   const sendOTP = async (isResend = false) => {
-    // Validate stage 1 first (only if not resending)
-    if (!isResend) {
-      const stage1Errors = validateStage1();
-
-      setBlurredFields({ email: true });
-
-      if (Object.keys(stage1Errors).length > 0) {
-        setErrors(stage1Errors);
-        return;
-      }
-    }
+    const validationErrors = validateAndCheckErrors(isResend);
+    if (validationErrors) return;
 
     setLoading(true);
     setMessage('');
     setIsError(false);
     setErrors({});
 
-    try {
-      const data = await requestOTPService(form.email);
-
-      if (data.success) {
-        setMessage(data.message || 'OTP sent successfully!');
+    await handleOTPRequest({
+      email: form.email,
+      requestOTPService,
+      isResend,
+      onSuccess: (msg, resending) => {
+        setMessage(msg);
         setIsError(false);
-        // Proceed to next stage only if not resending
-        if (!isResend) {
+        if (!resending) {
           setIsGoingBack(false);
           setCurrentStage(1);
         }
-      }
-    } catch (error) {
-      console.error('Error sending OTP:', error);
-      setMessage(error.response?.data?.message || 'Failed to send OTP');
-      setIsError(true);
-    } finally {
-      setLoading(false);
-    }
+      },
+      onError: (errorMsg) => {
+        setMessage(errorMsg);
+        setIsError(true);
+      },
+    });
+
+    setLoading(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate stage 3
-    const stage3Errors = validateStage3();
+    const validator = getStageValidator(2, form);
+    const stage3Errors = validator();
 
     setBlurredFields((prev) => ({
       ...prev,
@@ -209,8 +144,9 @@ export default function ForgotPassword() {
 
     setErrors(stage3Errors);
 
-    if (Object.keys(stage3Errors).length > 0) {
-      scrollToFirstError(stage3Errors, 2);
+    const hasErrors = Object.keys(stage3Errors).length > 0;
+    if (hasErrors) {
+      scrollToError(stage3Errors, 2, refs);
       return;
     }
 
@@ -218,171 +154,68 @@ export default function ForgotPassword() {
     setMessage('');
     setIsError(false);
 
-    try {
-      const data = await resetPasswordService(
-        form.email,
-        form.otp,
-        form.newPassword
-      );
-
-      if (data.success) {
-        setMessage('Password reset successfully! Redirecting to login...');
+    await handlePasswordReset({
+      email: form.email,
+      otp: form.otp,
+      newPassword: form.newPassword,
+      resetPasswordService,
+      onSuccess: (msg) => {
+        setMessage(msg);
         setIsError(false);
         navigate('/signin');
-      } else {
-        setMessage(data.message || 'Failed to reset password');
+      },
+      onError: (errorMsg) => {
+        setMessage(errorMsg);
         setIsError(true);
-      }
-    } catch (error) {
-      console.error('Error resetting password:', error);
-      setMessage(error.response?.data?.message || 'Failed to reset password');
-      setIsError(true);
-    } finally {
-      setLoading(false);
-    }
+      },
+    });
+
+    setLoading(false);
   };
 
   // STAGE 1: Email
   const stage1 = (
-    <>
-      <FormSection ref={emailRef}>
-        <TextField
-          label="Email"
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          onBlur={() => handleBlur('email')}
-          error={blurredFields.email && !!errors.email}
-          fullWidth
-        />
-        {blurredFields.email && errors.email && (
-          <Message type="error" message={errors.email} />
-        )}
-      </FormSection>
-
-      <Button
-        type="button"
-        variant="filled"
-        fullWidth
-        onClick={() => sendOTP()}
-        disabled={loading}
-      >
-        {loading ? 'Sending...' : 'Send OTP'}
-      </Button>
-    </>
+    <EmailStage
+      form={form}
+      errors={errors}
+      blurredFields={blurredFields}
+      loading={loading}
+      emailRef={emailRef}
+      handleChange={handleChange}
+      handleBlur={handleBlur}
+      sendOTP={sendOTP}
+    />
   );
 
   // STAGE 2: OTP
   const stage2 = (
-    <>
-      <FormSection ref={otpRef}>
-        <div
-          style={{
-            display: 'flex',
-            gap: 'var(--space-md)',
-            alignItems: 'flex-start',
-          }}
-        >
-          <div style={{ flex: 1, marginTop: 'var(--border-md)' }}>
-            <TextField
-              label="OTP"
-              type="text"
-              name="otp"
-              value={form.otp}
-              onChange={handleChange}
-              onBlur={() => handleBlur('otp')}
-              error={blurredFields.otp && !!errors.otp}
-              fullWidth
-            />
-          </div>
-          <Button
-            type="button"
-            variant="outlined"
-            onClick={() => sendOTP(true)}
-            disabled={loading}
-          >
-            Resend OTP
-          </Button>
-        </div>
-        {blurredFields.otp && errors.otp && (
-          <Message type="error" message={errors.otp} />
-        )}
-      </FormSection>
-
-      <div
-        style={{
-          display: 'flex',
-          gap: 'var(--space-md)',
-          alignItems: 'center',
-        }}
-      >
-        <BackButton onClick={handlePreviousStage} />
-        <Button
-          type="button"
-          variant="filled"
-          fullWidth
-          onClick={handleNextStage}
-          disabled={loading}
-        >
-          Next
-        </Button>
-      </div>
-    </>
+    <OTPStage
+      form={form}
+      errors={errors}
+      blurredFields={blurredFields}
+      loading={loading}
+      otpRef={otpRef}
+      handleChange={handleChange}
+      handleBlur={handleBlur}
+      sendOTP={sendOTP}
+      handlePreviousStage={handlePreviousStage}
+      handleNextStage={handleNextStage}
+    />
   );
 
   // STAGE 3: New Password
   const stage3 = (
-    <>
-      <FormSection ref={passwordRef}>
-        <PasswordField
-          label="New Password"
-          name="newPassword"
-          value={form.newPassword}
-          onChange={handleChange}
-          onBlur={() => handleBlur('newPassword')}
-          error={blurredFields.newPassword && !!errors.newPassword}
-          fullWidth
-        />
-        {blurredFields.newPassword && errors.newPassword && (
-          <Message type="error" message={errors.newPassword} />
-        )}
-      </FormSection>
-
-      <FormSection>
-        <PasswordField
-          label="Confirm Password"
-          name="confirmPassword"
-          value={form.confirmPassword}
-          onChange={handleChange}
-          onBlur={() => handleBlur('confirmPassword')}
-          error={blurredFields.confirmPassword && !!errors.confirmPassword}
-          fullWidth
-        />
-        {blurredFields.confirmPassword && errors.confirmPassword && (
-          <Message type="error" message={errors.confirmPassword} />
-        )}
-      </FormSection>
-
-      <div
-        style={{
-          display: 'flex',
-          gap: 'var(--space-md)',
-          alignItems: 'center',
-        }}
-      >
-        <BackButton onClick={handlePreviousStage} />
-        <Button
-          type="submit"
-          variant="filled"
-          fullWidth
-          onClick={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? 'Resetting...' : 'Reset Password'}
-        </Button>
-      </div>
-    </>
+    <PasswordStage
+      form={form}
+      errors={errors}
+      blurredFields={blurredFields}
+      loading={loading}
+      passwordRef={passwordRef}
+      handleChange={handleChange}
+      handleBlur={handleBlur}
+      handlePreviousStage={handlePreviousStage}
+      handleSubmit={handleSubmit}
+    />
   );
 
   return (

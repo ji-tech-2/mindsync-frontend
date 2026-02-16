@@ -69,14 +69,21 @@ export function updateFormField(form, fieldName, value) {
 
 /**
  * Handle change event for form inputs
+ * @param {Object} params - The parameters object
+ * @param {string} params.fieldName - Name of the field
+ * @param {*} params.value - New value
+ * @param {Object} params.form - Current form state
+ * @param {Object} params.errors - Current errors state
+ * @param {Object} params.blurredFields - Fields that have been blurred
+ * @returns {Object|null} Update object or null if validation fails
  */
-export function processFieldChange(
+export function processFieldChange({
   fieldName,
   value,
   form,
   errors,
-  blurredFields
-) {
+  blurredFields,
+}) {
   // Validate numeric input
   if (!isValidNumericInput(fieldName, value)) {
     return null; // Return null to indicate no update should occur
@@ -274,8 +281,11 @@ export function scrollToFirstSignUpError(errorObj, stage, fieldRefs) {
       { ref: fieldRefs.workRmtRef, hasError: !!errorObj.workRmt },
     ];
   } else if (stage === 'stage2') {
+    fieldErrors = [{ ref: fieldRefs.emailRef, hasError: !!errorObj.email }];
+  } else if (stage === 'stage3') {
+    fieldErrors = [{ ref: fieldRefs.otpRef, hasError: !!errorObj.otp }];
+  } else if (stage === 'stage4') {
     fieldErrors = [
-      { ref: fieldRefs.emailRef, hasError: !!errorObj.email },
       { ref: fieldRefs.passwordRef, hasError: !!errorObj.password },
       { ref: fieldRefs.passwordRef, hasError: !!errorObj.confirmPassword },
     ];
