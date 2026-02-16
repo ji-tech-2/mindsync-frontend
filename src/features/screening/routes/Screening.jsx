@@ -134,7 +134,7 @@ const questions = [
   },
   {
     key: 'work_screen_hours',
-    question: 'How many hours of screen time for work per day?',
+    question: 'How many hours of screen time for work today?',
     type: QUESTION_TYPES.NUMBER,
     placeholder: 'e.g. 6',
     min: 0,
@@ -142,7 +142,7 @@ const questions = [
   },
   {
     key: 'leisure_screen_hours',
-    question: 'How many hours of screen time for leisure per day?',
+    question: 'How many hours of screen time for leisure today?',
     type: QUESTION_TYPES.NUMBER,
     placeholder: 'e.g. 2',
     min: 0,
@@ -150,7 +150,7 @@ const questions = [
   },
   {
     key: 'sleep_hours',
-    question: 'How many hours of sleep do you get on average per day?',
+    question: 'How many hours of sleep did you get last night?',
     type: QUESTION_TYPES.NUMBER,
     placeholder: 'e.g. 7',
     min: 0,
@@ -158,7 +158,7 @@ const questions = [
   },
   {
     key: 'sleep_quality_1_5',
-    question: 'How is your sleep quality?',
+    question: 'How was your sleep quality?',
     type: QUESTION_TYPES.SLIDER,
     min: 1,
     max: 5,
@@ -168,7 +168,7 @@ const questions = [
   },
   {
     key: 'stress_level_0_10',
-    question: 'How high is your stress level?',
+    question: 'How stressed do you feel?',
     type: QUESTION_TYPES.SLIDER,
     min: 0,
     max: 10,
@@ -178,7 +178,7 @@ const questions = [
   },
   {
     key: 'productivity_0_100',
-    question: 'What is your productivity level?',
+    question: 'How productive do you feel?',
     type: QUESTION_TYPES.SLIDER,
     min: 0,
     max: 100,
@@ -188,7 +188,7 @@ const questions = [
   },
   {
     key: 'exercise_minutes_per_week',
-    question: 'How many minutes do you exercise per week?',
+    question: 'How many minutes did you exercise within the last 7 days?',
     type: QUESTION_TYPES.NUMBER,
     placeholder: 'e.g. 150',
     min: 0,
@@ -196,7 +196,7 @@ const questions = [
   },
   {
     key: 'social_hours_per_week',
-    question: 'How many hours do you socialize per week?',
+    question: 'How many hours did you socialize within the last 7 days?',
     type: QUESTION_TYPES.NUMBER,
     placeholder: 'e.g. 10',
     min: 0,
