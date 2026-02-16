@@ -55,12 +55,41 @@ function buildReadyResponse(data) {
  * Build a partial polling response.
  */
 function buildPartialResponse(data) {
+  const timing = data.result?.timing || {};
+  const startTimestamp = timing.start_timestamp;
+
+  // Calculate total end-to-end latency (including network + polling)
+  let totalLatencyMs = null;
+  if (startTimestamp) {
+    totalLatencyMs = (Date.now() / 1000 - startTimestamp) * 1000;
+    console.log(
+      '⏱️  [BENCHMARK] Ridge Prediction - Model.pkl only:',
+      timing.ridge_prediction_ms,
+      'ms'
+    );
+    console.log(
+      '⏱️  [BENCHMARK] Ridge Prediction - Server processing:',
+      timing.server_processing_ms,
+      'ms'
+    );
+    console.log(
+      '⏱️  [BENCHMARK] Ridge Prediction - Total end-to-end latency:',
+      totalLatencyMs.toFixed(2),
+      'ms'
+    );
+  }
+
   return {
     success: true,
     status: 'partial',
     data: data.result,
     metadata: {
       created_at: data.created_at,
+      timing: {
+        ridge_prediction_ms: timing.ridge_prediction_ms,
+        server_processing_ms: timing.server_processing_ms,
+        total_end_to_end_ms: totalLatencyMs,
+      },
     },
   };
 }
@@ -68,20 +97,20 @@ function buildPartialResponse(data) {
 /**
  * Poll with callback support for partial results
  * @param {string} predictionId - The prediction ID to poll
- * @param {string} baseURL - Base URL for the API
- * @param {string} resultPath - Result endpoint path (v1: '/v1/predictions')
- * @param {number} maxAttempts - Maximum polling attempts
- * @param {number} interval - Interval between polls in ms
- * @param {Function} onPartialResult - Callback for partial results (optional)
+ * @param {Object} options - Polling configuration options
+ * @param {string} options.baseURL - Base URL for the API
+ * @param {string} options.resultPath - Result endpoint path (v1: '/v1/predictions')
+ * @param {number} options.maxAttempts - Maximum polling attempts
+ * @param {number} options.interval - Interval between polls in ms
  * @returns {Promise} Resolves with complete result or rejects with error
  */
-export async function pollPredictionResult(
-  predictionId,
-  baseURL = 'https://api.mindsync.my',
-  resultPath = '/v1/predictions',
-  maxAttempts = 60,
-  interval = 2000
-) {
+export async function pollPredictionResult(predictionId, options = {}) {
+  const {
+    baseURL = 'https://api.mindsync.my',
+    resultPath = '/v1/predictions',
+    maxAttempts = 60,
+    interval = 2000,
+  } = options;
   let attempts = 0;
 
   const poll = async () => {
@@ -107,6 +136,32 @@ export async function pollPredictionResult(
       const statusHandlers = {
         ready: () => {
           console.log('✅ Prediction ready with advice:', data);
+
+          // Extract timing data for benchmarking
+          const timing = data.result?.timing || {};
+          const startTimestamp = timing.start_timestamp;
+
+          // Calculate total end-to-end latency (including network + polling)
+          let totalLatencyMs = null;
+          if (startTimestamp) {
+            totalLatencyMs = (Date.now() / 1000 - startTimestamp) * 1000;
+            console.log(
+              '⏱️  [BENCHMARK] Ridge Prediction - Model.pkl only:',
+              timing.ridge_prediction_ms,
+              'ms'
+            );
+            console.log(
+              '⏱️  [BENCHMARK] Ridge Prediction - Server processing:',
+              timing.server_processing_ms,
+              'ms'
+            );
+            console.log(
+              '⏱️  [BENCHMARK] Ridge Prediction - Total end-to-end latency:',
+              totalLatencyMs.toFixed(2),
+              'ms'
+            );
+          }
+
           return buildReadyResponse(data);
         },
         partial: () => {
