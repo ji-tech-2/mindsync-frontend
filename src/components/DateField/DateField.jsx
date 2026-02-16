@@ -35,6 +35,7 @@ const monthOptions = [
  * @param {boolean} props.yearError - Year field error state
  * @param {boolean} props.dateError - General date error state (affects all fields)
  * @param {string} props.label - Label for the field group (default: "Select a date")
+ * @param {string} props.variant - Variant for all child components (default: undefined)
  */
 const DateField = ({
   dayValue = '',
@@ -51,6 +52,7 @@ const DateField = ({
   yearError = false,
   dateError = false,
   label = 'Select a date',
+  variant,
 }) => {
   return (
     <fieldset className={styles.wrapper}>
@@ -65,6 +67,7 @@ const DateField = ({
           onBlur={onDayBlur}
           maxLength={2}
           error={dayError || dateError}
+          variant={variant}
         />
         <Dropdown
           label="Month"
@@ -78,6 +81,7 @@ const DateField = ({
           onBlur={onMonthBlur}
           fullWidth
           error={monthError || dateError}
+          variant={variant}
         />
         <TextField
           label="Year"
@@ -88,6 +92,7 @@ const DateField = ({
           onBlur={onYearBlur}
           maxLength={4}
           error={yearError || dateError}
+          variant={variant}
         />
       </div>
     </fieldset>

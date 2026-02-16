@@ -51,9 +51,9 @@ let mockUser = {
   email: 'demo@mindsync.my',
   name: 'Demo User',
   gender: 'Male',
-  occupation: 'Professional',
+  occupation: 'Employed',
   workRmt: 'Hybrid',
-  dateOfBirth: '1995-05-15',
+  dob: '1995-05-15',
 };
 
 // Track if user is "logged in" (simulates session)

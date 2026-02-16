@@ -1,6 +1,5 @@
 .message {
   font-family: var(--font-body);
-  font-size: var(--font-size-sm);
   animation: slide-down var(--transition-fast) forwards;
 }
 

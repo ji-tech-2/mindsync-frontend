@@ -6,6 +6,7 @@ import {
   Message,
   PasswordField,
   Card,
+  DateField,
 } from '@/components';
 import PageLayout from '@/layouts/PageLayout';
 import PasswordChangeModal from '../components/PasswordChangeModal';
@@ -16,7 +17,11 @@ import {
 } from '@/services';
 import { TokenManager } from '@/utils/tokenManager';
 import { useAuth } from '@/features/auth';
-import { validateNameField } from '@/features/auth/utils/signUpValidators';
+import {
+  validateNameField,
+  validateDobField,
+} from '@/features/auth/utils/signUpValidators';
+import { hasDobFieldError } from '@/features/auth/utils/formHandlers';
 import {
   genderOptions,
   occupationOptions,
@@ -36,6 +41,7 @@ export default function Profile() {
     name: '',
     email: '',
     gender: '',
+    dob: '',
     occupation: '',
     workRmt: '',
   });
@@ -43,6 +49,9 @@ export default function Profile() {
     name: '',
     email: '',
     gender: '',
+    dobDay: '',
+    dobMonth: '',
+    dobYear: '',
     occupation: '',
     workRmt: '',
   });
@@ -54,10 +63,19 @@ export default function Profile() {
   const [errors, setErrors] = useState({});
   const [blurredFields, setBlurredFields] = useState({});
 
+  // Helper to format DOB from form fields
+  const formatDob = () => {
+    if (!formData.dobDay || !formData.dobMonth || !formData.dobYear) return '';
+    const day = formData.dobDay.padStart(2, '0');
+    const month = formData.dobMonth.padStart(2, '0');
+    return `${formData.dobYear}-${month}-${day}`;
+  };
+
   // Check if any fields have changed (excluding password and email)
   const hasChanges =
     formData.name !== originalUser.name ||
     formData.gender !== originalUser.gender ||
+    formatDob() !== originalUser.dob ||
     formData.occupation !== originalUser.occupation ||
     formData.workRmt !== originalUser.workRmt;
 
@@ -69,15 +87,34 @@ export default function Profile() {
         if (data.success) {
           // Transform API values to display values
           const apiData = data.data;
+
+          // Parse DOB if available (YYYY-MM-DD format)
+          let dobDay = '';
+          let dobMonth = '';
+          let dobYear = '';
+          if (apiData.dob) {
+            const [year, month, day] = apiData.dob.split('-');
+            dobDay = day;
+            dobMonth = month;
+            dobYear = year;
+          }
+
           const userData = {
             name: apiData.name,
             email: apiData.email,
             gender: fromApiGender(apiData.gender),
+            dob: apiData.dob || '',
             occupation: fromApiOccupation(apiData.occupation),
             workRmt: fromApiWorkMode(apiData.workRmt),
           };
+          const formDataValues = {
+            ...userData,
+            dobDay,
+            dobMonth,
+            dobYear,
+          };
           setOriginalUser(userData);
-          setFormData(userData);
+          setFormData(formDataValues);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -110,18 +147,66 @@ export default function Profile() {
     }
   };
 
+  const handleDobFieldChange = (fieldName, value) => {
+    const updatedFormData = { ...formData, [fieldName]: value };
+    setFormData(updatedFormData);
+
+    // Clear message when user makes changes
+    if (message.text) {
+      setMessage({ type: '', text: '' });
+    }
+
+    // Clear DOB-specific errors
+    const clearedErrors = { ...errors };
+    if (fieldName === 'dobDay') delete clearedErrors.dobDayError;
+    if (fieldName === 'dobMonth') delete clearedErrors.dobMonthError;
+    if (fieldName === 'dobYear') delete clearedErrors.dobYearError;
+    delete clearedErrors.dobError;
+    delete clearedErrors.dobErrorMessage;
+    setErrors(clearedErrors);
+
+    // If DOB is already blurred, validate immediately
+    if (blurredFields.dob) {
+      const dobErrors = validateDobField(
+        updatedFormData.dobDay,
+        updatedFormData.dobMonth,
+        updatedFormData.dobYear
+      );
+      setErrors({ ...clearedErrors, ...dobErrors });
+    }
+  };
+
   const handleNameBlur = () => {
     setBlurredFields({ ...blurredFields, name: true });
     const error = validateNameField(formData.name);
     setErrors({ ...errors, name: error || '' });
   };
 
+  const handleDateFieldBlur = () => {
+    setBlurredFields({ ...blurredFields, dob: true });
+    const dobErrors = validateDobField(
+      formData.dobDay,
+      formData.dobMonth,
+      formData.dobYear
+    );
+    setErrors({ ...errors, ...dobErrors });
+  };
+
   const handleSave = async () => {
-    // Validate name before saving
+    // Validate all fields before saving
     const nameError = validateNameField(formData.name);
-    if (nameError) {
-      setErrors({ ...errors, name: nameError });
-      setBlurredFields({ ...blurredFields, name: true });
+    const dobErrors = validateDobField(
+      formData.dobDay,
+      formData.dobMonth,
+      formData.dobYear
+    );
+
+    const allErrors = { ...dobErrors };
+    if (nameError) allErrors.name = nameError;
+
+    if (Object.keys(allErrors).length > 0) {
+      setErrors(allErrors);
+      setBlurredFields({ ...blurredFields, name: true, dob: true });
       setMessage({
         type: 'error',
         text: 'Please fix the errors before saving',
@@ -137,6 +222,7 @@ export default function Profile() {
       const updateData = {
         name: formData.name,
         gender: toApiGender(formData.gender),
+        dob: formatDob(),
         occupation: toApiOccupation(formData.occupation),
         workRmt: toApiWorkMode(formData.workRmt),
       };
@@ -146,15 +232,34 @@ export default function Profile() {
       if (response.success) {
         // Transform API response to display values
         const apiData = response.data;
+
+        // Parse DOB
+        let dobDay = '';
+        let dobMonth = '';
+        let dobYear = '';
+        if (apiData.dob) {
+          const [year, month, day] = apiData.dob.split('-');
+          dobDay = day;
+          dobMonth = month;
+          dobYear = year;
+        }
+
         const updatedUser = {
           name: apiData.name,
           email: apiData.email,
           gender: fromApiGender(apiData.gender),
+          dob: apiData.dob || '',
           occupation: fromApiOccupation(apiData.occupation),
           workRmt: fromApiWorkMode(apiData.workRmt),
         };
+        const updatedFormData = {
+          ...updatedUser,
+          dobDay,
+          dobMonth,
+          dobYear,
+        };
         setOriginalUser(updatedUser);
-        setFormData(updatedUser);
+        setFormData(updatedFormData);
 
         // Update both localStorage and global auth context
         TokenManager.setUserData(apiData);
@@ -207,7 +312,7 @@ export default function Profile() {
           <p>Loading profile...</p>
         </div>
       ) : (
-        <Card className={styles.profileCard}>
+        <Card className={styles.profileCard} clipOverflow={false}>
           {/* Left Section - Content Grid */}
           <div className={styles.contentSection}>
             {/* Profile Section Row */}
@@ -262,6 +367,45 @@ export default function Profile() {
                 fullWidth
                 variant="surface"
               />
+
+              <DateField
+                label="Date of Birth"
+                dayValue={formData.dobDay}
+                monthValue={formData.dobMonth}
+                yearValue={formData.dobYear}
+                onDayChange={(e) => {
+                  handleDobFieldChange('dobDay', e.target.value);
+                }}
+                onMonthChange={(option) => {
+                  handleDobFieldChange('dobMonth', option.value);
+                }}
+                onYearChange={(e) => {
+                  handleDobFieldChange('dobYear', e.target.value);
+                }}
+                onDayBlur={handleDateFieldBlur}
+                onMonthBlur={handleDateFieldBlur}
+                onYearBlur={handleDateFieldBlur}
+                dayError={hasDobFieldError(
+                  blurredFields,
+                  errors,
+                  'dobDayError'
+                )}
+                monthError={hasDobFieldError(
+                  blurredFields,
+                  errors,
+                  'dobMonthError'
+                )}
+                yearError={hasDobFieldError(
+                  blurredFields,
+                  errors,
+                  'dobYearError'
+                )}
+                dateError={hasDobFieldError(blurredFields, errors, 'dobError')}
+                variant="surface"
+              />
+              {hasDobFieldError(blurredFields, errors, 'dobErrorMessage') && (
+                <Message type="error">{errors.dobErrorMessage}</Message>
+              )}
             </div>
 
             {/* Your Work Section Row */}

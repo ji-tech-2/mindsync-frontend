@@ -301,10 +301,7 @@ const ResultPage = () => {
                 <Button variant="filled" onClick={() => navigate('/signin')}>
                   Sign In
                 </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => navigate('/register')}
-                >
+                <Button variant="outlined" onClick={() => navigate('/signup')}>
                   Register
                 </Button>
               </div>
