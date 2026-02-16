@@ -626,10 +626,15 @@ export async function getStreak(userId) {
     const weekStartStr = weekStart.toISOString().split('T')[0];
     const weekEndStr = weekEnd.toISOString().split('T')[0];
 
-    // Format label - show only start date
+    // Format label
     const startMonth = weekStart.toLocaleString('en-US', { month: 'short' });
     const startDay = weekStart.getDate();
-    const label = `${startMonth} ${startDay}`;
+    const endMonth = weekEnd.toLocaleString('en-US', { month: 'short' });
+    const endDay = weekEnd.getDate();
+    const label =
+      startMonth === endMonth
+        ? `${startMonth} ${startDay}-${endDay}`
+        : `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
 
     weeklyData.push({
       week_start: weekStartStr,

@@ -90,7 +90,11 @@ export default function StreakCard({ data, loading, error }) {
             >
               {item.has_screening ? '✓' : ''}
             </div>
-            <span className={styles.dayName}>{item.label}</span>
+            <span className={styles.dayName}>
+              {viewType === 'weekly'
+                ? item.label.split('-')[0].trim()
+                : item.label}
+            </span>
           </div>
         ))}
       </div>
