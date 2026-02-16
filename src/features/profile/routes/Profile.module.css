@@ -16,6 +16,7 @@
   grid-template-columns: repeat(var(--grid-columns-mobile), 1fr);
   gap: var(--gutter);
   align-items: start;
+  order: 2;
 }
 
 .contentSection > * {
@@ -30,6 +31,7 @@
   align-items: center;
   justify-content: flex-start;
   padding: var(--gutter) 0;
+  order: 1;
 }
 
 .avatar {
@@ -46,19 +48,21 @@
   pointer-events: none;
 }
 
+.sectionTitle {
+  margin-bottom: var(--space-lg);
+}
+
 /* Section Title */
 .sectionTitle h2 {
   font-family: var(--font-body);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-light);
-  margin: 0 0 var(--space-2xs) 0;
-  font-size: var(--font-size-md);
+  margin: var(--space-xl) 0 var(--space-md) 0;
 }
 
 .sectionTitle p {
   color: var(--color-text-muted);
   margin: 0;
-  font-size: var(--font-size-sm);
 }
 
 /* Field Group */
@@ -150,6 +154,7 @@
   .avatarColumn {
     grid-column: span 6;
     padding: var(--gutter) 0 var(--space-xl);
+    order: 1;
   }
 
   .avatar {
@@ -162,6 +167,7 @@
     grid-column: span 6;
     grid-template-columns: 2fr 4fr;
     gap: var(--gutter);
+    order: 2;
   }
 
   .contentSection > .sectionTitle {
@@ -183,7 +189,7 @@
   }
 
   .sectionTitle h2 {
-    font-size: var(--font-size-lg);
+    margin: 0 0 var(--space-sm) 0;
   }
 }
 
