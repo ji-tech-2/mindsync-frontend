@@ -1,18 +1,9 @@
 import React from 'react';
 import styles from './CriticalFactorCard.module.css';
 import Card from '@/components/Card';
+import { getFeatureImage } from '@/utils/featureNames';
 
 const CriticalFactorCard = ({ data, loading }) => {
-  const getFactorImage = (rawName) => {
-    // ini hanya contoh sementara
-    const images = {
-      'num__sleep_quality_1_5^2': '/assets/factors/sleep.png',
-      num__stress_level: '/assets/factors/stress.png',
-      num__productivity_0_100: '/assets/factors/productivity.png',
-    };
-    return images[rawName] || '/assets/factors/default-factor.png';
-  };
-
   // 1. Cek loading dulu
   if (loading) {
     return (
@@ -47,7 +38,7 @@ const CriticalFactorCard = ({ data, loading }) => {
     <Card padded={false}>
       <div className={styles.imageHeader}>
         <img
-          src={getFactorImage(data.raw_name)}
+          src={getFeatureImage(data.factor_name)}
           alt={data.factor_name}
           className={styles.factorImg}
         />

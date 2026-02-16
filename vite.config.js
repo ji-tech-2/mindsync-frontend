@@ -1,18 +1,14 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { imagetools } from 'vite-imagetools';
 import path from 'path';
-
-// // https://vite.dev/config/
-// export default defineConfig({
-//   plugins: [react()],
-// })
 
 // Vite config with proxy setup for API calls (to bypass CORS in development)
 // ini cuman utk testing ngebypass CORS, di production pake direct URL aja
 //
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), imagetools()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
