@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
 import { submitScreening as submitScreeningService } from '@/services';
@@ -27,14 +27,58 @@ import {
 import logoSubmark from '@/assets/logo-submark.svg';
 import styles from './Screening.module.css';
 
+// ============= HELPER FUNCTIONS =============
+
+/**
+ * Calculate age from date of birth (YYYY-MM-DD format)
+ */
+function calculateAge(dateOfBirth) {
+  if (!dateOfBirth) return null;
+
+  const birthDate = new Date(dateOfBirth);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
+}
+
 // ============= TRANSFORM & SUBMIT FUNCTIONS =============
 
-function transformToJSON(screeningData, userId = null) {
+function transformToJSON(screeningData, userId = null, user = null) {
+  // Use user data for demographic fields if user is authenticated
+  const age =
+    user && user.dateOfBirth
+      ? calculateAge(user.dateOfBirth)
+      : parseInt(screeningData.age);
+
+  const gender =
+    user && user.gender
+      ? toApiGender(user.gender)
+      : toApiGender(screeningData.gender);
+
+  const occupation =
+    user && user.occupation
+      ? toApiOccupation(user.occupation)
+      : toApiOccupation(screeningData.occupation);
+
+  const workMode =
+    user && user.workRmt
+      ? toApiWorkMode(user.workRmt)
+      : toApiWorkMode(screeningData.work_mode);
+
   const payload = {
-    age: parseInt(screeningData.age),
-    gender: toApiGender(screeningData.gender),
-    occupation: toApiOccupation(screeningData.occupation),
-    work_mode: toApiWorkMode(screeningData.work_mode),
+    age: age,
+    gender: gender,
+    occupation: occupation,
+    work_mode: workMode,
     work_screen_hours: parseFloat(screeningData.work_screen_hours),
     leisure_screen_hours: parseFloat(screeningData.leisure_screen_hours),
     sleep_hours: parseFloat(screeningData.sleep_hours),
@@ -175,53 +219,78 @@ export default function Screening() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Helper to check if a question should be skipped
-  const shouldSkipQuestion = (questionIndex, currentAnswers) => {
-    const question = questions[questionIndex];
+  // Track if we've initialized answers from user data
+  const hasInitialized = useRef(false);
 
-    // Skip work_mode and work_screen_hours if occupation is Unemployed or Retired
-    if (
-      (question.key === 'work_mode' || question.key === 'work_screen_hours') &&
-      (currentAnswers.occupation === 'Unemployed' ||
-        currentAnswers.occupation === 'Retired')
-    ) {
+  // Filter questions based on user authentication and occupation
+  // For authenticated users, exclude demographic questions entirely
+  const activeQuestions = useMemo(() => {
+    return questions.filter((question) => {
+      // Exclude demographic questions for authenticated users
+      if (user) {
+        if (
+          question.key === 'age' ||
+          question.key === 'gender' ||
+          question.key === 'occupation' ||
+          question.key === 'work_mode'
+        ) {
+          return false;
+        }
+      }
+
+      // Exclude work_mode and work_screen_hours if occupation is Unemployed or Retired
+      const occupation = user?.occupation || answers.occupation;
+      if (
+        (question.key === 'work_mode' ||
+          question.key === 'work_screen_hours') &&
+        (occupation === 'Unemployed' || occupation === 'Retired')
+      ) {
+        return false;
+      }
+
       return true;
+    });
+  }, [user, answers.occupation]);
+
+  // Initialize answers with user data for authenticated users (only once)
+  useEffect(() => {
+    if (user && !hasInitialized.current) {
+      hasInitialized.current = true;
+
+      const initialAnswers = {};
+
+      // Pre-fill demographic data from user profile
+      if (user.dateOfBirth) {
+        initialAnswers.age = calculateAge(user.dateOfBirth)?.toString() || '';
+      }
+      if (user.gender) {
+        initialAnswers.gender = user.gender;
+      }
+      if (user.occupation) {
+        initialAnswers.occupation = user.occupation;
+      }
+      if (user.workRmt) {
+        initialAnswers.work_mode = user.workRmt;
+
+        // Auto-set work_screen_hours for Unemployed or Retired
+        if (user.occupation === 'Unemployed' || user.occupation === 'Retired') {
+          initialAnswers.work_screen_hours = '0';
+        }
+      }
+
+      // Use queueMicrotask to defer setState to avoid synchronous state update warning
+      queueMicrotask(() => {
+        setAnswers(initialAnswers);
+      });
     }
+  }, [user]);
 
-    return false;
-  };
+  const currentQ = activeQuestions[currentIndex];
+  const isLastQuestion = currentIndex === activeQuestions.length - 1;
 
-  // Find next non-skipped question index
-  const findNextQuestionIndex = (fromIndex, currentAnswers) => {
-    let nextIndex = fromIndex + 1;
-    while (
-      nextIndex < questions.length &&
-      shouldSkipQuestion(nextIndex, currentAnswers)
-    ) {
-      nextIndex++;
-    }
-    return nextIndex;
-  };
-
-  // Find previous non-skipped question index
-  const findPreviousQuestionIndex = (fromIndex, currentAnswers) => {
-    let prevIndex = fromIndex - 1;
-    while (prevIndex >= 0 && shouldSkipQuestion(prevIndex, currentAnswers)) {
-      prevIndex--;
-    }
-    return prevIndex;
-  };
-
-  const currentQ = questions[currentIndex];
-  const isLastQuestion = currentIndex === questions.length - 1;
-
-  // Calculate progress (only for non-skipped questions)
-  const totalQuestions = questions.filter(
-    (_, idx) => !shouldSkipQuestion(idx, answers)
-  ).length;
-  const answeredQuestions = questions
-    .slice(0, currentIndex + 1)
-    .filter((_, idx) => !shouldSkipQuestion(idx, answers)).length;
+  // Calculate progress based on active questions only
+  const totalQuestions = activeQuestions.length;
+  const answeredQuestions = currentIndex + 1;
   const progress = (answeredQuestions / totalQuestions) * 100;
 
   // Validation
@@ -293,11 +362,8 @@ export default function Screening() {
     if (isLastQuestion) {
       await submitScreening(updatedAnswers);
     } else {
-      const nextIndex = findNextQuestionIndex(currentIndex, updatedAnswers);
-      if (nextIndex < questions.length) {
-        setCurrentIndex(nextIndex);
-        setErrorMsg('');
-      }
+      setCurrentIndex(currentIndex + 1);
+      setErrorMsg('');
     }
   };
 
@@ -305,11 +371,7 @@ export default function Screening() {
   const handleBack = () => {
     setErrorMsg('');
     setIsGoingBack(true);
-    const prevIndex = findPreviousQuestionIndex(currentIndex, answers);
-
-    if (prevIndex >= 0) {
-      setCurrentIndex(prevIndex);
-    }
+    setCurrentIndex(currentIndex - 1);
   };
 
   // Submit screening
@@ -317,14 +379,8 @@ export default function Screening() {
     setIsLoading(true);
 
     try {
-      const transformedData = transformToJSON(finalAnswers);
-
-      if (user) {
-        const uid = user?.userId || user?.id || user?.user_id;
-        if (uid) {
-          transformedData.user_id = uid;
-        }
-      }
+      const uid = user?.userId || user?.id || user?.user_id;
+      const transformedData = transformToJSON(finalAnswers, uid, user);
 
       const result = await submitScreeningService(transformedData);
 
@@ -394,7 +450,7 @@ export default function Screening() {
   };
 
   // Create stages for StageContainer
-  const stages = questions.map((question, index) => (
+  const stages = activeQuestions.map((question, index) => (
     <QuestionLayout key={question.key} question={question.question}>
       <FormSection>{renderInput(question)}</FormSection>
       {currentIndex === index && errorMsg && (
