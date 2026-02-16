@@ -57,6 +57,29 @@ const getHealthStatus = (value) => {
   return 'Dangerous';
 };
 
+// Custom X-axis tick that styles days with no data differently
+const CustomXAxisTick = ({ x, y, payload, data }) => {
+  const dayData = data.find((d) => d.label === payload.value);
+  const hasData = dayData?.has_data !== false;
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={16}
+        textAnchor="middle"
+        fill={hasData ? '#666' : '#9d9586'}
+        fontSize={16}
+        fontWeight={hasData ? 500 : 400}
+        opacity={hasData ? 1 : 0.6}
+      >
+        {payload.value}
+      </text>
+    </g>
+  );
+};
+
 // Custom Tooltip with mental health status
 const CustomTooltip = ({ active, payload, selectedMetric }) => {
   if (active && payload && payload.length) {
@@ -201,12 +224,8 @@ export default function WeeklyChart({
           <div className={styles['chart-wrapper']}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={data.map((entry) =>
-                  entry.has_data === false
-                    ? { ...entry, [selectedMetric]: 5 }
-                    : entry
-                )}
-                margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
+                data={data}
+                margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
@@ -215,14 +234,14 @@ export default function WeeklyChart({
                 />
                 <XAxis
                   dataKey="label"
-                  tick={{ fill: '#666', fontSize: 12, fontWeight: 500 }}
+                  tick={<CustomXAxisTick data={data} />}
                   tickLine={false}
                   axisLine={{ stroke: '#e0e0e0' }}
                   interval={0}
                 />
                 <YAxis
                   domain={getYAxisDomain()}
-                  tick={{ fill: '#666', fontSize: 11 }}
+                  tick={{ fill: '#9d9586', fontSize: 16 }}
                   tickLine={false}
                   axisLine={{ stroke: '#e0e0e0' }}
                   width={35}
