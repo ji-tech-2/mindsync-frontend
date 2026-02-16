@@ -4,39 +4,16 @@ import Card from '@/components/Card';
 import SegmentedControl from '@/components/SegmentedControl';
 
 /**
- * Check if a specific day of the week has been completed.
- * @param {number} index - Day index (0=Mon, 6=Sun)
- * @param {Array} completedDays - Array of date strings (YYYY-MM-DD)
- * @returns {boolean}
- */
-function isDayCompleted(index, completedDays) {
-  if (!completedDays || completedDays.length === 0) return false;
-
-  const now = new Date();
-
-  // Calculate start of current week (Monday)
-  const startOfWeek = new Date(now);
-  const currentDay = now.getDay();
-  const diff = (currentDay === 0 ? -6 : 1) - currentDay;
-  startOfWeek.setDate(now.getDate() + diff);
-  startOfWeek.setHours(0, 0, 0, 0);
-
-  // Build date for the day being checked
-  const checkDate = new Date(startOfWeek);
-  checkDate.setDate(startOfWeek.getDate() + index);
-
-  const checkDateStr = checkDate.toISOString().split('T')[0];
-  return completedDays.includes(checkDateStr);
-}
-
-/**
- * Get current streak value and display unit based on view type.
+ * Get current streak value based on view type.
+ * @param {Object} data - Streak data from API
+ * @param {string} viewType - 'daily' or 'weekly'
+ * @returns {Object} Current streak count and unit
  */
 function getStreakData(data, viewType) {
   const currentStreak =
     viewType === 'daily'
-      ? data?.daily?.current || 0
-      : data?.weekly?.current || 0;
+      ? data?.current_streak?.daily || 0
+      : data?.current_streak?.weekly || 0;
   const unit = viewType === 'daily' ? 'days' : 'weeks';
   return { currentStreak, unit };
 }
@@ -74,8 +51,10 @@ export default function StreakCard({ data, loading, error }) {
   }
 
   const { currentStreak, unit } = getStreakData(data, viewType);
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const completedDays = data.completed_days_this_week || [];
+
+  // Get the appropriate data array based on view type
+  const periodData =
+    viewType === 'daily' ? data?.daily || [] : data?.weekly || [];
 
   const segmentOptions = [
     { label: 'Daily', value: 'daily' },
@@ -104,14 +83,14 @@ export default function StreakCard({ data, loading, error }) {
       </div>
 
       <div className={styles.daysRow}>
-        {days.map((day, index) => (
-          <div key={day} className={styles.dayItem}>
+        {periodData.map((item) => (
+          <div key={item.date || item.week_start} className={styles.dayItem}>
             <div
-              className={`${styles.dayCircle} ${isDayCompleted(index, completedDays) ? styles.completed : ''}`}
+              className={`${styles.dayCircle} ${item.has_screening ? styles.completed : ''}`}
             >
-              {isDayCompleted(index, completedDays) ? '✓' : ''}
+              {item.has_screening ? '✓' : ''}
             </div>
-            <span className={styles.dayName}>{day}</span>
+            <span className={styles.dayName}>{item.label}</span>
           </div>
         ))}
       </div>
