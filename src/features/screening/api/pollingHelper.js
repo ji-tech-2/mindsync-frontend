@@ -55,12 +55,41 @@ function buildReadyResponse(data) {
  * Build a partial polling response.
  */
 function buildPartialResponse(data) {
+  const timing = data.result?.timing || {};
+  const startTimestamp = timing.start_timestamp;
+
+  // Calculate total end-to-end latency (including network + polling)
+  let totalLatencyMs = null;
+  if (startTimestamp) {
+    totalLatencyMs = (Date.now() / 1000 - startTimestamp) * 1000;
+    console.log(
+      '⏱️  [BENCHMARK] Ridge Prediction - Model.pkl only:',
+      timing.ridge_prediction_ms,
+      'ms'
+    );
+    console.log(
+      '⏱️  [BENCHMARK] Ridge Prediction - Server processing:',
+      timing.server_processing_ms,
+      'ms'
+    );
+    console.log(
+      '⏱️  [BENCHMARK] Ridge Prediction - Total end-to-end latency:',
+      totalLatencyMs.toFixed(2),
+      'ms'
+    );
+  }
+
   return {
     success: true,
     status: 'partial',
     data: data.result,
     metadata: {
       created_at: data.created_at,
+      timing: {
+        ridge_prediction_ms: timing.ridge_prediction_ms,
+        server_processing_ms: timing.server_processing_ms,
+        total_end_to_end_ms: totalLatencyMs,
+      },
     },
   };
 }
