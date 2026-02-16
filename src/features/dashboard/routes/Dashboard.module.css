@@ -19,7 +19,6 @@
     url('@/assets/background.jpg');
   background-size: cover;
   background-attachment: fixed;
-  background-position-y: 140%;
   margin-bottom: var(--space-2xl);
   position: relative;
   left: 50%;
