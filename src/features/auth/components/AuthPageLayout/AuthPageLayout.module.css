@@ -5,7 +5,7 @@
   align-items: center;
   min-width: 100%;
   min-height: 100vh;
-  padding: var(--space-2xl) var(--space-md);
+  padding: var(--space-xl) var(--gutter);
   position: relative;
   overflow-x: hidden;
   background:
@@ -17,23 +17,35 @@
 }
 
 .card {
-  max-width: 480px;
+  max-width: 100%;
+  width: 100%;
 }
 
-@media (width <= 768px) {
+/* Tablet: 768px - 6 columns */
+@media (width >= 768px) {
   .wrapper {
-    padding: var(--space-xl) var(--space-md);
+    padding: var(--space-2xl) var(--gutter);
+  }
+
+  .card {
+    max-width: 480px;
   }
 }
 
-@media (width <= 480px) {
+/* Desktop: 1024px - 12 columns */
+@media (width >= 1024px) {
   .wrapper {
-    padding: var(--space-md);
+    padding: var(--space-3xl) var(--gutter);
+  }
+
+  .card {
+    max-width: 520px;
   }
 }
 
-@media (width >= 1200px) {
-  .wrapper {
-    padding: var(--space-3xl) var(--space-2xl);
+/* Desktop Large: 1440px - 12 columns */
+@media (width >= 1440px) {
+  .card {
+    max-width: 560px;
   }
 }

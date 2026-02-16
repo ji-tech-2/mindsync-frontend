@@ -1,6 +1,14 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
-  margin-top: var(--space-xl);
+  gap: var(--gutter);
+  margin-top: var(--space-lg);
+}
+
+/* Tablet: 768px - 6 columns */
+@media (width >= 768px) {
+  .form {
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+  }
 }
