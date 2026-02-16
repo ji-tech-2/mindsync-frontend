@@ -3,12 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Dashboard.module.css';
 import { WeeklyChart, Card, Button } from '@/components';
 import {
-  getScreeningHistory,
+  getWeeklyChart,
   getWeeklyCriticalFactors,
   getDailySuggestion,
   getStreak,
 } from '@/services';
-import { buildWeeklyChartFromHistory } from '@/utils/chartHelpers';
 import { getFeatureDisplayName, getFeatureIcon } from '@/utils/featureNames';
 import { useAuth } from '@/features/auth';
 import CriticalFactorCard from '../components/CriticalFactorCard';
@@ -26,9 +25,9 @@ export default function Dashboard() {
       const currentUserId = user?.userId || user?.id || user?.user_id;
       if (!currentUserId) return;
       try {
-        const response = await getScreeningHistory(currentUserId);
+        const response = await getWeeklyChart(currentUserId);
         if (response.status === 'success' && response.data) {
-          setWeeklyData(buildWeeklyChartFromHistory(response.data));
+          setWeeklyData(response.data);
         }
       } catch (err) {
         console.error('Failed to fetch weekly chart:', err);

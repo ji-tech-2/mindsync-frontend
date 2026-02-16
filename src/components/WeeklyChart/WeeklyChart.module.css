@@ -32,6 +32,15 @@
   align-items: center;
 }
 
+/* Metric Selector */
+.metric-selector {
+  margin-bottom: var(--space-md);
+}
+
+.minimal .metric-selector {
+  margin-top: 0;
+}
+
 .weekly-chart-container h3 {
   margin: 0;
   font-family: var(--font-body);
