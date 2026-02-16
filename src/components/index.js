@@ -8,6 +8,7 @@ export { default as FormInput } from './FormInput';
 export { default as FormSelect } from './FormSelect';
 export { default as Link } from './Link';
 export { default as OTPInput } from './OTPInput';
+export { default as PasswordField } from './PasswordField';
 export { default as SegmentedControl } from './SegmentedControl';
 export { default as TextField } from './TextField';
 export { default as EditModal } from './EditModal';

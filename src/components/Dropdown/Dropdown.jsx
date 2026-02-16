@@ -44,8 +44,13 @@ function buildDropdownClasses({
   disabled,
   floatingLabel,
   error,
+  variant,
 }) {
-  const wrapperClass = [styles.wrapper, fullWidth && styles.fullWidth]
+  const wrapperClass = [
+    styles.wrapper,
+    fullWidth && styles.fullWidth,
+    variant === 'surface' && styles.surface,
+  ]
     .filter(Boolean)
     .join(' ');
 
@@ -54,11 +59,16 @@ function buildDropdownClasses({
     isOpen ? styles.headerOpen : styles.headerClosed,
     disabled && styles.disabled,
     floatingLabel && styles.floatingLabel,
+    variant === 'surface' && styles.surface,
   ]
     .filter(Boolean)
     .join(' ');
 
-  const containerClass = [styles.container, error && styles.error]
+  const containerClass = [
+    styles.container,
+    error && styles.error,
+    variant === 'surface' && styles.surface,
+  ]
     .filter(Boolean)
     .join(' ');
 
@@ -98,6 +108,7 @@ function DropdownArrow({ isOpen }) {
  * @param {boolean} props.disabled - Disabled state
  * @param {boolean} props.floatingLabel - Enable floating label (default: true)
  * @param {Function} props.onBlur - Blur handler
+ * @param {string} props.variant - 'default' or 'surface' (default: 'default')
  */
 const Dropdown = ({
   label,
@@ -109,6 +120,7 @@ const Dropdown = ({
   disabled = false,
   floatingLabel = true,
   onBlur,
+  variant = 'default',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -157,6 +169,7 @@ const Dropdown = ({
     disabled,
     floatingLabel,
     error,
+    variant,
   });
 
   return (

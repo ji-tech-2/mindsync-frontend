@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
 import { Dropdown, WeeklyChart } from '@/components';
+import PageLayout from '@/layouts/PageLayout';
 import { HistoryItem } from '../components';
 import { getScreeningHistory } from '@/services';
 import { buildWeeklyChartFromHistory } from '@/utils/chartHelpers';
@@ -91,11 +92,10 @@ export default function History() {
   }, [user, navigate]);
 
   return (
-    <div className={styles.historyPage}>
-      {/* Header with Month Dropdown */}
-      <header className={styles.header}>
-        <h1 className={styles.title}>History</h1>
-        {monthOptions.length > 0 && (
+    <PageLayout
+      title="History"
+      headerRight={
+        monthOptions.length > 0 && (
           <div className={styles.monthDropdown}>
             <Dropdown
               options={monthOptions}
@@ -105,9 +105,9 @@ export default function History() {
               floatingLabel={false}
             />
           </div>
-        )}
-      </header>
-
+        )
+      }
+    >
       {/* Main Content */}
       {isLoading ? (
         <div className={styles.loading}>
@@ -148,6 +148,6 @@ export default function History() {
           </div>
         </div>
       )}
-    </div>
+    </PageLayout>
   );
 }

@@ -187,7 +187,7 @@ function Navbar() {
         {user && (
           <div className={styles.mobileMenuActions}>
             <Button variant="outlined" fullWidth onClick={handleEditProfile}>
-              Edit Profile
+              Settings
             </Button>
             <Button variant="filled" fullWidth onClick={handleLogout}>
               Logout

@@ -13,11 +13,12 @@ export const API_ROUTES = {
   AUTH_LOGIN: '/v1/auth/login',
   AUTH_REGISTER: '/v1/auth/register',
   AUTH_LOGOUT: '/v1/auth/logout',
+  AUTH_RESET_PASSWORD: '/v1/auth/reset-password',
 
   // User Profile (JWT cookie auth — /me/ prefix)
   PROFILE: '/v1/users/me/profile',
   PROFILE_REQUEST_OTP: '/v1/users/me/request-otp',
-  PROFILE_CHANGE_PASSWORD: '/v1/users/me/change-password',
+  PROFILE_CHANGE_PASSWORD: '/v1/profile/me/change-password',
 
   // Screening/Prediction
   PREDICT: '/v1/predictions/create',

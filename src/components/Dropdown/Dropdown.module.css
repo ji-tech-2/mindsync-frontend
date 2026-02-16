@@ -263,3 +263,26 @@
 .option:hover {
   background-color: var(--color-primary-light);
 }
+
+/* Surface variant - for use on surface backgrounds */
+.surface .header {
+  background-color: var(--color-bg-surface);
+}
+
+.surface .label {
+  background-color: var(--color-bg-surface);
+}
+
+.surface .menu {
+  background-color: var(--color-bg-surface);
+}
+
+/* Ensure label background stays surface when it has a value */
+.surface .container[data-has-value='true'] .label {
+  background-color: var(--color-bg-surface);
+}
+
+/* Keep surface background on hover for floating label */
+.surface.floatingLabel.headerClosed:hover:not(.disabled) {
+  background-color: var(--color-bg-surface);
+}

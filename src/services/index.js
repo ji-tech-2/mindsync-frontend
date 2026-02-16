@@ -33,6 +33,7 @@ export const {
   register,
   logout,
   requestOTP,
+  resetPassword,
   changePassword,
 
   // Profile

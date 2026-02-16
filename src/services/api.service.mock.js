@@ -143,13 +143,13 @@ export async function requestOTP(email) {
 }
 
 /**
- * Change password (mock)
+ * Reset password with OTP (mock - forgot password flow)
  */
-export async function changePassword(email, otp, newPassword) {
+export async function resetPassword(email, otp, newPassword) {
   await delay(700);
 
   console.log(
-    '🎭 [MOCK] Change password:',
+    '🎭 [MOCK] Reset password:',
     email,
     'New password length:',
     newPassword?.length
@@ -158,6 +158,31 @@ export async function changePassword(email, otp, newPassword) {
   // Simulate OTP validation
   if (otp !== '123456' && otp !== '000000') {
     throw new Error('Invalid OTP');
+  }
+
+  return {
+    success: true,
+    message: 'Password reset successfully',
+  };
+}
+
+/**
+ * Change password (mock - authenticated user)
+ */
+export async function changePassword(oldPassword, newPassword) {
+  await delay(700);
+
+  console.log(
+    '🎭 [MOCK] Change password:',
+    'Old password length:',
+    oldPassword?.length,
+    'New password length:',
+    newPassword?.length
+  );
+
+  // Simulate old password validation
+  if (oldPassword !== 'test123') {
+    throw new Error('Invalid old password');
   }
 
   return {

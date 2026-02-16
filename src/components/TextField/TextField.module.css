@@ -47,13 +47,8 @@
 
 /* Disabled state */
 .input:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
-}
-
-.container.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  outline-color: var(--color-text-muted);
 }
 
 /* Autofill styles - override browser defaults */
@@ -129,4 +124,26 @@
 
 .fullWidth .input {
   width: 100%;
+}
+
+/* Surface variant - for use on surface backgrounds */
+.surface .input {
+  background-color: var(--color-bg-surface);
+}
+
+.surface .input:-webkit-autofill,
+.surface .input:-webkit-autofill:hover,
+.surface .input:-webkit-autofill:focus,
+.surface .input:-webkit-autofill:active {
+  box-shadow: 0 0 0 30px var(--color-bg-surface) inset !important;
+}
+
+.surface .input:-webkit-autofill ~ .label,
+.surface .input:autofill ~ .label {
+  background-color: var(--color-bg-surface);
+}
+
+.surface .input:focus ~ .label,
+.surface .input:not(:placeholder-shown) ~ .label {
+  background-color: var(--color-bg-surface);
 }

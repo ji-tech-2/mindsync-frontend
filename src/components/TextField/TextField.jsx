@@ -12,6 +12,7 @@ import styles from './TextField.module.css';
  * @param {string} props.className - Additional CSS classes
  * @param {boolean} props.error - Show error state styling (default: false)
  * @param {boolean} props.fullWidth - Fill container width (default: false)
+ * @param {string} props.variant - 'default' or 'surface' (default: 'default')
  */
 const TextField = forwardRef(function TextField(
   {
@@ -23,6 +24,7 @@ const TextField = forwardRef(function TextField(
     className = '',
     error = false,
     fullWidth = false,
+    variant = 'default',
     ...rest
   },
   ref
@@ -40,6 +42,7 @@ const TextField = forwardRef(function TextField(
     disabled && styles.disabled,
     error && styles.error,
     fullWidth && styles.fullWidth,
+    variant === 'surface' && styles.surface,
   ]
     .filter(Boolean)
     .join(' ');
