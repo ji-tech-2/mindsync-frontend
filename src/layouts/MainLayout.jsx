@@ -19,7 +19,6 @@ export function MainLayout() {
       <main
         style={{
           minHeight: '100vh',
-          paddingTop: '4.5rem',
           display: 'flex',
           flexDirection: 'column',
         }}
