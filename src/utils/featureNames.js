@@ -10,6 +10,16 @@
  */
 
 // ============================================
+// Image Imports (Optimized with vite-imagetools)
+// ============================================
+
+import sleepImage from '@/assets/feature-images/tania-mousinho-sleep.jpg?w=800&format=webp&quality=85';
+import stressImage from '@/assets/feature-images/vitaly-gariev-stress.jpg?w=800&format=webp&quality=85';
+import exerciseImage from '@/assets/feature-images/vitaly-gariev-exercise.jpg?w=800&format=webp&quality=85';
+import workImage from '@/assets/feature-images/christin-hume-work.jpg?w=800&format=webp&quality=85';
+import wakeImage from '@/assets/feature-images/vitaly-gariev-wake.jpg?w=800&format=webp&quality=85';
+
+// ============================================
 // SINGLE SOURCE OF TRUTH - Feature Display Names
 // ============================================
 
@@ -51,6 +61,22 @@ export const FEATURE_ICONS = {
   Productivity: '💼',
   'Sleep & Productivity Balance': '⚖️',
   'Stress & Productivity Impact': '📊',
+};
+
+// ============================================
+// Image Mapping for Feature Cards
+// ============================================
+
+export const FEATURE_IMAGES = {
+  'Sleep Quality': wakeImage,
+  'Sleep Duration': sleepImage,
+  'Age-Related Sleep Needs': wakeImage,
+  'Total Screen Time': workImage,
+  'Stress Level': stressImage,
+  'Physical Activity': exerciseImage,
+  Productivity: workImage,
+  'Sleep & Productivity Balance': sleepImage,
+  'Stress & Productivity Impact': stressImage,
 };
 
 // ============================================
@@ -114,4 +140,28 @@ export const getFeatureDisplay = (featureName) => {
   const displayName = getFeatureDisplayName(featureName);
   const icon = getFeatureIcon(displayName);
   return { displayName, icon };
+};
+
+/**
+ * Get image path for a feature based on its display name
+ * @param {string} displayName - Customer-friendly feature name
+ * @returns {string} Image path for the feature
+ */
+export const getFeatureImage = (displayName) => {
+  // Check explicit mapping first
+  if (FEATURE_IMAGES[displayName]) {
+    return FEATURE_IMAGES[displayName];
+  }
+
+  // Determine image based on keywords
+  const lowerName = displayName.toLowerCase();
+  if (lowerName.includes('sleep')) return FEATURE_IMAGES['Sleep Quality'];
+  if (lowerName.includes('exercise') || lowerName.includes('activity'))
+    return FEATURE_IMAGES['Physical Activity'];
+  if (lowerName.includes('screen')) return FEATURE_IMAGES['Total Screen Time'];
+  if (lowerName.includes('stress')) return FEATURE_IMAGES['Stress Level'];
+  if (lowerName.includes('productivity')) return FEATURE_IMAGES['Productivity'];
+
+  // Fallback to a generic image
+  return workImage;
 };

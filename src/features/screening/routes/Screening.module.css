@@ -4,40 +4,37 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: var(--space-lg);
+  padding: var(--gutter);
+  padding-top: calc(48px + var(--gutter));
 }
 
 .header {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-lg);
+  padding: var(--gutter);
   margin: 0 auto;
   z-index: 100;
 }
 
-.exitButton {
-  /* Ensure button styles are applied */
-}
-
 .logo {
-  height: 40px;
+  height: 32px;
   width: auto;
 }
 
 .card {
-  max-width: 600px;
+  max-width: 100%;
   width: 100%;
-  min-height: 300px;
+  min-height: 350px;
   margin: 0 auto;
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--gutter);
   box-sizing: border-box;
 }
 
@@ -66,7 +63,7 @@
 .buttonContainer {
   display: flex;
   width: 100%;
-  gap: var(--space-md);
+  gap: var(--gutter);
   justify-content: center;
   align-items: center;
   flex-shrink: 0;
@@ -77,56 +74,37 @@
 }
 
 /* Responsive adjustments */
-@media (width <= 768px) {
-  .wrapper {
-    padding: var(--space-md);
-    padding-top: calc(52px + var(--space-lg));
-  }
 
-  .header {
-    padding: var(--space-md);
+/* Tablet: 768px - 6 columns */
+@media (width >= 768px) {
+  .wrapper {
+    padding-top: calc(52px + var(--gutter));
   }
 
   .logo {
-    height: 32px;
+    height: 36px;
   }
 
   .card {
-    max-width: 100%;
+    max-width: 600px;
     min-height: 400px;
   }
 }
 
-@media (width <= 480px) {
-  .wrapper {
-    padding: var(--space-sm);
-    padding-top: calc(48px + var(--space-md));
-    min-height: 100dvh; /* Use dvh for better mobile support */
-  }
-
-  .header {
-    padding: var(--space-sm);
-  }
-
+/* Desktop: 1024px - 12 columns */
+@media (width >= 1024px) {
   .logo {
-    height: 28px;
+    height: 40px;
   }
 
   .card {
-    gap: var(--space-md);
+    max-width: 600px;
   }
+}
 
-  .buttonContainer {
-    gap: var(--space-xs);
-  }
-
-  .backButtonWrapper {
-    width: 110px;
-    min-width: 110px;
-  }
-
-  .nextButton {
-    width: 110px;
-    min-width: 110px;
+/* Desktop Large: 1440px - 12 columns */
+@media (width >= 1440px) {
+  .card {
+    max-width: 650px;
   }
 }

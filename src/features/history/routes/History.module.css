@@ -1,18 +1,23 @@
 /* History Page Styles */
 
 .monthDropdown {
-  min-width: 200px;
+  width: 100%;
+  order: 2;
 }
 
 /* Main Content Grid */
 .content {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-xl);
+  grid-template-columns: repeat(var(--grid-columns-mobile), 1fr);
+  gap: var(--gutter);
   flex: 1;
   align-items: start;
   width: 100%;
   max-width: 100%;
+}
+
+.content > * {
+  grid-column: span 2;
 }
 
 /* Left Column - History List */
@@ -20,14 +25,16 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+  order: 3;
 }
 
 /* Right Column - Chart Section */
 .chartSection {
-  height: 500px;
+  height: 350px;
   align-self: flex-start;
   display: flex;
   flex-direction: column;
+  order: 1;
 }
 
 /* Loading State */
@@ -93,22 +100,20 @@
 }
 
 /* Responsive Design */
-@media (width <= 1024px) {
-  .content {
-    grid-template-columns: 1fr;
-    gap: var(--space-lg);
-  }
 
-  .chartSection {
-    position: relative;
-    top: 0;
-    height: 500px;
-  }
-}
-
-@media (width <= 768px) {
+/* Tablet: 768px - 6 columns */
+@media (width >= 768px) {
   .monthDropdown {
-    width: 100%;
+    width: auto;
+    min-width: 200px;
+  }
+
+  .content {
+    grid-template-columns: repeat(var(--grid-columns-tablet), 1fr);
+  }
+
+  .content > * {
+    grid-column: span 6;
   }
 
   .chartSection {
@@ -116,8 +121,38 @@
   }
 }
 
-@media (width <= 480px) {
+/* Desktop: 1024px - 12 columns */
+@media (width >= 1024px) {
+  .monthDropdown {
+    order: unset;
+  }
+
+  .content {
+    grid-template-columns: repeat(var(--grid-columns-desktop), 1fr);
+  }
+
+  .content > .historyList {
+    grid-column: span 5;
+    order: 1;
+  }
+
+  .content > .chartSection {
+    grid-column: span 7;
+    order: 2;
+  }
+
   .chartSection {
-    height: 350px;
+    height: 500px;
+  }
+}
+
+/* Desktop Large: 1440px - 12 columns */
+@media (width >= 1440px) {
+  .content > .historyList {
+    grid-column: span 5;
+  }
+
+  .content > .chartSection {
+    grid-column: span 7;
   }
 }

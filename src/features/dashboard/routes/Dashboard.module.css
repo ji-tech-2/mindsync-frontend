@@ -1,9 +1,9 @@
 /* Dashboard Layout - Using CSS Modules and Design System Variables */
 
 .container {
-  max-width: 1200px;
+  max-width: var(--container-max);
   margin: 0 auto;
-  padding: 0 var(--space-lg) var(--space-3xl);
+  padding: 0 var(--gutter) var(--space-3xl);
 }
 
 /* ======================================= */
@@ -13,14 +13,14 @@
 /* ======================================= */
 
 .header {
-  padding: var(--space-3xl) var(--space-lg);
+  padding: var(--space-2xl) var(--gutter);
   background:
     linear-gradient(to bottom, rgb(92 86 67 / 30%), rgb(92 86 67 / 30%)),
     url('@/assets/background.jpg');
   background-size: cover;
   background-attachment: fixed;
   background-position-y: 140%;
-  margin-bottom: var(--space-3xl);
+  margin-bottom: var(--space-2xl);
   position: relative;
   left: 50%;
   right: 50%;
@@ -31,7 +31,7 @@
 }
 
 .headerContent {
-  max-width: 1200px;
+  max-width: var(--container-max);
   margin: 0 auto;
   text-align: center;
   display: flex;
@@ -42,8 +42,7 @@
 
 .greeting {
   font-family: var(--font-heading);
-  font-size: var(--font-size-4xl);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-3xl);
   color: var(--color-text-dark);
   margin: 0;
   text-shadow: 0 2px 8px rgb(0 0 0 / 20%);
@@ -51,7 +50,7 @@
 
 .subtitle {
   font-family: var(--font-body);
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-md);
   color: var(--color-text-dark);
   margin: 0;
   font-weight: var(--font-weight-regular);
@@ -70,14 +69,18 @@
 
 .upperSection {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-xl);
+  grid-template-columns: repeat(var(--grid-columns-mobile), 1fr);
+  gap: var(--gutter);
+}
+
+.upperSection > * {
+  grid-column: span 2;
 }
 
 .leftColumn {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
+  gap: var(--gutter);
 }
 
 /* ======================================= */
@@ -87,12 +90,7 @@
 /* ======================================= */
 
 .sectionTitle {
-  font-family: var(--font-heading);
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-light);
-  margin: var(--space-3xl) 0 var(--space-lg);
-  letter-spacing: var(--letter-spacing-tight);
+  margin: var(--space-2xl) 0 var(--space-lg);
 }
 
 /* ======================================= */
@@ -103,8 +101,12 @@
 
 .criticalFactorsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--space-xl);
+  grid-template-columns: repeat(var(--grid-columns-mobile), 1fr);
+  gap: var(--gutter);
+}
+
+.criticalFactorsGrid > * {
+  grid-column: span 2;
 }
 
 /* ======================================= */
@@ -113,10 +115,11 @@
 
 /* ======================================= */
 
-/* Tablet and below */
-@media (width <= 1024px) {
-  .upperSection {
-    grid-template-columns: 1fr;
+/* Tablet: 768px - 6 columns */
+@media (width >= 768px) {
+  .header {
+    padding: var(--space-3xl) var(--gutter);
+    margin-bottom: var(--space-3xl);
   }
 
   .greeting {
@@ -127,60 +130,61 @@
     font-size: var(--font-size-lg);
   }
 
-  .criticalFactorsGrid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  }
-}
-
-/* Mobile */
-@media (width <= 768px) {
-  .container {
-    padding: 0 var(--space-md) var(--space-2xl);
+  .upperSection {
+    grid-template-columns: repeat(var(--grid-columns-tablet), 1fr);
   }
 
-  .header {
-    padding: var(--space-2xl) var(--space-md);
-    margin-bottom: var(--space-2xl);
-  }
-
-  .greeting {
-    font-size: var(--font-size-2xl);
-  }
-
-  .subtitle {
-    font-size: var(--font-size-md);
-  }
-
-  .content {
-    gap: var(--space-lg);
+  .upperSection > * {
+    grid-column: span 3;
   }
 
   .leftColumn {
-    gap: var(--space-lg);
-  }
-
-  .upperSection {
-    gap: var(--space-lg);
+    gap: var(--gutter);
   }
 
   .sectionTitle {
-    font-size: var(--font-size-2xl);
-    margin: var(--space-lg) 0 var(--space-md);
+    font-size: var(--font-size-3xl);
   }
 
   .criticalFactorsGrid {
-    grid-template-columns: 1fr;
-    gap: var(--space-lg);
+    grid-template-columns: repeat(var(--grid-columns-tablet), 1fr);
+  }
+
+  .criticalFactorsGrid > * {
+    grid-column: span 3;
   }
 }
 
-/* Small mobile */
-@media (width <= 480px) {
+/* Desktop: 1024px - 12 columns */
+@media (width >= 1024px) {
   .greeting {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-4xl);
   }
 
   .subtitle {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xl);
+  }
+
+  .upperSection {
+    grid-template-columns: repeat(var(--grid-columns-desktop), 1fr);
+  }
+
+  .upperSection > * {
+    grid-column: span 6;
+  }
+
+  .criticalFactorsGrid {
+    grid-template-columns: repeat(var(--grid-columns-desktop), 1fr);
+  }
+
+  .criticalFactorsGrid > * {
+    grid-column: span 4;
+  }
+}
+
+/* Desktop Large: 1440px - 12 columns */
+@media (width >= 1440px) {
+  .criticalFactorsGrid > * {
+    grid-column: span 4;
   }
 }

@@ -44,14 +44,14 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  /* Font Sizes */
-  --font-size-sm: 0.875rem; /* 14px */
-  --font-size-md: 1rem; /* 16px */
-  --font-size-lg: 1.125rem; /* 18px */
-  --font-size-xl: 1.25rem; /* 20px */
-  --font-size-2xl: 1.5rem; /* 24px */
-  --font-size-3xl: 2rem; /* 32px */
-  --font-size-4xl: 3rem; /* 48px */
+  /* Font Sizes - Mobile First (scale up on larger screens) */
+  --font-size-sm: 0.75rem; /* 12px */
+  --font-size-md: 0.875rem; /* 14px */
+  --font-size-lg: 1rem; /* 16px */
+  --font-size-xl: 1.125rem; /* 18px */
+  --font-size-2xl: 1.25rem; /* 20px */
+  --font-size-3xl: 1.5rem; /* 24px */
+  --font-size-4xl: 2rem; /* 32px */
 
   /* Line Heights */
   --line-height-tighter: 1.2;
@@ -95,6 +95,37 @@
   --transition-fast: 150ms ease-in-out;
   --transition-base: 300ms ease-in-out;
   --transition-slow: 500ms ease-in-out;
+
+  /* --- RESPONSIVE GRID SYSTEM --- */
+
+  /* Breakpoints */
+  --breakpoint-mobile: 0px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+  --breakpoint-desktop-lg: 1440px;
+
+  /* Grid Columns per Breakpoint */
+  --grid-columns-mobile: 2;
+  --grid-columns-tablet: 6;
+  --grid-columns-desktop: 12;
+  --grid-columns-desktop-lg: 12;
+
+  /* Gutter Widths per Breakpoint */
+  --gutter-mobile: 16px;
+  --gutter-tablet: 20px;
+  --gutter-desktop: 24px;
+  --gutter-desktop-lg: 32px;
+
+  /* Active Grid Settings (default: mobile) */
+  --grid-columns: var(--grid-columns-mobile);
+  --gutter: var(--gutter-mobile);
+
+  /* Container Max Widths */
+  --container-mobile: 100%;
+  --container-tablet: 720px;
+  --container-desktop: 960px;
+  --container-desktop-lg: 1200px;
+  --container-max: var(--container-mobile);
 }
 
 /* ======================================= */
@@ -208,3 +239,196 @@ a:hover {
 /* UTILITY CLASSES */
 
 /* ======================================= */
+
+/* Container with responsive max-width */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  max-width: var(--container-max);
+}
+
+/* 12-Column Grid System */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
+  gap: var(--gutter);
+}
+
+/* Column Span Utilities */
+.col-1 {
+  grid-column: span 1;
+}
+
+.col-2 {
+  grid-column: span 2;
+}
+
+.col-3 {
+  grid-column: span 3;
+}
+
+.col-4 {
+  grid-column: span 4;
+}
+
+.col-5 {
+  grid-column: span 5;
+}
+
+.col-6 {
+  grid-column: span 6;
+}
+
+.col-7 {
+  grid-column: span 7;
+}
+
+.col-8 {
+  grid-column: span 8;
+}
+
+.col-9 {
+  grid-column: span 9;
+}
+
+.col-10 {
+  grid-column: span 10;
+}
+
+.col-11 {
+  grid-column: span 11;
+}
+
+.col-12 {
+  grid-column: span 12;
+}
+
+.col-full {
+  grid-column: 1 / -1;
+}
+
+/* Responsive Breakpoints */
+@media (width >= 768px) {
+  :root {
+    --grid-columns: var(--grid-columns-tablet);
+    --gutter: var(--gutter-tablet);
+    --container-max: var(--container-tablet);
+
+    /* Font Sizes - Tablet */
+    --font-size-sm: 0.875rem; /* 14px */
+    --font-size-md: 1rem; /* 16px */
+    --font-size-lg: 1.125rem; /* 18px */
+    --font-size-xl: 1.25rem; /* 20px */
+    --font-size-2xl: 1.5rem; /* 24px */
+    --font-size-3xl: 1.875rem; /* 30px */
+    --font-size-4xl: 2.5rem; /* 40px */
+  }
+
+  .col-tablet-1 {
+    grid-column: span 1;
+  }
+
+  .col-tablet-2 {
+    grid-column: span 2;
+  }
+
+  .col-tablet-3 {
+    grid-column: span 3;
+  }
+
+  .col-tablet-4 {
+    grid-column: span 4;
+  }
+
+  .col-tablet-5 {
+    grid-column: span 5;
+  }
+
+  .col-tablet-6 {
+    grid-column: span 6;
+  }
+
+  .col-tablet-full {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (width >= 1024px) {
+  :root {
+    --grid-columns: var(--grid-columns-desktop);
+    --gutter: var(--gutter-desktop);
+    --container-max: var(--container-desktop);
+
+    /* Font Sizes - Desktop */
+    --font-size-sm: 0.875rem; /* 14px */
+    --font-size-md: 1rem; /* 16px */
+    --font-size-lg: 1.125rem; /* 18px */
+    --font-size-xl: 1.25rem; /* 20px */
+    --font-size-2xl: 1.5rem; /* 24px */
+    --font-size-3xl: 2rem; /* 32px */
+    --font-size-4xl: 3rem; /* 48px */
+  }
+
+  .col-desktop-1 {
+    grid-column: span 1;
+  }
+
+  .col-desktop-2 {
+    grid-column: span 2;
+  }
+
+  .col-desktop-3 {
+    grid-column: span 3;
+  }
+
+  .col-desktop-4 {
+    grid-column: span 4;
+  }
+
+  .col-desktop-5 {
+    grid-column: span 5;
+  }
+
+  .col-desktop-6 {
+    grid-column: span 6;
+  }
+
+  .col-desktop-7 {
+    grid-column: span 7;
+  }
+
+  .col-desktop-8 {
+    grid-column: span 8;
+  }
+
+  .col-desktop-9 {
+    grid-column: span 9;
+  }
+
+  .col-desktop-10 {
+    grid-column: span 10;
+  }
+
+  .col-desktop-11 {
+    grid-column: span 11;
+  }
+
+  .col-desktop-12 {
+    grid-column: span 12;
+  }
+
+  .col-desktop-full {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (width >= 1440px) {
+  :root {
+    --grid-columns: var(--grid-columns-desktop-lg);
+    --gutter: var(--gutter-desktop-lg);
+    --container-max: var(--container-desktop-lg);
+  }
+}

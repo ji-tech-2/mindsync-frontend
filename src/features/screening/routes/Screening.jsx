@@ -24,7 +24,7 @@ import {
   faChevronLeft,
   faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
-import logoSubmark from '@/assets/logo-submark.svg';
+import logoPrimary from '@/assets/logo-primary.svg';
 import styles from './Screening.module.css';
 
 // ============= HELPER FUNCTIONS =============
@@ -470,7 +470,7 @@ export default function Screening() {
         >
           Back to Home
         </Button>
-        <img src={logoSubmark} alt="MindSync" className={styles.logo} />
+        <img src={logoPrimary} alt="MindSync" className={styles.logo} />
       </div>
 
       <div className={styles.wrapper}>

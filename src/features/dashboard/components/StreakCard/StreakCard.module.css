@@ -10,7 +10,7 @@
 .streakInfo {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-sm);
 }
 
 .icon {
@@ -139,9 +139,10 @@
 /* Responsive Design */
 @media (width <= 768px) {
   .header {
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     gap: var(--space-md);
-    align-items: stretch;
   }
 
   .dayCircle {

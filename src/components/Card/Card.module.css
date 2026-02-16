@@ -6,7 +6,21 @@
 }
 
 .padded {
-  padding: var(--space-xl);
+  padding: var(--gutter);
+}
+
+/* Tablet: 768px - 6 columns */
+@media (width >= 768px) {
+  .padded {
+    padding: var(--space-lg);
+  }
+}
+
+/* Desktop: 1024px - 12 columns */
+@media (width >= 1024px) {
+  .padded {
+    padding: var(--space-xl);
+  }
 }
 
 .clipOverflow {
