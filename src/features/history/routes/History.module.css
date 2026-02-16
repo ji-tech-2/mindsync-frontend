@@ -132,27 +132,16 @@
   }
 
   .content > .historyList {
-    grid-column: span 5;
+    grid-column: span 6;
     order: 1;
   }
 
   .content > .chartSection {
-    grid-column: span 7;
+    grid-column: span 6;
     order: 2;
   }
 
   .chartSection {
     height: 500px;
-  }
-}
-
-/* Desktop Large: 1440px - 12 columns */
-@media (width >= 1440px) {
-  .content > .historyList {
-    grid-column: span 5;
-  }
-
-  .content > .chartSection {
-    grid-column: span 7;
   }
 }
