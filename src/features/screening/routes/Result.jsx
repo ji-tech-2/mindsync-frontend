@@ -80,6 +80,18 @@ const ResultPage = () => {
         );
 
         if (pollResult.success) {
+          // BENCHMARK: measure total Flask → Frontend time
+          const benchStart = parseFloat(
+            sessionStorage.getItem('benchmark_start') || '0'
+          );
+          if (benchStart > 0) {
+            const totalMs = performance.now() - benchStart;
+            console.log(
+              `⏱️ [BENCHMARK] Total Flask → Frontend: ${totalMs.toFixed(2)} ms (${(totalMs / 1000).toFixed(2)} s)`
+            );
+            sessionStorage.removeItem('benchmark_start');
+          }
+
           console.log('✅ Complete result received:', pollResult);
           setLoadingStage(3);
 

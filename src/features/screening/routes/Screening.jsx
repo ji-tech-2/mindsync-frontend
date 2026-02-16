@@ -329,6 +329,13 @@ export default function Screening() {
       const result = await submitScreeningService(transformedData);
 
       if (result.prediction_id) {
+        // BENCHMARK: start timer for total Flask → Frontend time
+        performance.mark('prediction-start');
+        console.log(
+          '⏱️ [BENCHMARK] Prediction request sent, id:',
+          result.prediction_id
+        );
+        sessionStorage.setItem('benchmark_start', performance.now().toString());
         navigate(`/result/${result.prediction_id}`);
       } else {
         setErrorMsg(
