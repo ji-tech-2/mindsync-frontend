@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuth } from '@/features/auth';
 import { Button, Card } from '@/components';
+import logoPrimaryAlt from '@/assets/logo-primary-alt.svg';
 import styles from './Home.module.css';
 
 export default function Home() {
@@ -27,16 +28,29 @@ export default function Home() {
       {/* Hero Section */}
       <section className={styles.hero}>
         <div className={styles.heroContent}>
+          <img
+            src={logoPrimaryAlt}
+            alt="MindSync Logo"
+            className={styles.heroLogo}
+          />
           <h1 className={styles.heroTitle}>Your Mental Health Companion</h1>
           <p className={styles.heroSubtitle}>
-            Take control of your mental well-being with personalized screening,
-            expert insights, and science-backed recommendations
+            Take control of your mental well-being with personalized screening
+            and data-backed recommendations
           </p>
           <div className={styles.heroCtas}>
-            <Button variant="filled" onClick={() => navigate('/signup')}>
+            <Button
+              variant="filled"
+              size="lg"
+              onClick={() => navigate('/signup')}
+            >
               Get Started
             </Button>
-            <Button variant="filled" onClick={() => navigate('/screening')}>
+            <Button
+              variant="filled"
+              size="lg"
+              onClick={() => navigate('/screening')}
+            >
               Try Screening
             </Button>
           </div>
