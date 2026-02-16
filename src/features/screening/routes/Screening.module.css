@@ -21,10 +21,6 @@
   z-index: 100;
 }
 
-.exitButton {
-  /* Ensure button styles are applied */
-}
-
 .logo {
   height: 32px;
   width: auto;
