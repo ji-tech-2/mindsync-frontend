@@ -103,9 +103,9 @@ function Navbar() {
               <Link to="/signin" className={styles.navLink}>
                 Log In
               </Link>
-              <Link to="/register" className={styles.buttonLink}>
+              <Link to="/signup" className={styles.buttonLink}>
                 <Button variant="light" bold>
-                  Try for Free
+                  Get Started
                 </Button>
               </Link>
             </>
@@ -174,11 +174,11 @@ function Navbar() {
                 Log In
               </Link>
               <Link
-                to="/register"
+                to="/signup"
                 className={styles.mobileNavLink}
                 onClick={closeMobileMenu}
               >
-                Try for Free
+                Get Started
               </Link>
             </>
           )}
