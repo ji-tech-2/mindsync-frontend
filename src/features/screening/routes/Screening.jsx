@@ -55,9 +55,7 @@ function calculateAge(dateOfBirth) {
 function transformToJSON(screeningData, userId = null, user = null) {
   // Use user data for demographic fields if user is authenticated
   const age =
-    user && user.dateOfBirth
-      ? calculateAge(user.dateOfBirth)
-      : parseInt(screeningData.age);
+    user && user.dob ? calculateAge(user.dob) : parseInt(screeningData.age);
 
   const gender =
     user && user.gender
@@ -260,8 +258,8 @@ export default function Screening() {
       const initialAnswers = {};
 
       // Pre-fill demographic data from user profile
-      if (user.dateOfBirth) {
-        initialAnswers.age = calculateAge(user.dateOfBirth)?.toString() || '';
+      if (user.dob) {
+        initialAnswers.age = calculateAge(user.dob)?.toString() || '';
       }
       if (user.gender) {
         initialAnswers.gender = user.gender;
