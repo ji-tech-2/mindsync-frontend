@@ -569,18 +569,26 @@ export async function getWeeklyChart(userId) {
   for (let i = 6; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(today.getDate() - i);
+    const hasData = Math.random() > 0.2; // 80% chance of having data
 
     data.push({
       label: dayLabels[date.getDay()],
       date: date.toISOString().split('T')[0],
-      mental_health_index: randomScore(),
+      has_data: hasData,
+      mental_health_index: hasData ? randomScore() : 0,
+      screen_time: hasData ? Math.random() * 12 : 0,
+      sleep_duration: hasData ? 6 + Math.random() * 3 : 0,
+      sleep_quality: hasData ? 1 + Math.random() * 4 : 0,
+      stress_level: hasData ? Math.random() * 10 : 0,
+      productivity: hasData ? 50 + Math.random() * 50 : 0,
+      exercise_duration: hasData ? Math.random() * 200 : 0,
+      social_activity: hasData ? Math.random() * 8 : 0,
     });
   }
 
   return {
     status: 'success',
     data: data,
-    days: 7,
   };
 }
 

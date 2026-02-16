@@ -4,8 +4,7 @@ import { useAuth } from '@/features/auth';
 import { Dropdown, WeeklyChart } from '@/components';
 import PageLayout from '@/layouts/PageLayout';
 import { HistoryItem } from '../components';
-import { getScreeningHistory } from '@/services';
-import { buildWeeklyChartFromHistory } from '@/utils/chartHelpers';
+import { getScreeningHistory, getWeeklyChart } from '@/services';
 import {
   generateMonthOptions,
   filterHistoryByMonth,
@@ -66,10 +65,6 @@ export default function History() {
           console.log('✅ Screening history loaded:', response.data);
           const transformedData = transformHistoryData(response.data);
           setHistoryData(transformedData);
-
-          // Build weekly chart from history data
-          const chartData = buildWeeklyChartFromHistory(response.data);
-          setWeeklyData(chartData);
         } else {
           console.warn('⚠️ History API not available:', response.error);
           setHistoryData([]);
@@ -85,9 +80,32 @@ export default function History() {
       }
     };
 
+    const fetchWeeklyChart = async () => {
+      const userId = getUserId(user);
+      if (!userId) return;
+
+      try {
+        const response = await getWeeklyChart(userId);
+        if (response.status === 'success' && response.data) {
+          console.log('✅ Weekly chart loaded:', response.data);
+          setWeeklyData(response.data);
+        } else {
+          console.warn('⚠️ Weekly chart API not available:', response.error);
+          setWeeklyData([]);
+        }
+      } catch (error) {
+        console.warn('⚠️ Weekly chart API error:', error.message);
+        setWeeklyData([]);
+      }
+    };
+
     fetchHistory().catch((err) => {
       console.warn('⚠️ History loading failed:', err);
       setIsLoading(false);
+    });
+
+    fetchWeeklyChart().catch((err) => {
+      console.warn('⚠️ Weekly chart loading failed:', err);
     });
   }, [user, navigate]);
 
@@ -141,7 +159,6 @@ export default function History() {
           <div className={styles.chartSection}>
             <WeeklyChart
               data={weeklyData}
-              dataKey="value"
               minimal
               style={{ height: '100%', flex: 1 }}
             />
