@@ -39,18 +39,10 @@ export default function Home() {
             and data-backed recommendations
           </p>
           <div className={styles.heroCtas}>
-            <Button
-              variant="filled"
-              size="lg"
-              onClick={() => navigate('/signup')}
-            >
+            <Button variant="filled" size="lg" href="/signup">
               Get Started
             </Button>
-            <Button
-              variant="filled"
-              size="lg"
-              onClick={() => navigate('/screening')}
-            >
+            <Button variant="filled" size="lg" href="/screening">
               Try Screening
             </Button>
           </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
 import { ProfileDropdown, Button, ProfileAvatar } from '@/components';
 import logoPrimaryAlt from '@/assets/logo-primary-alt.svg';
@@ -9,7 +9,6 @@ function Navbar() {
   const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef(null);
-  const navigate = useNavigate();
 
   // Close mobile menu when clicking outside
   useEffect(() => {
@@ -40,11 +39,6 @@ function Navbar() {
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
-  };
-
-  const handleEditProfile = () => {
-    closeMobileMenu();
-    navigate('/profile');
   };
 
   const handleLogout = () => {
@@ -186,7 +180,7 @@ function Navbar() {
 
         {user && (
           <div className={styles.mobileMenuActions}>
-            <Button variant="outlined" fullWidth onClick={handleEditProfile}>
+            <Button variant="outlined" fullWidth href="/profile">
               Settings
             </Button>
             <Button variant="filled" fullWidth onClick={handleLogout}>

@@ -243,10 +243,10 @@ const ResultPage = () => {
             <h2>⚠️ An Error Occurred</h2>
             <p>{pollingError}</p>
             <div className={styles.buttonGroup}>
-              <Button variant="filled" onClick={() => navigate('/screening')}>
+              <Button variant="filled" href="/screening">
                 Try Again
               </Button>
-              <Button variant="outlined" onClick={() => navigate('/')}>
+              <Button variant="outlined" href="/">
                 Back to Home
               </Button>
             </div>
@@ -298,10 +298,10 @@ const ResultPage = () => {
                 based on your results.
               </p>
               <div className={styles.buttonGroup}>
-                <Button variant="filled" onClick={() => navigate('/signin')}>
+                <Button variant="filled" href="/signin">
                   Sign In
                 </Button>
-                <Button variant="outlined" onClick={() => navigate('/signup')}>
+                <Button variant="outlined" href="/signup">
                   Register
                 </Button>
               </div>
@@ -311,10 +311,10 @@ const ResultPage = () => {
 
         {/* Footer Actions */}
         <div className={styles.footer}>
-          <Button variant="outlined" onClick={() => navigate('/screening')}>
+          <Button variant="outlined" href="/screening">
             Retake Test
           </Button>
-          <Button variant="filled" onClick={() => navigate('/')}>
+          <Button variant="filled" href="/">
             Back to Home
           </Button>
         </div>
