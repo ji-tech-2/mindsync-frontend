@@ -25,13 +25,12 @@ describe('pollPredictionResult', () => {
         json: async () => mockPartialResponse,
       });
 
-      const result = await pollPredictionResult(
-        'test-prediction-id',
-        'http://test-api.com',
-        '/v1/predictions',
-        3,
-        100
-      );
+      const result = await pollPredictionResult('test-prediction-id', {
+        baseURL: 'http://test-api.com',
+        resultPath: '/v1/predictions',
+        maxAttempts: 3,
+        interval: 100,
+      });
 
       expect(result).toEqual({
         success: true,
@@ -77,13 +76,12 @@ describe('pollPredictionResult', () => {
         json: async () => mockPartialResponse,
       });
 
-      const partialResult = await pollPredictionResult(
-        'test-prediction-id',
-        'http://test-api.com',
-        '/v1/predictions',
-        3,
-        100
-      );
+      const partialResult = await pollPredictionResult('test-prediction-id', {
+        baseURL: 'http://test-api.com',
+        resultPath: '/v1/predictions',
+        maxAttempts: 3,
+        interval: 100,
+      });
 
       expect(partialResult.status).toBe('partial');
 
@@ -93,13 +91,12 @@ describe('pollPredictionResult', () => {
         json: async () => mockReadyResponse,
       });
 
-      const readyResult = await pollPredictionResult(
-        'test-prediction-id',
-        'http://test-api.com',
-        '/v1/predictions',
-        3,
-        100
-      );
+      const readyResult = await pollPredictionResult('test-prediction-id', {
+        baseURL: 'http://test-api.com',
+        resultPath: '/v1/predictions',
+        maxAttempts: 3,
+        interval: 100,
+      });
 
       expect(readyResult.status).toBe('ready');
       expect(readyResult.data.advice).toBeDefined();
@@ -131,13 +128,12 @@ describe('pollPredictionResult', () => {
         json: async () => mockReadyResponse,
       });
 
-      const result = await pollPredictionResult(
-        'test-prediction-id',
-        'http://test-api.com',
-        '/v0-1/result',
-        3,
-        100
-      );
+      const result = await pollPredictionResult('test-prediction-id', {
+        baseURL: 'http://test-api.com',
+        resultPath: '/v0-1/result',
+        maxAttempts: 3,
+        interval: 100,
+      });
 
       expect(result).toEqual({
         success: true,
@@ -186,13 +182,12 @@ describe('pollPredictionResult', () => {
         json: async () => mockReadyResponse,
       });
 
-      const result = await pollPredictionResult(
-        'test-prediction-id',
-        'http://test-api.com',
-        '/v1/predictions',
-        5,
-        10 // short interval for test
-      );
+      const result = await pollPredictionResult('test-prediction-id', {
+        baseURL: 'http://test-api.com',
+        resultPath: '/v1/predictions',
+        maxAttempts: 5,
+        interval: 10, // short interval for test
+      });
 
       expect(result.status).toBe('ready');
       expect(fetch).toHaveBeenCalledTimes(2);
@@ -210,13 +205,12 @@ describe('pollPredictionResult', () => {
       });
 
       await expect(
-        pollPredictionResult(
-          'test-prediction-id',
-          'http://test-api.com',
-          '/v1/predictions',
-          3, // only 3 attempts
-          10
-        )
+        pollPredictionResult('test-prediction-id', {
+          baseURL: 'http://test-api.com',
+          resultPath: '/v1/predictions',
+          maxAttempts: 3, // only 3 attempts
+          interval: 10,
+        })
       ).rejects.toThrow('Timeout: Prediction took too long to process');
 
       expect(fetch).toHaveBeenCalledTimes(3);
@@ -237,13 +231,12 @@ describe('pollPredictionResult', () => {
       });
 
       await expect(
-        pollPredictionResult(
-          'test-prediction-id',
-          'http://test-api.com',
-          '/v1/predictions',
-          3,
-          100
-        )
+        pollPredictionResult('test-prediction-id', {
+          baseURL: 'http://test-api.com',
+          resultPath: '/v1/predictions',
+          maxAttempts: 3,
+          interval: 100,
+        })
       ).rejects.toThrow('Model prediction failed');
     });
 
@@ -259,13 +252,12 @@ describe('pollPredictionResult', () => {
       });
 
       await expect(
-        pollPredictionResult(
-          'test-prediction-id',
-          'http://test-api.com',
-          '/v1/predictions',
-          3,
-          100
-        )
+        pollPredictionResult('test-prediction-id', {
+          baseURL: 'http://test-api.com',
+          resultPath: '/v1/predictions',
+          maxAttempts: 3,
+          interval: 100,
+        })
       ).rejects.toThrow('Prediction ID not found');
     });
 
@@ -289,13 +281,12 @@ describe('pollPredictionResult', () => {
         }),
       });
 
-      const result = await pollPredictionResult(
-        'test-prediction-id',
-        'http://test-api.com',
-        '/v1/predictions',
-        5,
-        10
-      );
+      const result = await pollPredictionResult('test-prediction-id', {
+        baseURL: 'http://test-api.com',
+        resultPath: '/v1/predictions',
+        maxAttempts: 5,
+        interval: 10,
+      });
 
       expect(result.status).toBe('ready');
       expect(fetch).toHaveBeenCalledTimes(2);
@@ -305,13 +296,12 @@ describe('pollPredictionResult', () => {
       global.fetch.mockRejectedValue(new Error('Network error'));
 
       await expect(
-        pollPredictionResult(
-          'test-prediction-id',
-          'http://test-api.com',
-          '/v1/predictions',
-          3,
-          10
-        )
+        pollPredictionResult('test-prediction-id', {
+          baseURL: 'http://test-api.com',
+          resultPath: '/v1/predictions',
+          maxAttempts: 3,
+          interval: 10,
+        })
       ).rejects.toThrow('Network error: Failed to fetch prediction result');
 
       expect(fetch).toHaveBeenCalledTimes(3);
@@ -328,13 +318,12 @@ describe('pollPredictionResult', () => {
       });
 
       await expect(
-        pollPredictionResult(
-          'test-prediction-id',
-          'http://test-api.com',
-          '/v1/predictions',
-          3,
-          100
-        )
+        pollPredictionResult('test-prediction-id', {
+          baseURL: 'http://test-api.com',
+          resultPath: '/v1/predictions',
+          maxAttempts: 3,
+          interval: 100,
+        })
       ).rejects.toThrow('Backend configuration error');
     });
   });
@@ -358,13 +347,12 @@ describe('pollPredictionResult', () => {
         json: async () => mockResponse,
       });
 
-      await pollPredictionResult(
-        'abc123',
-        'http://api.example.com',
-        '/v1/predictions',
-        3,
-        100
-      );
+      await pollPredictionResult('abc123', {
+        baseURL: 'http://api.example.com',
+        resultPath: '/v1/predictions',
+        maxAttempts: 3,
+        interval: 100,
+      });
 
       expect(fetch).toHaveBeenCalledWith(
         'http://api.example.com/v1/predictions/abc123/result',
@@ -395,13 +383,12 @@ describe('pollPredictionResult', () => {
         json: async () => mockResponse,
       });
 
-      const result = await pollPredictionResult(
-        'test-id',
-        'http://test.com',
-        '/result',
-        3,
-        100
-      );
+      const result = await pollPredictionResult('test-id', {
+        baseURL: 'http://test.com',
+        resultPath: '/result',
+        maxAttempts: 3,
+        interval: 100,
+      });
 
       expect(result.metadata).toEqual({
         created_at: '2026-01-21T10:00:00Z',
@@ -426,13 +413,12 @@ describe('pollPredictionResult', () => {
         json: async () => mockResponse,
       });
 
-      const result = await pollPredictionResult(
-        'test-id',
-        'http://test.com',
-        '/result',
-        3,
-        100
-      );
+      const result = await pollPredictionResult('test-id', {
+        baseURL: 'http://test.com',
+        resultPath: '/result',
+        maxAttempts: 3,
+        interval: 100,
+      });
 
       expect(result.metadata).toEqual({
         created_at: '2026-01-21T10:00:00Z',
