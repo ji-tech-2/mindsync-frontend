@@ -592,7 +592,7 @@ export async function getStreak(userId) {
 
   console.log('🎭 [MOCK] Get streak:', userId);
 
-  // Calculate completed days for current week
+  // Calculate current week dates
   const today = new Date();
   const currentDay = today.getDay();
   const startOfWeek = new Date(today);
@@ -600,33 +600,61 @@ export async function getStreak(userId) {
   startOfWeek.setDate(today.getDate() + diff);
   startOfWeek.setHours(0, 0, 0, 0);
 
-  // Generate 2-4 random completed days this week
-  const completedDays = [];
-  const numCompletedDays = Math.floor(Math.random() * 3) + 2;
-  for (let i = 0; i < numCompletedDays; i++) {
-    const dayOffset = Math.floor(Math.random() * 7);
-    const completedDate = new Date(startOfWeek);
-    completedDate.setDate(startOfWeek.getDate() + dayOffset);
-    const dateStr = completedDate.toISOString().split('T')[0];
-    if (!completedDays.includes(dateStr)) {
-      completedDays.push(dateStr);
-    }
+  // Generate daily data for current week (Mon-Sun)
+  const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const dailyData = dayLabels.map((label, index) => {
+    const date = new Date(startOfWeek);
+    date.setDate(startOfWeek.getDate() + index);
+    const dateStr = date.toISOString().split('T')[0];
+    // Randomly mark some days as completed
+    const hasScreening = Math.random() > 0.4;
+    return {
+      date: dateStr,
+      label,
+      has_screening: hasScreening,
+    };
+  });
+
+  // Generate weekly data for last 7 weeks
+  const weeklyData = [];
+  for (let i = 6; i >= 0; i--) {
+    const weekStart = new Date(startOfWeek);
+    weekStart.setDate(startOfWeek.getDate() - i * 7);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+
+    const weekStartStr = weekStart.toISOString().split('T')[0];
+    const weekEndStr = weekEnd.toISOString().split('T')[0];
+
+    // Format label - show only start date
+    const startMonth = weekStart.toLocaleString('en-US', { month: 'short' });
+    const startDay = weekStart.getDate();
+    const label = `${startMonth} ${startDay}`;
+
+    weeklyData.push({
+      week_start: weekStartStr,
+      week_end: weekEndStr,
+      label,
+      has_screening: Math.random() > 0.3,
+    });
   }
+
+  // Calculate streak counts
+  const dailyStreak = Math.floor(Math.random() * 10) + 1;
+  const weeklyStreak = Math.floor(Math.random() * 5) + 1;
 
   return {
     status: 'success',
     data: {
-      daily: {
-        current: Math.floor(Math.random() * 30) + 1,
-        longest: Math.floor(Math.random() * 60) + 10,
+      user_id: userId,
+      current_streak: {
+        daily: dailyStreak,
+        daily_last_date: today.toISOString().split('T')[0],
+        weekly: weeklyStreak,
+        weekly_last_date: startOfWeek.toISOString().split('T')[0],
       },
-      weekly: {
-        current: Math.floor(Math.random() * 15) + 1,
-        longest: Math.floor(Math.random() * 30) + 5,
-      },
-      completed_days_this_week: completedDays,
-      total_screenings: Math.floor(Math.random() * 100) + 20,
-      last_screening_date: new Date().toISOString(),
+      daily: dailyData,
+      weekly: weeklyData,
     },
   };
 }
