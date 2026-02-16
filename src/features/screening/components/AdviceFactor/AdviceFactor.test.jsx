@@ -320,7 +320,7 @@ describe('AdviceFactor', () => {
 
       const header = screen.getByText('Test').parentElement;
       expect(header).toBeTruthy();
-      expect(header.tagName).toBe('DIV');
+      expect(header.tagName).toBe('BUTTON');
     });
 
     it('should open external links in new tab with security attributes', () => {
