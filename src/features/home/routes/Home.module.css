@@ -8,7 +8,7 @@
 
 .hero {
   background:
-    linear-gradient(to bottom, rgb(92 86 67 / 30%), rgb(92 86 67 / 30%)),
+    linear-gradient(to bottom, rgb(92 86 67 / 40%), rgb(66 62 54 / 90%)),
     url('@/assets/background.jpg');
   background-size: cover;
   background-attachment: fixed;
@@ -34,10 +34,16 @@
   gap: var(--space-lg);
 }
 
+.heroLogo {
+  width: clamp(200px, 50vw, 500px);
+  height: auto;
+  margin-bottom: var(--space-md);
+  filter: drop-shadow(0 4px 12px rgb(0 0 0 / 20%));
+}
+
 .heroTitle {
   font-family: var(--font-heading);
   font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
   color: var(--color-text-dark);
   margin: 0;
   line-height: var(--line-height-tight);

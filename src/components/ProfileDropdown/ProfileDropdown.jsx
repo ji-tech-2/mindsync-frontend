@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
 import Card from '../Card';
 import Button from '../Button';
@@ -9,7 +8,6 @@ import styles from './ProfileDropdown.module.css';
 function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   // Close dropdown when clicking outside
@@ -31,11 +29,6 @@ function ProfileDropdown() {
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
-  };
-
-  const handleEditProfile = () => {
-    setIsOpen(false);
-    navigate('/profile');
   };
 
   const handleLogout = () => {
@@ -69,7 +62,7 @@ function ProfileDropdown() {
 
             {/* Action Buttons */}
             <div className={styles.actions}>
-              <Button variant="outlined" fullWidth onClick={handleEditProfile}>
+              <Button variant="outlined" fullWidth href="/profile">
                 Settings
               </Button>
               <Button variant="filled" fullWidth onClick={handleLogout}>

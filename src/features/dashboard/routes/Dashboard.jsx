@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styles from './Dashboard.module.css';
 import { WeeklyChart, Card, Button } from '@/components';
 import {
@@ -15,7 +14,6 @@ import DashboardSuggestion from '../components/DashboardSuggestion';
 import StreakCard from '../components/StreakCard';
 
 export default function Dashboard() {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const userName = user?.name || 'User';
   const [weeklyData, setWeeklyData] = useState([]);
@@ -131,11 +129,7 @@ export default function Dashboard() {
         <div className={styles.headerContent}>
           <h1 className={styles.greeting}>Hello, {userName}!</h1>
           <p className={styles.subtitle}>How are you feeling today?</p>
-          <Button
-            variant="filled"
-            size="lg"
-            onClick={() => navigate('/screening')}
-          >
+          <Button variant="filled" size="lg" href="/screening">
             Take Screening Now
           </Button>
         </div>
@@ -158,12 +152,7 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          <WeeklyChart
-            data={weeklyData}
-            title="Weekly Chart"
-            navigate={navigate}
-            compact
-          />
+          <WeeklyChart data={weeklyData} title="Weekly Chart" compact />
         </div>
 
         <h2 className={styles.sectionTitle}>Critical Factors</h2>

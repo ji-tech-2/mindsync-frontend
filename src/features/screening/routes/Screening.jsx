@@ -464,7 +464,7 @@ export default function Screening() {
       <div className={styles.header}>
         <Button
           variant="outlined"
-          onClick={() => navigate('/dashboard')}
+          href="/dashboard"
           icon={<FontAwesomeIcon icon={faChevronLeft} />}
           className={styles.exitButton}
         >

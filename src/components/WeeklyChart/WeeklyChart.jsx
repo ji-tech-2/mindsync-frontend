@@ -127,14 +127,12 @@ const CustomTooltip = ({ active, payload, selectedMetric }) => {
  * - data: Array of objects with format from /chart/weekly API:
  *   { date, label, has_data, mental_health_index, screen_time, sleep_duration, etc. }
  * - title: Chart title (optional)
- * - navigate: Navigation function (optional)
  * - compact: Compact layout (optional)
  * - minimal: Minimal variant without title and button (optional)
  */
 export default function WeeklyChart({
   data = [],
   title = 'Weekly Chart',
-  navigate = null,
   compact = false,
   minimal = false,
   style = {},
@@ -193,9 +191,7 @@ export default function WeeklyChart({
         {!minimal && (
           <div className={styles['chart-header']}>
             <h2>{title}</h2>
-            {navigate && (
-              <Button iconOnly icon="↗" onClick={() => navigate('/history')} />
-            )}
+            <Button iconOnly icon="↗" href="/history" />
           </div>
         )}
 
