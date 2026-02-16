@@ -35,7 +35,7 @@ vi.mock('@/features/auth', () => {
   };
 });
 
-// Mock the Advice component
+// Mock the Advice component and Button
 vi.mock('@/components', () => ({
   Advice: ({ adviceData, isLoading }) => (
     <div data-testid="advice-component">
@@ -44,6 +44,11 @@ vi.mock('@/components', () => ({
         {adviceData ? 'has-advice' : 'no-advice'}
       </div>
     </div>
+  ),
+  Button: ({ children, onClick, ...props }) => (
+    <button data-testid="button" onClick={onClick} {...props}>
+      {children}
+    </button>
   ),
 }));
 
