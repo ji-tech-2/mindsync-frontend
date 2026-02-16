@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   requestOTP as requestOTPService,
-  changePassword as changePasswordService,
+  resetPassword as resetPasswordService,
 } from '@/services';
 import { getPasswordError } from '@/utils/passwordValidation';
 import {
@@ -219,7 +219,7 @@ export default function ForgotPassword() {
     setIsError(false);
 
     try {
-      const data = await changePasswordService(
+      const data = await resetPasswordService(
         form.email,
         form.otp,
         form.newPassword

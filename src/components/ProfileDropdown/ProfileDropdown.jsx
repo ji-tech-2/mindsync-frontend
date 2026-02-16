@@ -70,7 +70,7 @@ function ProfileDropdown() {
             {/* Action Buttons */}
             <div className={styles.actions}>
               <Button variant="outlined" fullWidth onClick={handleEditProfile}>
-                Edit Profile
+                Settings
               </Button>
               <Button variant="filled" fullWidth onClick={handleLogout}>
                 Logout

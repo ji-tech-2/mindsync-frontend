@@ -58,16 +58,30 @@ export async function requestOTP(email) {
 }
 
 /**
- * Change password with OTP
+ * Reset password with OTP (forgot password flow)
  * @param {string} email - User email
  * @param {string} otp - OTP code
  * @param {string} newPassword - New password
  * @returns {Promise} Response with status
  */
-export async function changePassword(email, otp, newPassword) {
-  const response = await apiClient.post(API_ROUTES.PROFILE_CHANGE_PASSWORD, {
+export async function resetPassword(email, otp, newPassword) {
+  const response = await apiClient.post(API_ROUTES.AUTH_RESET_PASSWORD, {
     email,
     otp,
+    newPassword,
+  });
+  return response.data;
+}
+
+/**
+ * Change password (authenticated user)
+ * @param {string} oldPassword - Current password
+ * @param {string} newPassword - New password
+ * @returns {Promise} Response with status
+ */
+export async function changePassword(oldPassword, newPassword) {
+  const response = await apiClient.post(API_ROUTES.PROFILE_CHANGE_PASSWORD, {
+    oldPassword,
     newPassword,
   });
   return response.data;

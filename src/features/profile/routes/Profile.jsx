@@ -1,18 +1,22 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../assets/profile.css';
-import { ProfileAvatar } from '@/components';
-import ProfileFieldRow from '../components/ProfileFieldRow';
-import { EditModal, FormInput, FormSelect, OTPInput } from '@/components';
+import {
+  TextField,
+  Dropdown,
+  Button,
+  Message,
+  PasswordField,
+  Card,
+} from '@/components';
+import PageLayout from '@/layouts/PageLayout';
+import PasswordChangeModal from '../components/PasswordChangeModal';
 import {
   getProfile as getProfileService,
   updateProfile as updateProfileService,
-  requestOTP as requestOTPService,
   changePassword as changePasswordService,
 } from '@/services';
 import { TokenManager } from '@/utils/tokenManager';
 import { useAuth } from '@/features/auth';
-import { getPasswordError } from '@/utils/passwordValidation';
+import { validateNameField } from '@/features/auth/utils/signUpValidators';
 import {
   genderOptions,
   occupationOptions,
@@ -24,29 +28,38 @@ import {
   fromApiOccupation,
   fromApiWorkMode,
 } from '@/utils/fieldMappings';
+import styles from './Profile.module.css';
 
 export default function Profile() {
-  const navigate = useNavigate();
   const { updateUser } = useAuth();
-  const [user, setUser] = useState({
+  const [originalUser, setOriginalUser] = useState({
     name: '',
     email: '',
     gender: '',
     occupation: '',
     workRmt: '',
-    dob: '',
+  });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    gender: '',
+    occupation: '',
+    workRmt: '',
   });
   const [isLoading, setIsLoading] = useState(true);
-
-  const [activeModal, setActiveModal] = useState(null);
-  const [formData, setFormData] = useState({
-    value: '',
-    password: '',
-    otp: '',
-  });
-  const [passwordError, setPasswordError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [errors, setErrors] = useState({});
+  const [blurredFields, setBlurredFields] = useState({});
+
+  // Check if any fields have changed (excluding password and email)
+  const hasChanges =
+    formData.name !== originalUser.name ||
+    formData.gender !== originalUser.gender ||
+    formData.occupation !== originalUser.occupation ||
+    formData.workRmt !== originalUser.workRmt;
 
   // Fetch user profile on component mount
   useEffect(() => {
@@ -56,12 +69,15 @@ export default function Profile() {
         if (data.success) {
           // Transform API values to display values
           const apiData = data.data;
-          setUser({
-            ...apiData,
+          const userData = {
+            name: apiData.name,
+            email: apiData.email,
             gender: fromApiGender(apiData.gender),
             occupation: fromApiOccupation(apiData.occupation),
             workRmt: fromApiWorkMode(apiData.workRmt),
-          });
+          };
+          setOriginalUser(userData);
+          setFormData(userData);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -77,93 +93,74 @@ export default function Profile() {
     fetchProfile();
   }, []);
 
-  const openModal = (field) => {
-    setActiveModal(field);
-    setFormData({ value: '', password: '', otp: '' });
-    setPasswordError('');
-    setMessage({ type: '', text: '' });
-  };
-
-  const closeModal = () => {
-    setActiveModal(null);
-    setFormData({ value: '', password: '', otp: '' });
-    setPasswordError('');
-    setMessage({ type: '', text: '' });
-  };
-
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-
-    // Clear password error when user types in password field
-    if (e.target.name === 'value' && activeModal === 'password') {
-      setPasswordError('');
+  const handleFieldChange = (fieldName, value) => {
+    setFormData({ ...formData, [fieldName]: value });
+    // Clear message when user makes changes
+    if (message.text) {
+      setMessage({ type: '', text: '' });
+    }
+    // Clear error for this field
+    if (errors[fieldName]) {
+      setErrors({ ...errors, [fieldName]: '' });
+    }
+    // If field is already blurred, validate immediately
+    if (blurredFields[fieldName] && fieldName === 'name') {
+      const error = validateNameField(value);
+      setErrors({ ...errors, name: error || '' });
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleNameBlur = () => {
+    setBlurredFields({ ...blurredFields, name: true });
+    const error = validateNameField(formData.name);
+    setErrors({ ...errors, name: error || '' });
+  };
+
+  const handleSave = async () => {
+    // Validate name before saving
+    const nameError = validateNameField(formData.name);
+    if (nameError) {
+      setErrors({ ...errors, name: nameError });
+      setBlurredFields({ ...blurredFields, name: true });
+      setMessage({
+        type: 'error',
+        text: 'Please fix the errors before saving',
+      });
+      return;
+    }
+
+    setIsSaving(true);
     setMessage({ type: '', text: '' });
 
     try {
-      if (activeModal === 'password') {
-        // Validate password before submitting
-        const error = getPasswordError(formData.value);
-        if (error) {
-          setPasswordError(error);
-          setLoading(false);
-          return;
-        }
+      // Build update data with API-formatted values
+      const updateData = {
+        name: formData.name,
+        gender: toApiGender(formData.gender),
+        occupation: toApiOccupation(formData.occupation),
+        workRmt: toApiWorkMode(formData.workRmt),
+      };
 
-        // Change password with OTP
-        const data = await changePasswordService(
-          user.email,
-          formData.otp,
-          formData.value
-        );
+      const response = await updateProfileService(updateData);
 
-        if (data.success) {
-          setMessage({ type: 'success', text: data.message });
-          setTimeout(() => {
-            closeModal();
-          }, 1500);
-        }
-      } else {
-        // Update profile (name, gender, occupation, workRmt)
-        const updateData = {};
+      if (response.success) {
+        // Transform API response to display values
+        const apiData = response.data;
+        const updatedUser = {
+          name: apiData.name,
+          email: apiData.email,
+          gender: fromApiGender(apiData.gender),
+          occupation: fromApiOccupation(apiData.occupation),
+          workRmt: fromApiWorkMode(apiData.workRmt),
+        };
+        setOriginalUser(updatedUser);
+        setFormData(updatedUser);
 
-        if (activeModal === 'name') {
-          updateData.name = formData.value;
-        } else if (activeModal === 'gender') {
-          updateData.gender = toApiGender(formData.value);
-        } else if (activeModal === 'occupation') {
-          updateData.occupation = toApiOccupation(formData.value);
-        } else if (activeModal === 'workRmt') {
-          updateData.workRmt = toApiWorkMode(formData.value);
-        }
+        // Update both localStorage and global auth context
+        TokenManager.setUserData(apiData);
+        updateUser(apiData);
 
-        const response = await updateProfileService(updateData);
-
-        if (response.success) {
-          // Transform API response to display values
-          const apiData = response.data;
-          const updatedUser = {
-            ...apiData,
-            gender: fromApiGender(apiData.gender),
-            occupation: fromApiOccupation(apiData.occupation),
-            workRmt: fromApiWorkMode(apiData.workRmt),
-          };
-          setUser(updatedUser);
-
-          // Update both localStorage and global auth context
-          TokenManager.setUserData(apiData);
-          updateUser(apiData);
-
-          setMessage({ type: 'success', text: response.message });
-          setTimeout(() => {
-            closeModal();
-          }, 1500);
-        }
+        setMessage({ type: 'success', text: 'Profile updated successfully' });
       }
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -172,212 +169,166 @@ export default function Profile() {
         text: error.response?.data?.message || 'Failed to update profile',
       });
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
-  const sendOTP = async () => {
-    setLoading(true);
-    setMessage({ type: '', text: '' });
+  const handlePasswordChange = async ({ oldPassword, newPassword }) => {
+    setIsChangingPassword(true);
 
     try {
-      const data = await requestOTPService(user.email);
+      const changeData = await changePasswordService(oldPassword, newPassword);
 
-      if (data.success) {
-        setMessage({ type: 'info', text: data.message });
+      if (changeData.success) {
+        setMessage({
+          type: 'success',
+          text: 'Password changed successfully',
+        });
+        setIsPasswordModalOpen(false);
       }
     } catch (error) {
-      console.error('Error sending OTP:', error);
-      setMessage({
-        type: 'error',
-        text: error.response?.data?.message || 'Failed to send OTP',
-      });
+      console.error('Error changing password:', error);
+      throw error;
     } finally {
-      setLoading(false);
+      setIsChangingPassword(false);
     }
+  };
+
+  // Get the dropdown value object for a field
+  const getDropdownValue = (options, value) => {
+    return options.find((opt) => opt.value === value) || null;
   };
 
   return (
-    <div className="profile-container">
-      <div className="profile-header">
-        <button className="back-button" onClick={() => navigate('/dashboard')}>
-          ← Back to Dashboard
-        </button>
-        <h1>Profile Settings</h1>
-        <p>Manage your personal information</p>
-      </div>
-
+    <PageLayout title="Settings">
       {isLoading ? (
-        <div className="profile-content">
-          <div className="profile-card">
-            <p style={{ textAlign: 'center', padding: '2rem' }}>
-              Loading profile...
-            </p>
-          </div>
+        <div className={styles.loading}>
+          <div className={styles.spinner}></div>
+          <p>Loading profile...</p>
         </div>
       ) : (
-        <div className="profile-content">
-          <div className="profile-card">
-            <ProfileAvatar name={user.name} size="large" />
-
-            <div className="profile-fields">
-              <ProfileFieldRow
-                label="Name"
-                value={user.name}
-                onEdit={() => openModal('name')}
+        <Card className={styles.profileCard}>
+          {/* Left Section - Content Grid */}
+          <div className={styles.contentSection}>
+            {/* Profile Section Row */}
+            <div className={styles.sectionTitle}>
+              <h2>Profile</h2>
+              <p>Set your account profile</p>
+            </div>
+            <div className={styles.fieldGroup}>
+              <TextField
+                label="Email"
+                value={formData.email}
+                disabled
+                fullWidth
+                variant="surface"
               />
 
-              <div className="field-row">
-                <div className="field-info">
-                  <label>Email</label>
-                  <p>{user.email}</p>
-                </div>
+              <div className={styles.passwordField}>
+                <PasswordField
+                  label="Password"
+                  value="••••••••"
+                  disabled
+                  fullWidth
+                  variant="surface"
+                />
+                <Button
+                  variant="filled"
+                  onClick={() => setIsPasswordModalOpen(true)}
+                  className={styles.changePasswordButton}
+                >
+                  Change
+                </Button>
               </div>
 
-              <ProfileFieldRow
+              <TextField
+                label="Name"
+                value={formData.name}
+                onChange={(e) => handleFieldChange('name', e.target.value)}
+                onBlur={handleNameBlur}
+                error={blurredFields.name && !!errors.name}
+                fullWidth
+                variant="surface"
+              />
+              {blurredFields.name && errors.name && (
+                <Message type="error">{errors.name}</Message>
+              )}
+
+              <Dropdown
                 label="Gender"
-                value={user.gender}
-                onEdit={() => openModal('gender')}
-              />
-
-              <ProfileFieldRow
-                label="Occupation"
-                value={user.occupation}
-                onEdit={() => openModal('occupation')}
-              />
-
-              <ProfileFieldRow
-                label="Work Mode"
-                value={user.workRmt}
-                onEdit={() => openModal('workRmt')}
-              />
-
-              <ProfileFieldRow
-                label="Password"
-                value="••••••••"
-                onEdit={() => openModal('password')}
-                buttonText="Change"
+                options={genderOptions}
+                value={getDropdownValue(genderOptions, formData.gender)}
+                onChange={(option) => handleFieldChange('gender', option.value)}
+                fullWidth
+                variant="surface"
               />
             </div>
+
+            {/* Your Work Section Row */}
+            <div className={styles.sectionTitle}>
+              <h2>Your Work</h2>
+              <p>Set your work information</p>
+            </div>
+            <div className={styles.fieldGroup}>
+              <Dropdown
+                label="Occupation"
+                options={occupationOptions}
+                value={getDropdownValue(occupationOptions, formData.occupation)}
+                onChange={(option) =>
+                  handleFieldChange('occupation', option.value)
+                }
+                fullWidth
+                variant="surface"
+              />
+
+              <Dropdown
+                label="Work Remote"
+                options={workModeOptions}
+                value={getDropdownValue(workModeOptions, formData.workRmt)}
+                onChange={(option) =>
+                  handleFieldChange('workRmt', option.value)
+                }
+                fullWidth
+                variant="surface"
+              />
+
+              {hasChanges && (
+                <div className={styles.saveButtonContainer}>
+                  <Button
+                    variant="filled"
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    fullWidth
+                  >
+                    {isSaving ? 'Saving...' : 'Save'}
+                  </Button>
+                </div>
+              )}
+
+              {message.text && (
+                <div className={styles.messageContainer}>
+                  <Message type={message.type}>{message.text}</Message>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+
+          {/* Right Section - Avatar */}
+          <div className={styles.avatarColumn}>
+            <div className={styles.avatar}>
+              {(formData.name || '').trim().charAt(0).toUpperCase()}
+            </div>
+          </div>
+        </Card>
       )}
 
-      {/* Modal for Name */}
-      <EditModal
-        isOpen={activeModal === 'name'}
-        onClose={closeModal}
-        title="Edit Name"
-        onSubmit={handleSubmit}
-        loading={loading}
-        message={message}
-      >
-        <FormInput
-          label="New Name"
-          type="text"
-          name="value"
-          value={formData.value}
-          onChange={handleInputChange}
-          placeholder="Enter new name"
-          required
-        />
-      </EditModal>
-
-      {/* Modal for Gender */}
-      <EditModal
-        isOpen={activeModal === 'gender'}
-        onClose={closeModal}
-        title="Edit Gender"
-        onSubmit={handleSubmit}
-        loading={loading}
-        message={message}
-      >
-        <FormSelect
-          label="Gender"
-          name="value"
-          value={formData.value}
-          onChange={handleInputChange}
-          options={genderOptions}
-          required
-        />
-      </EditModal>
-
-      {/* Modal for Occupation */}
-      <EditModal
-        isOpen={activeModal === 'occupation'}
-        onClose={closeModal}
-        title="Edit Occupation"
-        onSubmit={handleSubmit}
-        loading={loading}
-        message={message}
-      >
-        <FormSelect
-          label="Occupation"
-          name="value"
-          value={formData.value}
-          onChange={handleInputChange}
-          options={occupationOptions}
-          required
-        />
-      </EditModal>
-
-      {/* Modal for Work Mode */}
-      <EditModal
-        isOpen={activeModal === 'workRmt'}
-        onClose={closeModal}
-        title="Edit Work Mode"
-        onSubmit={handleSubmit}
-        loading={loading}
-        message={message}
-      >
-        <FormSelect
-          label="Work Mode"
-          name="value"
-          value={formData.value}
-          onChange={handleInputChange}
-          options={workModeOptions}
-          required
-        />
-      </EditModal>
-
-      {/* Modal for Password */}
-      <EditModal
-        isOpen={activeModal === 'password'}
-        onClose={closeModal}
-        title="Change Password"
-        onSubmit={handleSubmit}
-        loading={loading}
-        message={message}
-      >
-        <FormInput
-          label="New Password"
-          type="password"
-          name="value"
-          value={formData.value}
-          onChange={handleInputChange}
-          placeholder="Enter new password"
-          required
-        />
-        {passwordError && (
-          <div
-            style={{
-              color: '#dc3545',
-              fontSize: '0.875rem',
-              marginTop: '-0.5rem',
-              marginBottom: '0.5rem',
-            }}
-          >
-            {passwordError}
-          </div>
-        )}
-        <OTPInput
-          otpValue={formData.otp}
-          onOtpChange={handleInputChange}
-          onSendOTP={sendOTP}
-          emailValue={user.email}
-          loading={loading}
-        />
-      </EditModal>
-    </div>
+      {/* Password Change Modal */}
+      <PasswordChangeModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+        onSubmit={handlePasswordChange}
+        loading={isChangingPassword}
+      />
+    </PageLayout>
   );
 }
