@@ -18,7 +18,7 @@ export const API_ROUTES = {
   // User Profile (JWT cookie auth — /me/ prefix)
   PROFILE: '/v1/users/me/profile',
   PROFILE_REQUEST_OTP: '/v1/users/me/request-otp',
-  PROFILE_CHANGE_PASSWORD: '/v1/profile/me/change-password',
+  PROFILE_CHANGE_PASSWORD: '/v1/users/me/change-password',
 
   // Screening/Prediction
   PREDICT: '/v1/predictions/create',
