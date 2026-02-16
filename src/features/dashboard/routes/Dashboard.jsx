@@ -9,52 +9,11 @@ import {
   getStreak,
 } from '@/services';
 import { buildWeeklyChartFromHistory } from '@/utils/chartHelpers';
+import { getFeatureDisplayName, getFeatureIcon } from '@/utils/featureNames';
 import { useAuth } from '@/features/auth';
 import CriticalFactorCard from '../components/CriticalFactorCard';
 import DashboardSuggestion from '../components/DashboardSuggestion';
 import StreakCard from '../components/StreakCard';
-
-// Mapping untuk nama faktor yang lebih bersahabat
-const FACTOR_MAP = {
-  'num__sleep_quality_1_5^2': 'Sleep Quality',
-  num__productivity_0_100: 'Productivity Score',
-  'num__age sleep_hours': 'Sleep Duration',
-  num__physical_activity: 'Physical Activity',
-  num__stress_level: 'Stress Level',
-  num__social_interaction: 'Social Interaction',
-  'num__stress_level_0_10^2': 'Stress Level',
-};
-
-// Fungsi helper untuk membersihkan nama jika tidak ada di mapping
-const formatDisplayName = (rawName) => {
-  if (FACTOR_MAP[rawName]) return FACTOR_MAP[rawName];
-
-  // Jika tidak ada di map, bersihkan otomatis:
-  // hapus 'num__', ganti '_' dengan spasi, dan kapitalisasi
-  return rawName
-    .replace(/^num__/, '')
-    .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
-
-// Helper function untuk icon berdasarkan factor name
-const getIconForFactor = (factorName) => {
-  const lowerName = factorName.toLowerCase();
-  if (lowerName.includes('sleep') || lowerName.includes('tidur')) return '🛏️';
-  if (
-    lowerName.includes('exercise') ||
-    lowerName.includes('aktivitas') ||
-    lowerName.includes('olahraga')
-  )
-    return '🏃';
-  if (lowerName.includes('screen') || lowerName.includes('layar')) return '📱';
-  if (lowerName.includes('social') || lowerName.includes('sosial')) return '👥';
-  if (lowerName.includes('stress') || lowerName.includes('stres')) return '😰';
-  if (lowerName.includes('productivity') || lowerName.includes('produktivitas'))
-    return '💼';
-  return '💡';
-};
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -104,14 +63,15 @@ export default function Dashboard() {
                   ? advices.join(' ')
                   : 'No suggestions available.';
 
+              const displayName = getFeatureDisplayName(factor.factor_name);
               return {
-                factor_name: formatDisplayName(factor.factor_name),
+                factor_name: displayName,
                 raw_name: factor.factor_name,
                 description: description,
                 references: references,
                 count: factor.count,
                 avg_impact_score: factor.avg_impact_score,
-                icon: getIconForFactor(factor.factor_name),
+                icon: getFeatureIcon(displayName),
               };
             });
 

@@ -17,7 +17,7 @@ const CriticalFactorCard = ({ data, loading }) => {
   if (loading) {
     return (
       <Card>
-        <div className={styles.loadingState}>Menganalisis Faktor Kritis...</div>
+        <div className={styles.loadingState}>Analyzing Critical Factors...</div>
       </Card>
     );
   }

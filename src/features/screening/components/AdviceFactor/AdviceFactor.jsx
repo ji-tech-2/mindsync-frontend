@@ -1,20 +1,11 @@
 import React from 'react';
 import CollapsibleCard from '@/components/CollapsibleCard';
+import { getFeatureDisplayName } from '@/utils/featureNames';
 import styles from './AdviceFactor.module.css';
 
 const AdviceFactor = ({ factorKey, factorData }) => {
-  const formatTitle = (key) => {
-    return key
-      .replace('num__', '')
-      .split('_')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
-      .replace('0 100', '')
-      .replace('1 5^2', '');
-  };
-
   return (
-    <CollapsibleCard title={formatTitle(factorKey)}>
+    <CollapsibleCard title={getFeatureDisplayName(factorKey)}>
       <div className={styles.content}>
         <ul className={styles.list}>
           {factorData.advices.map((item, index) => (
