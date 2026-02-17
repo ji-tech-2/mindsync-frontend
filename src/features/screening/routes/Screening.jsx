@@ -67,17 +67,31 @@ function transformToJSON(screeningData, userId = null, user = null) {
       ? toApiOccupation(user.occupation)
       : toApiOccupation(screeningData.occupation);
 
-  const workMode =
-    user && user.workRmt
+  // Handle work_mode and work_screen_hours for Unemployed/Retired
+  const isUnemployedOrRetired =
+    occupation === 'unemployed' ||
+    occupation === 'retired' ||
+    (user &&
+      (user.occupation === 'Unemployed' || user.occupation === 'Retired')) ||
+    screeningData.occupation === 'Unemployed' ||
+    screeningData.occupation === 'Retired';
+
+  const workMode = isUnemployedOrRetired
+    ? toApiWorkMode('Unemployed')
+    : user && user.workRmt
       ? toApiWorkMode(user.workRmt)
       : toApiWorkMode(screeningData.work_mode);
+
+  const workScreenHours = isUnemployedOrRetired
+    ? 0
+    : parseFloat(screeningData.work_screen_hours);
 
   const payload = {
     age: age,
     gender: gender,
     occupation: occupation,
     work_mode: workMode,
-    work_screen_hours: parseFloat(screeningData.work_screen_hours),
+    work_screen_hours: workScreenHours,
     leisure_screen_hours: parseFloat(screeningData.leisure_screen_hours),
     sleep_hours: parseFloat(screeningData.sleep_hours),
     sleep_quality_1_5: parseInt(screeningData.sleep_quality_1_5),
@@ -267,13 +281,13 @@ export default function Screening() {
       if (user.occupation) {
         initialAnswers.occupation = user.occupation;
       }
-      if (user.workRmt) {
-        initialAnswers.work_mode = user.workRmt;
 
-        // Auto-set work_screen_hours for Unemployed or Retired
-        if (user.occupation === 'Unemployed' || user.occupation === 'Retired') {
-          initialAnswers.work_screen_hours = '0';
-        }
+      // Auto-set work_mode and work_screen_hours for Unemployed or Retired
+      if (user.occupation === 'Unemployed' || user.occupation === 'Retired') {
+        initialAnswers.work_mode = 'Unemployed';
+        initialAnswers.work_screen_hours = '0';
+      } else if (user.workRmt) {
+        initialAnswers.work_mode = user.workRmt;
       }
 
       // Use queueMicrotask to defer setState to avoid synchronous state update warning
