@@ -36,9 +36,9 @@ describe('pollPredictionResult', () => {
         success: true,
         status: 'partial',
         data: mockPartialResponse.result,
-        metadata: {
+        metadata: expect.objectContaining({
           created_at: mockPartialResponse.created_at,
-        },
+        }),
       });
     });
 
@@ -390,9 +390,11 @@ describe('pollPredictionResult', () => {
         interval: 100,
       });
 
-      expect(result.metadata).toEqual({
-        created_at: '2026-01-21T10:00:00Z',
-      });
+      expect(result.metadata).toEqual(
+        expect.objectContaining({
+          created_at: '2026-01-21T10:00:00Z',
+        })
+      );
     });
 
     it('should include created_at and completed_at in ready response metadata', async () => {

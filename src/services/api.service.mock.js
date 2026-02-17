@@ -143,6 +143,20 @@ export async function requestOTP(email) {
 }
 
 /**
+ * Request OTP for signup email verification (mock)
+ */
+export async function requestSignupOTP(email) {
+  await delay(600);
+
+  console.log('🎭 [MOCK] Request Signup OTP:', email);
+
+  return {
+    success: true,
+    message: 'OTP sent to your email for verification (mock: 123456)',
+  };
+}
+
+/**
  * Reset password with OTP (mock - forgot password flow)
  */
 export async function resetPassword(email, otp, newPassword) {

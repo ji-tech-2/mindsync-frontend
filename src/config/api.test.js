@@ -5,15 +5,10 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import {
-  TokenManager,
-  API_CONFIG,
-  getApiUrl,
-  API_URLS,
-  buildWeeklyChartFromHistory,
-  fetchScreeningHistory,
-  fetchWeeklyChart,
-} from './api';
+import { TokenManager } from '@/utils/tokenManager';
+import { API_ROUTES, POLLING_CONFIG } from './apiRoutes';
+import { buildWeeklyChartFromHistory } from '@/utils/chartHelpers';
+import { getScreeningHistory, getWeeklyChart } from '@/services';
 import apiClient from './api';
 
 describe('TokenManager - Security', () => {
@@ -93,22 +88,16 @@ describe('TokenManager - Security', () => {
 
 describe('API Configuration', () => {
   it('should have secure polling configuration', () => {
-    expect(API_CONFIG.POLLING.MAX_ATTEMPTS).toBeGreaterThan(0);
-    expect(API_CONFIG.POLLING.INTERVAL_MS).toBeGreaterThan(0);
-    expect(API_CONFIG.POLLING.TIMEOUT_MS).toBeGreaterThan(0);
+    expect(POLLING_CONFIG.MAX_ATTEMPTS).toBeGreaterThan(0);
+    expect(POLLING_CONFIG.INTERVAL_MS).toBeGreaterThan(0);
+    expect(POLLING_CONFIG.TIMEOUT_MS).toBeGreaterThan(0);
   });
 
-  it('should use /api proxy in development for CORS bypass', () => {
-    // In test environment, DEV is false, so we test the logic
-    expect(API_CONFIG.BASE_URL).toBeDefined();
-  });
-
-  it('should have all required endpoints configured', () => {
-    expect(API_CONFIG.AUTH_LOGIN).toBeDefined();
-    expect(API_CONFIG.AUTH_REGISTER).toBeDefined();
-    expect(API_CONFIG.PREDICT_ENDPOINT).toBeDefined();
-    expect(API_CONFIG.RESULT_ENDPOINT).toBeDefined();
-    expect(API_CONFIG.ADVICE_ENDPOINT).toBeDefined();
+  it('should have all required auth endpoints configured', () => {
+    expect(API_ROUTES.AUTH_LOGIN).toBeDefined();
+    expect(API_ROUTES.AUTH_REGISTER).toBeDefined();
+    expect(API_ROUTES.PREDICT).toBeDefined();
+    expect(API_ROUTES.RESULT).toBeDefined();
   });
 });
 
@@ -131,63 +120,6 @@ describe('Security Events', () => {
 
     expect(mockHandler).toHaveBeenCalled();
     window.removeEventListener('auth:unauthorized', mockHandler);
-  });
-});
-
-describe('getApiUrl', () => {
-  it('should concatenate base URL with endpoint', () => {
-    const result = getApiUrl('/test-endpoint');
-    expect(result).toBe(`${API_CONFIG.BASE_URL}/test-endpoint`);
-  });
-});
-
-describe('API_URLS', () => {
-  it('should return predict URL', () => {
-    expect(API_URLS.predict).toBe(
-      `${API_CONFIG.BASE_URL}${API_CONFIG.PREDICT_ENDPOINT}`
-    );
-  });
-
-  it('should return result URL with predictionId', () => {
-    const url = API_URLS.result('abc-123');
-    expect(url).toContain(API_CONFIG.RESULT_ENDPOINT);
-    expect(url).toContain('abc-123');
-  });
-
-  it('should return advice URL', () => {
-    expect(API_URLS.advice).toBe(
-      `${API_CONFIG.BASE_URL}${API_CONFIG.ADVICE_ENDPOINT}`
-    );
-  });
-
-  it('should return screening history URL with userId', () => {
-    const url = API_URLS.screeningHistory('user-1');
-    expect(url).toContain(API_CONFIG.SCREENING_HISTORY_ENDPOINT);
-    expect(url).toContain('user-1');
-  });
-
-  it('should return weekly chart URL with userId', () => {
-    const url = API_URLS.weeklyChart('user-1');
-    expect(url).toContain(API_CONFIG.WEEKLY_CHART_ENDPOINT);
-    expect(url).toContain('user-1');
-  });
-
-  it('should return streak URL with userId', () => {
-    const url = API_URLS.streak('user-1');
-    expect(url).toContain(API_CONFIG.STREAK_ENDPOINT);
-    expect(url).toContain('user-1');
-  });
-
-  it('should return weekly critical factors URL with userId', () => {
-    const url = API_URLS.weeklyCriticalFactors('user-1');
-    expect(url).toContain(API_CONFIG.WEEKLY_CRITICAL_FACTORS);
-    expect(url).toContain('user-1');
-  });
-
-  it('should return daily suggestion URL with userId', () => {
-    const url = API_URLS.dailySuggestion('user-1');
-    expect(url).toContain(API_CONFIG.DAILY_SUGGESTION);
-    expect(url).toContain('user-1');
   });
 });
 
@@ -260,7 +192,7 @@ describe('buildWeeklyChartFromHistory', () => {
   });
 });
 
-describe('fetchScreeningHistory', () => {
+describe('getScreeningHistory', () => {
   beforeEach(() => {
     vi.spyOn(apiClient, 'get');
   });
@@ -269,112 +201,91 @@ describe('fetchScreeningHistory', () => {
     vi.restoreAllMocks();
   });
 
-  it('should return success data on successful response', async () => {
-    apiClient.get.mockResolvedValue({
-      data: { status: 'success', data: [{ id: 1 }], total: 1 },
-    });
-    const result = await fetchScreeningHistory('user-1');
-    expect(result.success).toBe(true);
+  it('should return response data directly on success', async () => {
+    const responseData = { status: 'success', data: [{ id: 1 }], total: 1 };
+    apiClient.get.mockResolvedValue({ data: responseData });
+    const result = await getScreeningHistory('user-1');
+    expect(result).toEqual(responseData);
+    expect(result.status).toBe('success');
     expect(result.data).toEqual([{ id: 1 }]);
-    expect(result.total).toBe(1);
   });
 
-  it('should return failure on non-success status', async () => {
-    apiClient.get.mockResolvedValue({
-      data: { status: 'error', message: 'Not found' },
-    });
-    const result = await fetchScreeningHistory('user-1');
-    expect(result.success).toBe(false);
-    expect(result.error).toBe('Not found');
+  it('should call correct API endpoint with userId', async () => {
+    apiClient.get.mockResolvedValue({ data: { status: 'success', data: [] } });
+    await getScreeningHistory('user-1');
+    expect(apiClient.get).toHaveBeenCalledWith('/v1/users/user-1/history');
   });
 
-  it('should handle network errors', async () => {
+  it('should propagate network errors', async () => {
     apiClient.get.mockRejectedValue(new Error('Network error'));
-    const result = await fetchScreeningHistory('user-1');
-    expect(result.success).toBe(false);
-    expect(result.error).toContain('Network error');
+    await expect(getScreeningHistory('user-1')).rejects.toThrow(
+      'Network error'
+    );
   });
 
-  it('should handle error with response data', async () => {
-    apiClient.get.mockRejectedValue({
-      response: { data: { message: 'Server error' } },
-    });
-    const result = await fetchScreeningHistory('user-1');
-    expect(result.success).toBe(false);
-    expect(result.error).toBe('Server error');
+  it('should return error status response as-is', async () => {
+    const responseData = { status: 'error', message: 'Not found' };
+    apiClient.get.mockResolvedValue({ data: responseData });
+    const result = await getScreeningHistory('user-1');
+    expect(result.status).toBe('error');
+    expect(result.message).toBe('Not found');
   });
 
-  it('should return default failure message when none provided', async () => {
-    apiClient.get.mockResolvedValue({ data: { status: 'fail' } });
-    const result = await fetchScreeningHistory('user-1');
-    expect(result.success).toBe(false);
-    expect(result.error).toBe('Failed to fetch history');
+  it('should return raw response data without wrapping', async () => {
+    const responseData = { status: 'fail', message: 'No data' };
+    apiClient.get.mockResolvedValue({ data: responseData });
+    const result = await getScreeningHistory('user-1');
+    expect(result).toEqual(responseData);
   });
 });
 
-describe('fetchWeeklyChart', () => {
+describe('getWeeklyChart', () => {
   beforeEach(() => {
     vi.spyOn(apiClient, 'get');
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('should return mapped chart data on success', async () => {
-    apiClient.get.mockResolvedValue({
-      data: {
-        status: 'success',
-        data: [
-          { label: 'Mon', date: '2024-01-01', mental_health_index: 75 },
-          { label: 'Tue', date: '2024-01-02', mental_health_index: -10 },
-        ],
-      },
-    });
-    const result = await fetchWeeklyChart('user-1');
-    expect(result.success).toBe(true);
+  it('should return response data directly on success', async () => {
+    const responseData = {
+      status: 'success',
+      data: [
+        { label: 'Mon', date: '2024-01-01', mental_health_index: 75 },
+        { label: 'Tue', date: '2024-01-02', mental_health_index: 50 },
+      ],
+    };
+    apiClient.get.mockResolvedValue({ data: responseData });
+    const result = await getWeeklyChart('user-1');
+    expect(result).toEqual(responseData);
+    expect(result.status).toBe('success');
     expect(result.data).toHaveLength(2);
-    expect(result.data[0]).toEqual({
-      day: 'Mon',
-      date: '2024-01-01',
-      value: 75,
-    });
-    // Negative values clamped to 0
-    expect(result.data[1].value).toBe(0);
   });
 
-  it('should return failure on non-success status', async () => {
-    apiClient.get.mockResolvedValue({
-      data: { status: 'error', message: 'No data' },
-    });
-    const result = await fetchWeeklyChart('user-1');
-    expect(result.success).toBe(false);
-    expect(result.error).toBe('No data');
+  it('should call correct API endpoint with userId', async () => {
+    apiClient.get.mockResolvedValue({ data: { status: 'success', data: [] } });
+    await getWeeklyChart('user-1');
+    expect(apiClient.get).toHaveBeenCalledWith('/v1/users/user-1/weekly-chart');
   });
 
-  it('should handle network errors', async () => {
+  it('should propagate network errors', async () => {
     apiClient.get.mockRejectedValue(new Error('timeout'));
-    const result = await fetchWeeklyChart('user-1');
-    expect(result.success).toBe(false);
-    expect(result.error).toContain('timeout');
+    await expect(getWeeklyChart('user-1')).rejects.toThrow('timeout');
   });
 
-  it('should handle null mental_health_index', async () => {
-    apiClient.get.mockResolvedValue({
-      data: {
-        status: 'success',
-        data: [{ label: 'Mon', date: '2024-01-01', mental_health_index: null }],
-      },
-    });
-    const result = await fetchWeeklyChart('user-1');
-    expect(result.data[0].value).toBe(0);
+  it('should return error status response as-is', async () => {
+    const responseData = { status: 'error', message: 'No data' };
+    apiClient.get.mockResolvedValue({ data: responseData });
+    const result = await getWeeklyChart('user-1');
+    expect(result.status).toBe('error');
+    expect(result.message).toBe('No data');
   });
 
-  it('should return default failure message', async () => {
-    apiClient.get.mockResolvedValue({ data: { status: 'fail' } });
-    const result = await fetchWeeklyChart('user-1');
-    expect(result.error).toBe('Failed to fetch chart data');
+  it('should return raw response data without wrapping', async () => {
+    const responseData = { status: 'fail' };
+    apiClient.get.mockResolvedValue({ data: responseData });
+    const result = await getWeeklyChart('user-1');
+    expect(result).toEqual(responseData);
   });
 });

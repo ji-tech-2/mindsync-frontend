@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import { AuthProvider } from '@/features/auth';
@@ -19,6 +19,16 @@ vi.mock('react-router-dom', async () => {
     useNavigate: () => mockNavigate,
   };
 });
+
+// Mock WeeklyChart to avoid recharts dependency
+vi.mock('@/components/WeeklyChart', () => ({
+  default: ({ data, title }) => (
+    <div data-testid="weekly-chart">
+      <span>{title}</span>
+      <span data-testid="chart-data">{JSON.stringify(data)}</span>
+    </div>
+  ),
+}));
 
 // Mock child components
 vi.mock('../components/CriticalFactorCard', () => ({
@@ -41,35 +51,38 @@ vi.mock('../components/DashboardSuggestion', () => ({
   ),
 }));
 
-vi.mock('../../screening/components/StreakCard', () => ({
+vi.mock('../components/StreakCard', () => ({
   default: ({ data, loading, error }) => (
     <div data-testid="streak-card">
       {loading
         ? 'Loading streak...'
         : error
           ? `Error: ${error}`
-          : `Streak: ${data?.current_streak || 0}`}
+          : `Streak: ${data?.current_streak?.daily || 0}`}
     </div>
   ),
 }));
 
-vi.mock('@/config/api', () => ({
+// Mock services
+vi.mock('@/services', () => ({
+  getWeeklyChart: vi.fn(),
+  getWeeklyCriticalFactors: vi.fn(),
+  getDailySuggestion: vi.fn(),
+  getStreak: vi.fn(),
+}));
+
+// Mock TokenManager
+vi.mock('@/utils/tokenManager', () => ({
   TokenManager: {
     getUserData: vi.fn(),
+    setUserData: vi.fn(),
     clearUserData: vi.fn(),
+    isAuthenticated: vi.fn(() => true),
   },
-  API_CONFIG: {},
-  API_URLS: {
-    weeklyCriticalFactors: vi.fn(
-      (userId) => `http://api.test/factors/${userId}`
-    ),
-    dailySuggestion: vi.fn((userId) => `http://api.test/suggestion/${userId}`),
-    streak: vi.fn((userId) => `http://api.test/streak/${userId}`),
-  },
-  fetchScreeningHistory: vi.fn(),
 }));
 
 import { TokenManager } from '@/utils/tokenManager';
+import * as services from '@/services';
 
 const mockFactorsResponse = {
   status: 'success',
@@ -98,36 +111,36 @@ const mockSuggestionResponse = {
 
 const mockStreakResponse = {
   status: 'success',
-  data: { current_streak: 7, longest_streak: 14 },
+  data: { current_streak: { daily: 7, weekly: 1 }, longest_streak: 14 },
 };
 
-const setupDefaultFetch = () => {
-  global.fetch = vi
-    .fn()
-    .mockResolvedValueOnce({
-      json: async () => ({
-        status: 'success',
-        top_critical_factors: [],
-        advice: {},
-      }),
-    })
-    .mockResolvedValueOnce({
-      json: async () => ({ status: 'success', suggestion: '' }),
-    })
-    .mockResolvedValueOnce({
-      json: async () => ({
-        status: 'success',
-        data: { current_streak: 0, longest_streak: 0 },
-      }),
-    });
+const setupServices = (factorsRes, suggestionRes, streakRes) => {
+  services.getWeeklyCriticalFactors.mockResolvedValue(
+    factorsRes || {
+      status: 'success',
+      top_critical_factors: [],
+      advice: {},
+    }
+  );
+  services.getDailySuggestion.mockResolvedValue(
+    suggestionRes || { status: 'success', suggestion: '' }
+  );
+  services.getStreak.mockResolvedValue(
+    streakRes || {
+      status: 'success',
+      data: { current_streak: { daily: 0, weekly: 0 }, longest_streak: 0 },
+    }
+  );
+  services.getWeeklyChart.mockResolvedValue({
+    status: 'success',
+    data: [],
+  });
 };
 
-const setupFetchWith = (factorsRes, suggestionRes, streakRes) => {
-  global.fetch = vi
-    .fn()
-    .mockResolvedValueOnce({ json: async () => factorsRes })
-    .mockResolvedValueOnce({ json: async () => suggestionRes })
-    .mockResolvedValueOnce({ json: async () => streakRes });
+const defaultUser = {
+  name: 'John Doe',
+  email: 'john@example.com',
+  userId: '123',
 };
 
 const renderDashboard = (userData = null) => {
@@ -146,17 +159,11 @@ const renderDashboard = (userData = null) => {
   );
 };
 
-const defaultUser = {
-  name: 'John Doe',
-  email: 'john@example.com',
-  userId: '123',
-};
-
 describe('Dashboard Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
-    setupDefaultFetch();
+    setupServices();
   });
 
   afterEach(() => {
@@ -171,7 +178,6 @@ describe('Dashboard Component', () => {
 
     it('should display default greeting when user name is not available', () => {
       renderDashboard({ email: 'john@example.com', userId: '123' });
-
       expect(screen.getByText(/Hello, User!/i)).toBeInTheDocument();
     });
 
@@ -184,54 +190,28 @@ describe('Dashboard Component', () => {
   });
 
   describe('Header Section', () => {
-    it('should render full-width header with greeting and CTA button', () => {
+    it('should render header with greeting and CTA link', () => {
       renderDashboard({
         name: 'Jane Smith',
         email: 'jane@example.com',
         userId: '123',
       });
 
-      const header = document.querySelector('.dashboard-header-full');
-      expect(header).toBeInTheDocument();
+      expect(screen.getByText(/Hello, Jane Smith!/i)).toBeInTheDocument();
 
-      const ctaButton = screen.getByRole('button', {
+      // CTA button renders as a link with href
+      const ctaLink = screen.getByRole('link', {
         name: /take screening now/i,
       });
-      expect(ctaButton).toBeInTheDocument();
-    });
-
-    it('should navigate to screening page when CTA button clicked', () => {
-      renderDashboard(defaultUser);
-
-      const ctaButton = screen.getByRole('button', {
-        name: /take screening now/i,
-      });
-      fireEvent.click(ctaButton);
-
-      expect(mockNavigate).toHaveBeenCalledWith('/screening');
+      expect(ctaLink).toBeInTheDocument();
+      expect(ctaLink).toHaveAttribute('href', '/screening');
     });
   });
 
   describe('Dashboard Layout', () => {
-    it('should render upper section structure', () => {
-      renderDashboard({
-        name: 'John Doe',
-        email: 'john@example.com',
-        userId: '123',
-      });
-
-      const upperSection = document.querySelector('.cards-upper-section');
-      expect(upperSection).toBeInTheDocument();
-
-      // Third card is the WeeklyChart component (renders chart title, not "Card 3")
-      expect(screen.getByText('Last 7 Days Trend')).toBeInTheDocument();
-    });
-
-    it('should render left column with streak and suggestion cards', () => {
+    it('should render WeeklyChart component', () => {
       renderDashboard(defaultUser);
-
-      expect(document.querySelector('.cards-left-column')).toBeInTheDocument();
-      expect(document.querySelectorAll('.card-small').length).toBe(2);
+      expect(screen.getByTestId('weekly-chart')).toBeInTheDocument();
     });
 
     it('should render StreakCard component', () => {
@@ -239,15 +219,9 @@ describe('Dashboard Component', () => {
       expect(screen.getByTestId('streak-card')).toBeInTheDocument();
     });
 
-    it('should render DashboardSuggestion component with title', () => {
+    it('should render DashboardSuggestion component', () => {
       renderDashboard(defaultUser);
-      expect(screen.getByText('Daily Suggestion')).toBeInTheDocument();
       expect(screen.getByTestId('dashboard-suggestion')).toBeInTheDocument();
-    });
-
-    it('should render one large card', () => {
-      renderDashboard(defaultUser);
-      expect(document.querySelector('.card-large')).toBeInTheDocument();
     });
 
     it('should render Critical Factors section title', () => {
@@ -255,12 +229,8 @@ describe('Dashboard Component', () => {
       expect(screen.getByText('Critical Factors')).toBeInTheDocument();
     });
 
-    it('should render lower section with 3 CriticalFactorCard components', () => {
+    it('should render 3 CriticalFactorCard components', () => {
       renderDashboard(defaultUser);
-
-      const lowerSection = document.querySelector('.cards-lower-section');
-      expect(lowerSection).toBeInTheDocument();
-
       const factorCards = screen.getAllByTestId('critical-factor-card');
       expect(factorCards).toHaveLength(3);
     });
@@ -268,7 +238,10 @@ describe('Dashboard Component', () => {
 
   describe('API Data Loading', () => {
     it('should show loading state for critical factors', () => {
-      global.fetch = vi.fn(() => new Promise(() => {}));
+      // Never resolve - stays in loading
+      services.getWeeklyCriticalFactors.mockImplementation(
+        () => new Promise(() => {})
+      );
 
       renderDashboard(defaultUser);
 
@@ -279,7 +252,7 @@ describe('Dashboard Component', () => {
     });
 
     it('should fetch and display critical factors data', async () => {
-      setupFetchWith(
+      setupServices(
         mockFactorsResponse,
         mockSuggestionResponse,
         mockStreakResponse
@@ -289,12 +262,12 @@ describe('Dashboard Component', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Sleep Quality')).toBeInTheDocument();
-        expect(screen.getByText('Productivity Score')).toBeInTheDocument();
+        expect(screen.getByText('Productivity')).toBeInTheDocument();
       });
     });
 
     it('should display empty state when no factors available', async () => {
-      setupFetchWith(
+      setupServices(
         { status: 'success', top_critical_factors: [], advice: {} },
         mockSuggestionResponse,
         mockStreakResponse
@@ -309,7 +282,7 @@ describe('Dashboard Component', () => {
     });
 
     it('should fetch daily suggestion', async () => {
-      setupFetchWith(
+      setupServices(
         { status: 'success', top_critical_factors: [], advice: {} },
         mockSuggestionResponse,
         mockStreakResponse
@@ -325,7 +298,7 @@ describe('Dashboard Component', () => {
     });
 
     it('should fetch streak data', async () => {
-      setupFetchWith(
+      setupServices(
         { status: 'success', top_critical_factors: [], advice: {} },
         mockSuggestionResponse,
         mockStreakResponse
@@ -337,19 +310,55 @@ describe('Dashboard Component', () => {
         expect(screen.getByText('Streak: 7')).toBeInTheDocument();
       });
     });
+
+    it('should call services with user ID', async () => {
+      setupServices(
+        { status: 'success', top_critical_factors: [], advice: {} },
+        mockSuggestionResponse,
+        mockStreakResponse
+      );
+
+      renderDashboard(defaultUser);
+
+      await waitFor(() => {
+        expect(services.getWeeklyCriticalFactors).toHaveBeenCalledWith('123');
+        expect(services.getDailySuggestion).toHaveBeenCalledWith('123');
+        expect(services.getStreak).toHaveBeenCalledWith('123');
+        expect(services.getWeeklyChart).toHaveBeenCalledWith('123');
+      });
+    });
+
+    it('should handle API errors gracefully', async () => {
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      services.getWeeklyCriticalFactors.mockRejectedValue(
+        new Error('Network error')
+      );
+      services.getDailySuggestion.mockRejectedValue(new Error('Network error'));
+      services.getStreak.mockRejectedValue(new Error('Network error'));
+      services.getWeeklyChart.mockRejectedValue(new Error('Network error'));
+
+      renderDashboard(defaultUser);
+
+      await waitFor(() => {
+        expect(consoleSpy).toHaveBeenCalled();
+      });
+
+      consoleSpy.mockRestore();
+    });
   });
 
   describe('Container Structure', () => {
     it('should render main dashboard container', () => {
-      renderDashboard(defaultUser);
-      expect(
-        document.querySelector('.dashboard-container')
-      ).toBeInTheDocument();
+      const { container } = renderDashboard(defaultUser);
+      expect(container.firstChild).toBeInTheDocument();
     });
 
-    it('should render dashboard content section', () => {
+    it('should render Weekly Chart title', () => {
       renderDashboard(defaultUser);
-      expect(document.querySelector('.dashboard-content')).toBeInTheDocument();
+      expect(screen.getByText('Weekly Chart')).toBeInTheDocument();
     });
   });
 });

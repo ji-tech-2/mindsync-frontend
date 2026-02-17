@@ -133,6 +133,7 @@ describe('DashboardSuggestion Component', () => {
     it('should handle number as data', () => {
       render(<DashboardSuggestion data={42} loading={false} />);
 
+      // Number is converted to a single-item list
       expect(screen.getByText('42')).toBeTruthy();
     });
 
@@ -141,8 +142,8 @@ describe('DashboardSuggestion Component', () => {
         <DashboardSuggestion data={true} loading={false} />
       );
 
-      // Boolean true will not display because empty/falsy in JSX context
-      expect(container.textContent).toContain('');
+      // Boolean is in a list
+      expect(container.querySelector('ul')).toBeTruthy();
     });
 
     it('should handle empty string', () => {
@@ -214,8 +215,9 @@ describe('DashboardSuggestion Component', () => {
         <DashboardSuggestion data="string data" loading={false} />
       );
 
-      expect(container.querySelector('p')).toBeTruthy();
-      expect(container.querySelector('ul')).toBeFalsy();
+      // String data is wrapped in a ul/li structure
+      expect(container.querySelector('ul')).toBeTruthy();
+      expect(screen.getByText('string data')).toBeTruthy();
     });
   });
 });

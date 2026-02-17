@@ -1,6 +1,38 @@
 import styles from './Slider.module.css';
 
 /**
+ * Build container CSS class names
+ */
+const buildContainerClass = (disabled, error, className) => {
+  const classes = [styles.container];
+  if (disabled) classes.push(styles.disabled);
+  if (error) classes.push(styles.error);
+  if (className) classes.push(className);
+  return classes.filter(Boolean).join(' ');
+};
+
+/**
+ * Get label text for min/max
+ */
+const getLabelText = (value, customLabel) => {
+  return customLabel !== undefined ? customLabel : value;
+};
+
+/**
+ * Calculate percentage for slider fill
+ */
+const calculatePercentage = (value, min, max) => {
+  return ((value - min) / (max - min)) * 100;
+};
+
+/**
+ * Build slider background style
+ */
+const buildSliderBackground = (percentage) => {
+  return `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${percentage}%, var(--color-primary-light) ${percentage}%, var(--color-primary-light) 100%)`;
+};
+
+/**
  * Slider Component
  * Slider input that snaps to specific values
  *
@@ -32,25 +64,15 @@ function Slider({
   error = false,
   className = '',
 }) {
-  // Calculate percentage for visual feedback
-  const percentage = ((value - min) / (max - min)) * 100;
+  const percentage = calculatePercentage(value, min, max);
 
   const handleChange = (e) => {
     const newValue = parseFloat(e.target.value);
     onChange?.(newValue);
   };
 
-  const containerClass = [
-    styles.container,
-    disabled && styles.disabled,
-    error && styles.error,
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
-
   return (
-    <div className={containerClass}>
+    <div className={buildContainerClass(disabled, error, className)}>
       {showValue && <div className={styles.valueDisplay}>{value}</div>}
 
       <div className={styles.sliderWrapper}>
@@ -63,19 +85,13 @@ function Slider({
           onChange={handleChange}
           disabled={disabled}
           className={styles.slider}
-          style={{
-            background: `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${percentage}%, var(--color-primary-light) ${percentage}%, var(--color-primary-light) 100%)`,
-          }}
+          style={{ background: buildSliderBackground(percentage) }}
         />
 
         {showLabels && (
           <div className={styles.labels}>
-            <span className={styles.label}>
-              {minLabel !== undefined ? minLabel : min}
-            </span>
-            <span className={styles.label}>
-              {maxLabel !== undefined ? maxLabel : max}
-            </span>
+            <span className={styles.label}>{getLabelText(min, minLabel)}</span>
+            <span className={styles.label}>{getLabelText(max, maxLabel)}</span>
           </div>
         )}
       </div>

@@ -1,6 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register as registerService } from '@/services';
+import {
+  register as registerService,
+  requestSignupOTP as requestSignupOTPService,
+} from '@/services';
 import {
   Dropdown,
   TextField,
@@ -37,9 +40,6 @@ import {
 } from '../utils/signUpValidators';
 import {
   processFieldChange,
-  markAllStage1Blurred,
-  markStage2Blurred,
-  getStage1BlurredFields,
   transformFormData,
   applyFieldValidation,
   scrollToFirstSignUpError,
@@ -55,16 +55,18 @@ export default function SignUp() {
   const [isGoingBack, setIsGoingBack] = useState(false);
 
   // Create refs for form fields
+  const emailRef = useRef(null);
+  const otpRef = useRef(null);
   const nameRef = useRef(null);
   const dobRef = useRef(null);
   const genderRef = useRef(null);
   const occupationRef = useRef(null);
   const workRmtRef = useRef(null);
-  const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
   const [form, setForm] = useState({
     email: '',
+    otp: '',
     password: '',
     confirmPassword: '',
     name: '',
@@ -84,7 +86,13 @@ export default function SignUp() {
   function handleChange(e) {
     const { name, value } = e.target;
 
-    const result = processFieldChange(name, value, form, errors, blurredFields);
+    const result = processFieldChange({
+      fieldName: name,
+      value,
+      form,
+      errors,
+      blurredFields,
+    });
 
     // If result is null, input validation failed (e.g., non-numeric in numeric field)
     if (!result) return;
@@ -174,20 +182,41 @@ export default function SignUp() {
     return newErrors;
   };
 
-  // Validation for Stage 2 (credentials)
+  // Validation for Stage 2 (email)
   const validateStage2 = (currentForm = form) => {
     const newErrors = {};
 
+    // Email validation
     const emailError = validateEmailField(currentForm.email);
     if (emailError) {
       newErrors.email = emailError;
     }
 
+    return newErrors;
+  };
+
+  // Validation for Stage 3 (OTP)
+  const validateStage3 = (currentForm = form) => {
+    const newErrors = {};
+
+    if (!currentForm.otp.trim()) {
+      newErrors.otp = 'OTP is required';
+    }
+
+    return newErrors;
+  };
+
+  // Validation for Stage 4 (passwords)
+  const validateStage4 = (currentForm = form) => {
+    const newErrors = {};
+
+    // Password validation
     const passwordError = validatePasswordField(currentForm.password);
     if (passwordError) {
       newErrors.password = passwordError;
     }
 
+    // Confirm Password validation
     const confirmPasswordError = validateConfirmPasswordField(
       currentForm.confirmPassword,
       currentForm.password
@@ -199,45 +228,105 @@ export default function SignUp() {
     return newErrors;
   };
 
-  // Handle next button on stage 1
-  const handleNextStage = () => {
-    // Validate stage 1
-    const stage1Errors = validateStage1(form);
+  // Send OTP for email verification
+  const sendOTP = async (isResend = false) => {
+    // Validate stage 2 (email) first (only if not resending)
+    if (!isResend) {
+      const stage2Errors = validateStage2();
 
-    setBlurredFields(markAllStage1Blurred());
-    setErrors(stage1Errors);
+      setBlurredFields((prev) => ({ ...prev, email: true }));
 
-    if (Object.keys(stage1Errors).length === 0) {
-      setIsGoingBack(false);
-      setCurrentStage(1);
-    } else {
-      scrollToFirstError(stage1Errors, 'stage1');
+      if (Object.keys(stage2Errors).length > 0) {
+        setErrors(stage2Errors);
+        scrollToFirstError(stage2Errors, 'stage2');
+        return;
+      }
+    }
+
+    setLoading(true);
+    setMessage('Sending OTP...');
+
+    try {
+      const data = await requestSignupOTPService(form.email);
+
+      if (data.success) {
+        setMessage(data.message || 'OTP sent successfully!');
+        // Proceed to next stage only if not resending
+        if (!isResend) {
+          setIsGoingBack(false);
+          setCurrentStage(2);
+        }
+      }
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      setMessage(error.response?.data?.message || 'Failed to send OTP');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Handle back button on stage 2
+  // Handle next button on stages
+  const handleNextStage = () => {
+    let stageErrors = {};
+
+    if (currentStage === 0) {
+      // Stage 1: Personal info validation
+      stageErrors = validateStage1();
+      setBlurredFields((prev) => ({
+        ...prev,
+        name: true,
+        dob: true,
+        gender: true,
+        occupation: true,
+        workRmt: true,
+      }));
+    } else if (currentStage === 1) {
+      // Stage 2: Email - send OTP when clicking next
+      sendOTP();
+      return;
+    } else if (currentStage === 2) {
+      // Stage 3: OTP validation
+      stageErrors = validateStage3();
+      setBlurredFields((prev) => ({ ...prev, otp: true }));
+    }
+
+    setErrors(stageErrors);
+
+    if (Object.keys(stageErrors).length === 0) {
+      setIsGoingBack(false);
+      setCurrentStage(currentStage + 1);
+    } else {
+      const stageNames = ['stage1', 'stage2', 'stage3', 'stage4'];
+      scrollToFirstError(stageErrors, stageNames[currentStage]);
+    }
+  };
+
+  // Handle back button
   const handlePreviousStage = () => {
     setIsGoingBack(true);
-    setCurrentStage(0);
+    setCurrentStage(currentStage - 1);
     setErrors({});
-    setBlurredFields(getStage1BlurredFields(form));
   };
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    // Validate stage 2 fields
-    const stage2Errors = validateStage2(form);
+    // Validate stage 4 fields (passwords)
+    const stage4Errors = validateStage4(form);
 
-    // Mark all stage 2 fields as blurred to show all errors
-    setBlurredFields((prev) => markStage2Blurred(prev));
+    // Mark all stage 4 fields as blurred to show all errors
+    setBlurredFields((prev) => ({
+      ...prev,
+      password: true,
+      confirmPassword: true,
+    }));
 
     // Set errors state
-    setErrors(stage2Errors);
+    setErrors(stage4Errors);
 
     // If there are errors, scroll to first error and return
-    if (Object.keys(stage2Errors).length > 0) {
-      scrollToFirstError(stage2Errors, 'stage2');
+    if (Object.keys(stage4Errors).length > 0) {
+      scrollToFirstError(stage4Errors, 'stage4');
       return;
     }
 
@@ -245,13 +334,11 @@ export default function SignUp() {
     setMessage('Processing registration...');
 
     try {
-      // Transform form data to API format
-      const formDataToSubmit = transformFormData(
-        form,
-        toApiGender,
-        toApiOccupation,
-        toApiWorkMode
-      );
+      // Transform form data to API format, including OTP
+      const formDataToSubmit = {
+        ...transformFormData(form, toApiGender, toApiOccupation, toApiWorkMode),
+        otp: form.otp,
+      };
 
       const result = await registerService(formDataToSubmit);
 
@@ -276,12 +363,13 @@ export default function SignUp() {
   }
 
   const fieldRefs = {
+    emailRef,
+    otpRef,
     nameRef,
     dobRef,
     genderRef,
     occupationRef,
     workRmtRef,
-    emailRef,
     passwordRef,
   };
 
@@ -411,7 +499,7 @@ export default function SignUp() {
     </>
   );
 
-  // STAGE 2: Credentials
+  // STAGE 2: Email
   const stage2 = (
     <>
       <FormSection ref={emailRef}>
@@ -430,6 +518,88 @@ export default function SignUp() {
         )}
       </FormSection>
 
+      <div
+        style={{
+          display: 'flex',
+          gap: 'var(--space-md)',
+          alignItems: 'center',
+        }}
+      >
+        <BackButton onClick={handlePreviousStage} />
+        <Button
+          type="button"
+          variant="filled"
+          fullWidth
+          onClick={handleNextStage}
+          disabled={loading}
+        >
+          {loading ? 'Sending...' : 'Send OTP'}
+        </Button>
+      </div>
+    </>
+  );
+
+  // STAGE 3: OTP Verification
+  const stage3 = (
+    <>
+      <FormSection ref={otpRef}>
+        <div
+          style={{
+            display: 'flex',
+            gap: 'var(--space-md)',
+            alignItems: 'flex-start',
+          }}
+        >
+          <div style={{ flex: 1, marginTop: 'var(--border-md)' }}>
+            <TextField
+              label="OTP"
+              type="text"
+              name="otp"
+              value={form.otp}
+              onChange={handleChange}
+              onBlur={handleTextFieldBlur}
+              error={hasFieldError(blurredFields, errors, 'otp')}
+              fullWidth
+            />
+          </div>
+          <Button
+            type="button"
+            variant="outlined"
+            onClick={() => sendOTP(true)}
+            disabled={loading}
+          >
+            Resend OTP
+          </Button>
+        </div>
+        {hasFieldError(blurredFields, errors, 'otp') && (
+          <Message type="error" message={errors.otp} />
+        )}
+      </FormSection>
+
+      <div
+        style={{
+          display: 'flex',
+          gap: 'var(--space-md)',
+          alignItems: 'center',
+        }}
+      >
+        <BackButton onClick={handlePreviousStage} />
+        <Button
+          type="button"
+          variant="filled"
+          fullWidth
+          onClick={handleNextStage}
+          disabled={loading}
+        >
+          Next
+        </Button>
+      </div>
+    </>
+  );
+
+  // STAGE 4: Password
+  const stage4 = (
+    <>
       <FormSection ref={passwordRef}>
         <PasswordField
           label="Password"
@@ -490,7 +660,7 @@ export default function SignUp() {
 
       <FormContainer onSubmit={handleSubmit}>
         <StageContainer
-          stages={[stage1, stage2]}
+          stages={[stage1, stage2, stage3, stage4]}
           currentStage={currentStage}
           isGoingBack={isGoingBack}
         />

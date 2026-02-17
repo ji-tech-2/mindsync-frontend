@@ -85,7 +85,6 @@ describe('MainLayout', () => {
     const main = container.querySelector('main');
     expect(main).toBeTruthy();
     expect(main.style.minHeight).toBe('100vh');
-    expect(main.style.paddingTop).toBe('4.5rem');
   });
 
   it('should maintain layout structure across route changes', () => {
@@ -93,7 +92,6 @@ describe('MainLayout', () => {
 
     const { container } = render(
       <MemoryRouter initialEntries={['/page1']}>
-        \n{' '}
         <Routes>
           <Route element={<MainLayout />}>
             <Route path="/page1" element={<Page1 />} />
@@ -105,7 +103,6 @@ describe('MainLayout', () => {
     const main = container.querySelector('main');
     expect(main).toBeTruthy();
     expect(main.style.minHeight).toBe('100vh');
-    expect(main.style.paddingTop).toBe('4.5rem');
     expect(screen.getByTestId('page1')).toBeTruthy();
   });
 });

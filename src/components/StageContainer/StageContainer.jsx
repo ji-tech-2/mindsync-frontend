@@ -2,6 +2,40 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './StageContainer.module.css';
 
 /**
+ * Build wrapper CSS class names
+ */
+const buildWrapperClasses = (isAnimating, animateHeight) => {
+  const classes = [styles.stageWrapper];
+  if (isAnimating) classes.push(styles.clipping);
+  if (!animateHeight) classes.push(styles.noHeightAnimation);
+  return classes.join(' ');
+};
+
+/**
+ * Build stage CSS class names
+ */
+const buildStageClasses = (isExiting, isGoingBack, animateHeight) => {
+  const classes = [styles.stage];
+  if (isExiting) {
+    classes.push(isGoingBack ? styles.backExit : styles.exit);
+  }
+  if (!animateHeight) classes.push(styles.fixedHeight);
+  return classes.join(' ');
+};
+
+/**
+ * Get animation class for current stage
+ */
+const getCurrentStageAnimation = (
+  hasBeenAnimating,
+  isAnimating,
+  isGoingBack
+) => {
+  if (!hasBeenAnimating || !isAnimating) return styles.noAnimation;
+  return isGoingBack ? styles.back : styles.entering;
+};
+
+/**
  * StageContainer Component
  * Manages multi-stage form transitions with slide and fade animations
  * Uses CSS Grid to stack stages naturally without absolute positioning
@@ -26,7 +60,7 @@ function StageContainer({
 
   // Measure and update wrapper height
   useEffect(() => {
-    if (!animateHeight) return;
+    if (!animateHeight || !currentStageRef.current) return;
 
     const measureAndUpdateHeight = () => {
       if (currentStageRef.current) {
@@ -35,65 +69,48 @@ function StageContainer({
       }
     };
 
-    // Measure immediately and also after layout shift
     measureAndUpdateHeight();
-
-    // Use ResizeObserver to track content size changes
     const observer = new ResizeObserver(measureAndUpdateHeight);
-    if (currentStageRef.current) {
-      observer.observe(currentStageRef.current);
-    }
+    observer.observe(currentStageRef.current);
 
     return () => observer.disconnect();
   }, [currentStage, animateHeight]);
 
   useEffect(() => {
     if (prevStage !== currentStage) {
-      const timer = setTimeout(() => {
-        setPrevStage(currentStage);
-      }, 300);
+      const timer = setTimeout(() => setPrevStage(currentStage), 300);
       return () => clearTimeout(timer);
     }
   }, [currentStage, prevStage]);
 
-  if (!stages || stages.length === 0) {
-    return null;
-  }
+  if (!stages || stages.length === 0) return null;
 
-  // Only animate after the first stage change
   const isAnimating = prevStage !== currentStage;
-  const hasBeenAnimating = prevStage !== currentStage || currentStage !== 0;
+  const hasBeenAnimating = isAnimating || currentStage !== 0;
+  const wrapperStyle = animateHeight ? { height: wrapperHeight } : {};
 
   return (
     <div
       ref={wrapperRef}
-      className={`${styles.stageWrapper} ${isAnimating ? styles.clipping : ''} ${
-        !animateHeight ? styles.noHeightAnimation : ''
-      }`}
-      style={animateHeight ? { height: wrapperHeight } : {}}
+      className={buildWrapperClasses(isAnimating, animateHeight)}
+      style={wrapperStyle}
     >
-      {/* Previous stage - animating out */}
       {isAnimating && (
         <div
           ref={prevStageRef}
-          className={`${styles.stage} ${
-            isGoingBack ? styles.backExit : styles.exit
-          } ${!animateHeight ? styles.fixedHeight : ''}`}
+          className={buildStageClasses(true, isGoingBack, animateHeight)}
         >
           {stages[prevStage]}
         </div>
       )}
 
-      {/* Current stage - always in DOM, stacked on grid */}
       <div
         ref={currentStageRef}
-        className={`${styles.stage} ${
-          hasBeenAnimating && isAnimating
-            ? isGoingBack
-              ? styles.back
-              : styles.entering
-            : styles.noAnimation
-        } ${!animateHeight ? styles.fixedHeight : ''}`}
+        className={`${styles.stage} ${getCurrentStageAnimation(
+          hasBeenAnimating,
+          isAnimating,
+          isGoingBack
+        )} ${!animateHeight ? styles.fixedHeight : ''}`}
       >
         {stages[currentStage]}
       </div>

@@ -24,27 +24,29 @@ describe('StreakCard Component', () => {
   });
 
   describe('Empty State', () => {
-    it('should display empty state when no data', () => {
+    it('should display zero streak when no data', () => {
       render(<StreakCard data={null} loading={false} error={null} />);
 
-      expect(screen.getByText(/Start your first screening!/)).toBeTruthy();
-      expect(screen.getByText(/0/)).toBeTruthy();
-      expect(screen.getByText(/days/)).toBeTruthy();
+      expect(screen.getByText('0')).toBeTruthy();
+      expect(screen.getByText('days')).toBeTruthy();
     });
 
-    it('should display empty state when data has no daily or weekly', () => {
+    it('should display zero streak when data has no current_streak', () => {
       render(<StreakCard data={{}} loading={false} error={null} />);
 
-      expect(screen.getByText(/Start your first screening!/)).toBeTruthy();
+      expect(screen.getByText('0')).toBeTruthy();
     });
   });
 
   describe('Data Display', () => {
     it('should display daily streak by default', () => {
       const mockData = {
-        daily: { current: 5 },
-        weekly: { current: 2 },
-        completed_days_this_week: [],
+        current_streak: { daily: 5, weekly: 2 },
+        daily: [
+          { date: '2024-01-15', label: 'Mon', has_screening: true },
+          { date: '2024-01-16', label: 'Tue', has_screening: false },
+        ],
+        weekly: [],
       };
 
       render(<StreakCard data={mockData} loading={false} error={null} />);
@@ -56,25 +58,35 @@ describe('StreakCard Component', () => {
 
     it('should display weekly streak when toggled', () => {
       const mockData = {
-        daily: { current: 5 },
-        weekly: { current: 2 },
-        completed_days_this_week: [],
+        current_streak: { daily: 5, weekly: 2 },
+        daily: [],
+        weekly: [
+          {
+            week_start: '2024-01-08',
+            label: 'Jan 8 - Jan 14',
+            has_screening: true,
+          },
+        ],
       };
 
       render(<StreakCard data={mockData} loading={false} error={null} />);
 
-      const weeklyButton = screen.getByText('Weekly');
-      fireEvent.click(weeklyButton);
+      const weeklyTab = screen.getByRole('tab', { name: 'Weekly' });
+      fireEvent.click(weeklyTab);
 
       expect(screen.getByText('2')).toBeTruthy();
       expect(screen.getByText('weeks')).toBeTruthy();
     });
 
-    it('should render all days of the week', () => {
+    it('should render period data labels', () => {
       const mockData = {
-        daily: { current: 3 },
-        weekly: { current: 1 },
-        completed_days_this_week: [],
+        current_streak: { daily: 3, weekly: 1 },
+        daily: [
+          { date: '2024-01-15', label: 'Mon', has_screening: true },
+          { date: '2024-01-16', label: 'Tue', has_screening: false },
+          { date: '2024-01-17', label: 'Wed', has_screening: true },
+        ],
+        weekly: [],
       };
 
       render(<StreakCard data={mockData} loading={false} error={null} />);
@@ -82,17 +94,13 @@ describe('StreakCard Component', () => {
       expect(screen.getByText('Mon')).toBeTruthy();
       expect(screen.getByText('Tue')).toBeTruthy();
       expect(screen.getByText('Wed')).toBeTruthy();
-      expect(screen.getByText('Thu')).toBeTruthy();
-      expect(screen.getByText('Fri')).toBeTruthy();
-      expect(screen.getByText('Sat')).toBeTruthy();
-      expect(screen.getByText('Sun')).toBeTruthy();
     });
 
     it('should handle zero streak values', () => {
       const mockData = {
-        daily: { current: 0 },
-        weekly: { current: 0 },
-        completed_days_this_week: [],
+        current_streak: { daily: 0, weekly: 0 },
+        daily: [],
+        weekly: [],
       };
 
       render(<StreakCard data={mockData} loading={false} error={null} />);
@@ -105,9 +113,15 @@ describe('StreakCard Component', () => {
   describe('Toggle Functionality', () => {
     it('should toggle between daily and weekly views', () => {
       const mockData = {
-        daily: { current: 7 },
-        weekly: { current: 1 },
-        completed_days_this_week: [],
+        current_streak: { daily: 7, weekly: 1 },
+        daily: [{ date: '2024-01-15', label: 'Mon', has_screening: true }],
+        weekly: [
+          {
+            week_start: '2024-01-08',
+            label: 'Jan 8 - Jan 14',
+            has_screening: true,
+          },
+        ],
       };
 
       render(<StreakCard data={mockData} loading={false} error={null} />);
@@ -117,64 +131,66 @@ describe('StreakCard Component', () => {
       expect(screen.getByText('days')).toBeTruthy();
 
       // Switch to weekly
-      const weeklyButton = screen.getByText('Weekly');
-      fireEvent.click(weeklyButton);
+      const weeklyTab = screen.getByRole('tab', { name: 'Weekly' });
+      fireEvent.click(weeklyTab);
       expect(screen.getByText('1')).toBeTruthy();
       expect(screen.getByText('weeks')).toBeTruthy();
 
       // Switch back to daily
-      const dailyButton = screen.getByText('Daily');
-      fireEvent.click(dailyButton);
+      const dailyTab = screen.getByRole('tab', { name: 'Daily' });
+      fireEvent.click(dailyTab);
       expect(screen.getByText('7')).toBeTruthy();
       expect(screen.getByText('days')).toBeTruthy();
     });
 
-    it('should apply active class to selected toggle', () => {
+    it('should apply active state to selected tab', () => {
       const mockData = {
-        daily: { current: 5 },
-        weekly: { current: 2 },
-        completed_days_this_week: [],
+        current_streak: { daily: 5, weekly: 2 },
+        daily: [],
+        weekly: [],
       };
 
       render(<StreakCard data={mockData} loading={false} error={null} />);
 
-      const dailyButton = screen.getByText('Daily');
-      const weeklyButton = screen.getByText('Weekly');
+      const dailyTab = screen.getByRole('tab', { name: 'Daily' });
+      const weeklyTab = screen.getByRole('tab', { name: 'Weekly' });
 
       // Daily should be active by default
-      expect(dailyButton.className).toContain('activeToggle');
-      expect(weeklyButton.className).not.toContain('activeToggle');
+      expect(dailyTab.getAttribute('aria-selected')).toBe('true');
+      expect(weeklyTab.getAttribute('aria-selected')).toBe('false');
 
       // Click weekly
-      fireEvent.click(weeklyButton);
-      expect(weeklyButton.className).toContain('activeToggle');
-      expect(dailyButton.className).not.toContain('activeToggle');
+      fireEvent.click(weeklyTab);
+      expect(weeklyTab.getAttribute('aria-selected')).toBe('true');
+      expect(dailyTab.getAttribute('aria-selected')).toBe('false');
     });
   });
 
   describe('Completed Days Logic', () => {
-    it('should render day circles with completed days data', () => {
-      const today = new Date();
-      const todayStr = today.toISOString().split('T')[0];
-
+    it('should render checkmark for completed screening days', () => {
       const mockData = {
-        daily: { current: 1 },
-        weekly: { current: 1 },
-        completed_days_this_week: [todayStr],
+        current_streak: { daily: 1, weekly: 1 },
+        daily: [
+          { date: '2024-01-15', label: 'Mon', has_screening: true },
+          { date: '2024-01-16', label: 'Tue', has_screening: false },
+        ],
+        weekly: [],
       };
 
       render(<StreakCard data={mockData} loading={false} error={null} />);
 
-      // Check that day names are rendered
+      // Check that day labels are rendered
       expect(screen.getByText('Mon')).toBeTruthy();
       expect(screen.getByText('Tue')).toBeTruthy();
+      // Completed day should show checkmark
+      expect(screen.getByText('✓')).toBeTruthy();
     });
 
-    it('should handle empty completed_days_this_week array', () => {
+    it('should handle empty period data', () => {
       const mockData = {
-        daily: { current: 0 },
-        weekly: { current: 0 },
-        completed_days_this_week: [],
+        current_streak: { daily: 0, weekly: 0 },
+        daily: [],
+        weekly: [],
       };
 
       render(<StreakCard data={mockData} loading={false} error={null} />);
@@ -184,11 +200,11 @@ describe('StreakCard Component', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should handle undefined current values', () => {
+    it('should handle undefined current_streak values', () => {
       const mockData = {
-        daily: {},
-        weekly: {},
-        completed_days_this_week: [],
+        current_streak: {},
+        daily: [],
+        weekly: [],
       };
 
       render(<StreakCard data={mockData} loading={false} error={null} />);
@@ -198,17 +214,17 @@ describe('StreakCard Component', () => {
 
     it('should handle high streak numbers', () => {
       const mockData = {
-        daily: { current: 365 },
-        weekly: { current: 52 },
-        completed_days_this_week: [],
+        current_streak: { daily: 365, weekly: 52 },
+        daily: [],
+        weekly: [],
       };
 
       render(<StreakCard data={mockData} loading={false} error={null} />);
 
       expect(screen.getByText('365')).toBeTruthy();
 
-      const weeklyButton = screen.getByText('Weekly');
-      fireEvent.click(weeklyButton);
+      const weeklyTab = screen.getByRole('tab', { name: 'Weekly' });
+      fireEvent.click(weeklyTab);
       expect(screen.getByText('52')).toBeTruthy();
     });
   });

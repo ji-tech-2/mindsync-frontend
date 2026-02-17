@@ -24,8 +24,9 @@ describe('AdviceFactor', () => {
         />
       );
 
-      expect(screen.getByText('Sleep Hours')).toBeTruthy();
-      expect(screen.getByText('+')).toBeTruthy();
+      expect(screen.getByText('Sleep Duration')).toBeTruthy();
+      const header = screen.getByText('Sleep Duration').parentElement;
+      expect(header.getAttribute('aria-expanded')).toBe('false');
       expect(screen.queryByText('Get at least 7-8 hours of sleep')).toBeNull();
     });
 
@@ -73,7 +74,7 @@ describe('AdviceFactor', () => {
         />
       );
 
-      const header = screen.getByText('Sleep Hours').parentElement;
+      const header = screen.getByText('Sleep Duration').parentElement;
       fireEvent.click(header);
 
       expect(screen.getByText('Get at least 7-8 hours of sleep')).toBeTruthy();
@@ -81,7 +82,7 @@ describe('AdviceFactor', () => {
         screen.getByText('Maintain a consistent sleep schedule')
       ).toBeTruthy();
       expect(screen.getByText('Avoid screens before bedtime')).toBeTruthy();
-      expect(screen.getByText('−')).toBeTruthy();
+      expect(header.getAttribute('aria-expanded')).toBe('true');
     });
 
     it('should collapse when clicked again', () => {
@@ -92,7 +93,7 @@ describe('AdviceFactor', () => {
         />
       );
 
-      const header = screen.getByText('Sleep Hours').parentElement;
+      const header = screen.getByText('Sleep Duration').parentElement;
 
       // Expand
       fireEvent.click(header);
@@ -101,10 +102,10 @@ describe('AdviceFactor', () => {
       // Collapse
       fireEvent.click(header);
       expect(screen.queryByText('Get at least 7-8 hours of sleep')).toBeNull();
-      expect(screen.getByText('+')).toBeTruthy();
+      expect(header.getAttribute('aria-expanded')).toBe('false');
     });
 
-    it('should toggle icon between + and −', () => {
+    it('should toggle aria-expanded attribute', () => {
       render(
         <AdviceFactor
           factorKey="num__sleep_hours"
@@ -112,20 +113,18 @@ describe('AdviceFactor', () => {
         />
       );
 
-      const header = screen.getByText('Sleep Hours').parentElement;
+      const header = screen.getByText('Sleep Duration').parentElement;
 
       // Initially collapsed
-      expect(screen.getByText('+')).toBeTruthy();
+      expect(header.getAttribute('aria-expanded')).toBe('false');
 
       // Expand
       fireEvent.click(header);
-      expect(screen.getByText('−')).toBeTruthy();
-      expect(screen.queryByText('+')).toBeNull();
+      expect(header.getAttribute('aria-expanded')).toBe('true');
 
       // Collapse
       fireEvent.click(header);
-      expect(screen.getByText('+')).toBeTruthy();
-      expect(screen.queryByText('−')).toBeNull();
+      expect(header.getAttribute('aria-expanded')).toBe('false');
     });
   });
 
@@ -138,7 +137,7 @@ describe('AdviceFactor', () => {
         />
       );
 
-      const header = screen.getByText('Sleep Hours').parentElement;
+      const header = screen.getByText('Sleep Duration').parentElement;
       fireEvent.click(header);
 
       mockFactorData.advices.forEach((advice) => {
@@ -154,10 +153,10 @@ describe('AdviceFactor', () => {
         />
       );
 
-      const header = screen.getByText('Sleep Hours').parentElement;
+      const header = screen.getByText('Sleep Duration').parentElement;
       fireEvent.click(header);
 
-      expect(screen.getByText('Sources & References')).toBeTruthy();
+      expect(screen.getByText('References:')).toBeTruthy();
 
       mockFactorData.references.forEach((ref, index) => {
         const link = screen.getByRole('link', {
@@ -186,7 +185,7 @@ describe('AdviceFactor', () => {
       const header = screen.getByText('Test Factor').parentElement;
       fireEvent.click(header);
 
-      expect(screen.getByText('Sources & References')).toBeTruthy();
+      expect(screen.getByText('References:')).toBeTruthy();
     });
 
     it('should handle advice with special characters', () => {
@@ -289,10 +288,10 @@ describe('AdviceFactor', () => {
       // Multiple toggle cycles
       for (let i = 0; i < 3; i++) {
         fireEvent.click(header);
-        expect(screen.getByText('−')).toBeTruthy();
+        expect(header.getAttribute('aria-expanded')).toBe('true');
 
         fireEvent.click(header);
-        expect(screen.getByText('+')).toBeTruthy();
+        expect(header.getAttribute('aria-expanded')).toBe('false');
       }
     });
 
@@ -307,7 +306,8 @@ describe('AdviceFactor', () => {
       const header = screen.getByText('No Refs').parentElement;
       fireEvent.click(header);
 
-      expect(screen.getByText('Sources & References')).toBeTruthy();
+      // Should not show references section when empty
+      expect(screen.queryByText('References:')).toBeNull();
       expect(screen.getByText('Some advice')).toBeTruthy();
     });
   });
@@ -320,7 +320,7 @@ describe('AdviceFactor', () => {
 
       const header = screen.getByText('Test').parentElement;
       expect(header).toBeTruthy();
-      expect(header.tagName).toBe('DIV');
+      expect(header.tagName).toBe('BUTTON');
     });
 
     it('should open external links in new tab with security attributes', () => {

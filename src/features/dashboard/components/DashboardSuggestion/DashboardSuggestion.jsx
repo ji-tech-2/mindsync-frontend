@@ -45,8 +45,12 @@ const DashboardSuggestion = ({ data, loading }) => {
       <ul className={styles.suggestionList}>
         {suggestions.map((item, index) => (
           <li key={index} className={styles.suggestionItem}>
-            <span className={styles.icon}>{getFeatureIcon(item)}</span>
-            <span className={styles.text}>{item}</span>
+            <span className={styles.icon}>
+              {getFeatureIcon(typeof item === 'string' ? item : String(item))}
+            </span>
+            <span className={styles.text}>
+              {typeof item === 'string' ? item : String(item)}
+            </span>
           </li>
         ))}
       </ul>

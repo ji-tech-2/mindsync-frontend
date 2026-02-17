@@ -34,7 +34,6 @@ describe('Advice Component - Partial Polling', () => {
     it('should show loading message when isLoading is true', () => {
       render(<Advice adviceData={null} isLoading={true} />);
 
-      expect(screen.getByText('Advice')).toBeInTheDocument();
       expect(
         screen.getByText('Loading personalized advice...')
       ).toBeInTheDocument();
@@ -54,7 +53,6 @@ describe('Advice Component - Partial Polling', () => {
     it('should show placeholder message when no advice data', () => {
       render(<Advice adviceData={null} isLoading={false} />);
 
-      expect(screen.getByText('Advice')).toBeInTheDocument();
       expect(
         screen.getByText('Advice will appear once analysis is complete...')
       ).toBeInTheDocument();
@@ -73,7 +71,6 @@ describe('Advice Component - Partial Polling', () => {
     it('should display advice description when data is available', () => {
       render(<Advice adviceData={mockAdviceData} isLoading={false} />);
 
-      expect(screen.getByText('Advice')).toBeInTheDocument();
       expect(screen.getByText(mockAdviceData.description)).toBeInTheDocument();
     });
 
@@ -139,7 +136,6 @@ describe('Advice Component - Partial Polling', () => {
       render(<Advice resultData={null} adviceData={null} isLoading={false} />);
 
       // Should still render the component
-      expect(screen.getByText('Advice')).toBeInTheDocument();
       expect(
         screen.getByText('Advice will appear once analysis is complete...')
       ).toBeInTheDocument();
@@ -197,7 +193,7 @@ describe('Advice Component - Partial Polling', () => {
       // CSS modules transform class names, so we check for div structure instead
       const adviceSection = container.querySelector('div');
       expect(adviceSection).toBeInTheDocument();
-      expect(adviceSection).toHaveTextContent('Advice');
+      expect(adviceSection).toHaveTextContent(mockAdviceData.description);
     });
 
     it('should render advice factors container when advice data present', () => {

@@ -139,13 +139,14 @@ describe('ProfileDropdown Component', () => {
       expect(screen.getByText(`Hi, ${mockUser.name}!`)).toBeInTheDocument();
     });
 
-    it('displays Edit Profile button', async () => {
+    it('displays Settings link', async () => {
       const user = userEvent.setup();
       renderWithRouter(<ProfileDropdown />);
 
       await user.click(screen.getByLabelText('Profile menu'));
-      const editButton = screen.getByRole('button', { name: /edit profile/i });
-      expect(editButton).toBeInTheDocument();
+      const settingsLink = screen.getByRole('link', { name: /settings/i });
+      expect(settingsLink).toBeInTheDocument();
+      expect(settingsLink).toHaveAttribute('href', '/profile');
     });
 
     it('displays Logout button', async () => {
@@ -157,7 +158,7 @@ describe('ProfileDropdown Component', () => {
       expect(logoutButton).toBeInTheDocument();
     });
 
-    it('closes dropdown when Edit Profile is clicked', async () => {
+    it('closes dropdown when Settings is clicked', async () => {
       const user = userEvent.setup();
       renderWithRouter(<ProfileDropdown />);
 
@@ -165,15 +166,8 @@ describe('ProfileDropdown Component', () => {
       await user.click(button);
       expect(screen.getByText(`Hi, ${mockUser.name}!`)).toBeInTheDocument();
 
-      const editButton = screen.getByRole('button', { name: /edit profile/i });
-      await user.click(editButton);
-
-      // Dropdown should be closed after navigation
-      await waitFor(() => {
-        expect(
-          screen.queryByText(`Hi, ${mockUser.name}!`)
-        ).not.toBeInTheDocument();
-      });
+      const settingsLink = screen.getByRole('link', { name: /settings/i });
+      expect(settingsLink).toHaveAttribute('href', '/profile');
     });
 
     it('calls logout when Logout button is clicked', async () => {
