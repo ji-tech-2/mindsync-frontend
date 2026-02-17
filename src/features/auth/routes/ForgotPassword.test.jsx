@@ -170,10 +170,9 @@ describe('ForgotPassword Component', () => {
       fireEvent.click(sendOtpButton);
 
       await waitFor(() => {
-        expect(apiClient.post).toHaveBeenCalledWith(
-          '/v1/users/me/request-otp',
-          { email: 'user@example.com' }
-        );
+        expect(apiClient.post).toHaveBeenCalledWith('/v1/auth/request-otp', {
+          email: 'user@example.com',
+        });
       });
 
       // Stage 2 OTP field should appear
@@ -324,7 +323,7 @@ describe('ForgotPassword Component', () => {
       await waitFor(() => {
         expect(apiClient.post).toHaveBeenCalledTimes(2);
         expect(apiClient.post).toHaveBeenLastCalledWith(
-          '/v1/users/me/request-otp',
+          '/v1/auth/request-otp',
           { email: 'user@example.com' }
         );
       });
