@@ -46,7 +46,6 @@ import {
   hasFieldError,
   hasDobFieldError,
   getDropdownValue,
-  isSignUpErrorMessage,
 } from '../utils/formHandlers';
 
 export default function SignUp() {
@@ -82,6 +81,7 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [blurredFields, setBlurredFields] = useState({});
+  const [isMessageError, setIsMessageError] = useState(false);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -245,21 +245,27 @@ export default function SignUp() {
 
     setLoading(true);
     setMessage('Sending OTP...');
+    setIsMessageError(false);
 
     try {
       const data = await requestSignupOTPService(form.email);
 
       if (data.success) {
         setMessage(data.message || 'OTP sent successfully!');
+        setIsMessageError(false);
         // Proceed to next stage only if not resending
         if (!isResend) {
           setIsGoingBack(false);
           setCurrentStage(2);
         }
+      } else {
+        setMessage(data.message || 'Failed to send OTP');
+        setIsMessageError(true);
       }
     } catch (error) {
       console.error('Error sending OTP:', error);
       setMessage(error.response?.data?.message || 'Failed to send OTP');
+      setIsMessageError(true);
     } finally {
       setLoading(false);
     }
@@ -332,6 +338,7 @@ export default function SignUp() {
 
     setLoading(true);
     setMessage('Processing registration...');
+    setIsMessageError(false);
 
     try {
       // Transform form data to API format, including OTP
@@ -344,6 +351,7 @@ export default function SignUp() {
 
       if (result.success) {
         setMessage('Registration successful! Redirecting to login...');
+        setIsMessageError(false);
         setLoading(false);
         navigate('/signin');
       } else {
@@ -351,6 +359,7 @@ export default function SignUp() {
         setMessage(
           result.message || 'Registration failed. Please check your form data.'
         );
+        setIsMessageError(true);
       }
     } catch (err) {
       setLoading(false);
@@ -358,6 +367,7 @@ export default function SignUp() {
         err.response?.data?.message ||
         'Error connecting to server. Please ensure your backend is running.';
       setMessage(errorMessage);
+      setIsMessageError(true);
       console.error('Registration error:', err);
     }
   }
@@ -671,9 +681,21 @@ export default function SignUp() {
         Already have an account? <Link href="/signin">Sign In Here</Link>
       </p>
 
-      {isSignUpErrorMessage(message) && (
-        <Message type="error">{message}</Message>
+      {/* Show success messages */}
+      {message && !isMessageError && (
+        <p
+          style={{
+            color: 'var(--color-success, green)',
+            textAlign: 'center',
+            marginTop: 'var(--space-md)',
+          }}
+        >
+          {message}
+        </p>
       )}
+
+      {/* Show error messages */}
+      {isMessageError && message && <Message type="error">{message}</Message>}
     </AuthPageLayout>
   );
 }

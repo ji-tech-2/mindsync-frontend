@@ -125,6 +125,8 @@ export const handleOTPRequest = async ({
     if (data.success) {
       const message = data.message || 'OTP sent successfully!';
       onSuccess(message, isResend);
+    } else {
+      onError(data.message || 'Failed to send OTP');
     }
   } catch (error) {
     console.error('Error sending OTP:', error);
