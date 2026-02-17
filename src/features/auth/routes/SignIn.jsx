@@ -17,7 +17,6 @@ import {
   validateSignInField,
   validateSignInForm,
   scrollToFirstErrorField,
-  isSignInErrorMessage,
 } from '../utils/signInHelpers';
 
 export default function SignIn() {
@@ -41,6 +40,7 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [blurredFields, setBlurredFields] = useState({});
+  const [isMessageError, setIsMessageError] = useState(false);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -94,6 +94,7 @@ export default function SignIn() {
 
     setLoading(true);
     setMessage('Processing sign in...');
+    setIsMessageError(false);
     setErrors({});
 
     // Backend response: { success: true, user: { email, name, userId } }
@@ -103,6 +104,7 @@ export default function SignIn() {
 
       if (data.success && data.user) {
         setMessage('Sign in successful!');
+        setIsMessageError(false);
         setLoading(false);
 
         // Use AuthContext login to update global auth state
@@ -114,12 +116,14 @@ export default function SignIn() {
       } else {
         setLoading(false);
         setMessage(data.message || 'Sign in failed');
+        setIsMessageError(!data.success);
       }
     } catch (err) {
       setLoading(false);
       const errorMessage =
         err.response?.data?.message || 'Server error occurred';
       setMessage(errorMessage);
+      setIsMessageError(true);
       console.error('Sign in error:', err);
     }
   }
@@ -183,7 +187,7 @@ export default function SignIn() {
       </Button>
 
       {/* Show success messages */}
-      {message && message.includes('successful') && (
+      {message && !isMessageError && (
         <p
           style={{
             color: 'var(--color-success, green)',
@@ -196,9 +200,7 @@ export default function SignIn() {
       )}
 
       {/* Show error messages */}
-      {isSignInErrorMessage(message) && (
-        <Message type="error">{message}</Message>
-      )}
+      {isMessageError && message && <Message type="error">{message}</Message>}
     </AuthPageLayout>
   );
 }
