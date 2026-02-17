@@ -50,10 +50,10 @@ describe('ProfileDropdown Component', () => {
 
   describe('Dropdown Toggle', () => {
     beforeEach(() => {
-      const mockLogout = vi.fn();
+      const mockLogoutWithTransition = vi.fn();
       vi.mocked(authModule.useAuth).mockReturnValue({
         user: mockUser,
-        logout: mockLogout,
+        logoutWithTransition: mockLogoutWithTransition,
       });
     });
 
@@ -91,10 +91,10 @@ describe('ProfileDropdown Component', () => {
 
   describe('Outside Click Behavior', () => {
     beforeEach(() => {
-      const mockLogout = vi.fn();
+      const mockLogoutWithTransition = vi.fn();
       vi.mocked(authModule.useAuth).mockReturnValue({
         user: mockUser,
-        logout: mockLogout,
+        logoutWithTransition: mockLogoutWithTransition,
       });
     });
 
@@ -121,13 +121,13 @@ describe('ProfileDropdown Component', () => {
   });
 
   describe('Dropdown Content', () => {
-    let mockLogout;
+    let mockLogoutWithTransition;
 
     beforeEach(() => {
-      mockLogout = vi.fn();
+      mockLogoutWithTransition = vi.fn();
       vi.mocked(authModule.useAuth).mockReturnValue({
         user: mockUser,
-        logout: mockLogout,
+        logoutWithTransition: mockLogoutWithTransition,
       });
     });
 
@@ -180,7 +180,7 @@ describe('ProfileDropdown Component', () => {
       const logoutButton = screen.getByRole('button', { name: /logout/i });
       await user.click(logoutButton);
 
-      expect(mockLogout).toHaveBeenCalled();
+      expect(mockLogoutWithTransition).toHaveBeenCalled();
     });
 
     it('closes dropdown when Logout button is clicked', async () => {

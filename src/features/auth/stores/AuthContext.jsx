@@ -138,7 +138,7 @@ export const AuthProvider = ({ children }) => {
 
       // Clear the flag after auth is cleared
       setIsLoggingOut(false);
-    }, 150);
+    }, 50);
   }, [navigate]);
 
   // Update user data
