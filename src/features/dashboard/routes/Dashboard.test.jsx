@@ -321,10 +321,10 @@ describe('Dashboard Component', () => {
       renderDashboard(defaultUser);
 
       await waitFor(() => {
-        expect(services.getWeeklyCriticalFactors).toHaveBeenCalledWith('123');
-        expect(services.getDailySuggestion).toHaveBeenCalledWith('123');
-        expect(services.getStreak).toHaveBeenCalledWith('123');
-        expect(services.getWeeklyChart).toHaveBeenCalledWith('123');
+        expect(services.getWeeklyCriticalFactors).toHaveBeenCalled();
+        expect(services.getDailySuggestion).toHaveBeenCalled();
+        expect(services.getStreak).toHaveBeenCalled();
+        expect(services.getWeeklyChart).toHaveBeenCalled();
       });
     });
 

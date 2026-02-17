@@ -20,10 +20,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     const loadWeeklyData = async () => {
-      const currentUserId = user?.userId || user?.id || user?.user_id;
-      if (!currentUserId) return;
+      if (!user) return;
       try {
-        const response = await getWeeklyChart(currentUserId);
+        const response = await getWeeklyChart();
         if (response.status === 'success' && response.data) {
           setWeeklyData(response.data);
         }
@@ -33,8 +32,6 @@ export default function Dashboard() {
     };
     loadWeeklyData();
   }, [user]);
-
-  const userId = user?.userId || user?.id || null;
 
   // State untuk API data
   const [factors, setFactors] = useState([]);
@@ -47,8 +44,8 @@ export default function Dashboard() {
 
   // Fetch critical factors dari API
   useEffect(() => {
-    if (userId) {
-      getWeeklyCriticalFactors(userId)
+    if (user) {
+      getWeeklyCriticalFactors()
         .then((data) => {
           if (data.status === 'success') {
             const factorsWithDesc = data.top_critical_factors.map((factor) => {
@@ -81,12 +78,12 @@ export default function Dashboard() {
           setLoading(false);
         });
     }
-  }, [userId]);
+  }, [user]);
 
   // Fetch daily suggestion dari API
   useEffect(() => {
-    if (userId) {
-      getDailySuggestion(userId)
+    if (user) {
+      getDailySuggestion()
         .then((data) => {
           console.log('💡 Daily suggestion response:', data);
 
@@ -100,12 +97,12 @@ export default function Dashboard() {
           setLoadingSuggestion(false);
         });
     }
-  }, [userId]);
+  }, [user]);
 
   // fetch streak data dari API
   useEffect(() => {
-    if (userId) {
-      getStreak(userId)
+    if (user) {
+      getStreak()
         .then((data) => {
           console.log('🔥 Streak response data:', data);
           if (data.status === 'success') {
@@ -121,7 +118,7 @@ export default function Dashboard() {
           setLoadingStreak(false);
         });
     }
-  }, [userId]);
+  }, [user]);
 
   return (
     <div className={styles.container}>

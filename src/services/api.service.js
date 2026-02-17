@@ -46,12 +46,12 @@ export async function logout() {
 }
 
 /**
- * Request OTP for password reset or verification
+ * Request OTP for password reset
  * @param {string} email - User email
  * @returns {Promise} Response with OTP status
  */
 export async function requestOTP(email) {
-  const response = await apiClient.post(API_ROUTES.PROFILE_REQUEST_OTP, {
+  const response = await apiClient.post(API_ROUTES.AUTH_REQUEST_OTP, {
     email,
   });
   return response.data;
@@ -92,7 +92,7 @@ export async function resetPassword(email, otp, newPassword) {
  * @returns {Promise} Response with status
  */
 export async function changePassword(oldPassword, newPassword) {
-  const response = await apiClient.post(API_ROUTES.PROFILE_CHANGE_PASSWORD, {
+  const response = await apiClient.post(API_ROUTES.CHANGE_PASSWORD, {
     oldPassword,
     newPassword,
   });
@@ -229,13 +229,10 @@ export async function pollPredictionResult(
 
 /**
  * Get user's screening history
- * @param {string} userId - User ID
  * @returns {Promise} Response with screening history
  */
-export async function getScreeningHistory(userId) {
-  const response = await apiClient.get(
-    `${API_ROUTES.HISTORY}/${userId}/history`
-  );
+export async function getScreeningHistory() {
+  const response = await apiClient.get(API_ROUTES.HISTORY);
   return response.data;
 }
 
@@ -245,48 +242,36 @@ export async function getScreeningHistory(userId) {
 
 /**
  * Get weekly chart data
- * @param {string} userId - User ID
  * @returns {Promise} Response with weekly chart data
  */
-export async function getWeeklyChart(userId) {
-  const response = await apiClient.get(
-    `${API_ROUTES.WEEKLY_CHART}/${userId}/weekly-chart`
-  );
+export async function getWeeklyChart() {
+  const response = await apiClient.get(API_ROUTES.WEEKLY_CHART);
   return response.data;
 }
 
 /**
  * Get user's streak data
- * @param {string} userId - User ID
  * @returns {Promise} Response with streak data
  */
-export async function getStreak(userId) {
-  const response = await apiClient.get(
-    `${API_ROUTES.STREAK}/${userId}/streaks`
-  );
+export async function getStreak() {
+  const response = await apiClient.get(API_ROUTES.STREAK);
   return response.data;
 }
 
 /**
  * Get weekly critical factors
- * @param {string} userId - User ID
  * @returns {Promise} Response with critical factors
  */
-export async function getWeeklyCriticalFactors(userId) {
-  const response = await apiClient.get(
-    `${API_ROUTES.CRITICAL_FACTORS}/${userId}/weekly-factors`
-  );
+export async function getWeeklyCriticalFactors() {
+  const response = await apiClient.get(API_ROUTES.CRITICAL_FACTORS);
   return response.data;
 }
 
 /**
  * Get daily suggestion for user
- * @param {string} userId - User ID
  * @returns {Promise} Response with daily suggestion
  */
-export async function getDailySuggestion(userId) {
-  const response = await apiClient.get(
-    `${API_ROUTES.DAILY_SUGGESTION}/${userId}/daily-suggestions`
-  );
+export async function getDailySuggestion() {
+  const response = await apiClient.get(API_ROUTES.DAILY_SUGGESTION);
   return response.data;
 }

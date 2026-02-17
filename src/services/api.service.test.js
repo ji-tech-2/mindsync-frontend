@@ -72,10 +72,10 @@ describe('api.service', () => {
   });
 
   describe('requestOTP', () => {
-    it('calls POST /v1/users/me/request-otp with email', async () => {
+    it('calls POST /v1/auth/request-otp with email', async () => {
       apiClient.post.mockResolvedValue({ data: { success: true } });
       const result = await requestOTP('user@test.com');
-      expect(apiClient.post).toHaveBeenCalledWith('/v1/users/me/request-otp', {
+      expect(apiClient.post).toHaveBeenCalledWith('/v1/auth/request-otp', {
         email: 'user@test.com',
       });
       expect(result).toEqual({ success: true });
@@ -178,54 +178,50 @@ describe('api.service', () => {
 
   // ===== History =====
   describe('getScreeningHistory', () => {
-    it('calls GET /v1/users/{userId}/history', async () => {
+    it('calls GET /v1/users/me/history', async () => {
       apiClient.get.mockResolvedValue({ data: { success: true, data: [] } });
-      const result = await getScreeningHistory('user-123');
-      expect(apiClient.get).toHaveBeenCalledWith('/v1/users/user-123/history');
+      const result = await getScreeningHistory();
+      expect(apiClient.get).toHaveBeenCalledWith('/v1/users/me/history');
       expect(result).toEqual({ success: true, data: [] });
     });
   });
 
   // ===== Dashboard =====
   describe('getWeeklyChart', () => {
-    it('calls GET /v1/users/{userId}/weekly-chart', async () => {
+    it('calls GET /v1/users/me/weekly-chart', async () => {
       apiClient.get.mockResolvedValue({ data: { success: true, data: [] } });
-      const result = await getWeeklyChart('user-123');
-      expect(apiClient.get).toHaveBeenCalledWith(
-        '/v1/users/user-123/weekly-chart'
-      );
+      const result = await getWeeklyChart();
+      expect(apiClient.get).toHaveBeenCalledWith('/v1/users/me/weekly-chart');
       expect(result).toEqual({ success: true, data: [] });
     });
   });
 
   describe('getStreak', () => {
-    it('calls GET /v1/users/{userId}/streaks', async () => {
+    it('calls GET /v1/users/me/streaks', async () => {
       apiClient.get.mockResolvedValue({ data: { success: true, streak: 5 } });
-      const result = await getStreak('user-123');
-      expect(apiClient.get).toHaveBeenCalledWith('/v1/users/user-123/streaks');
+      const result = await getStreak();
+      expect(apiClient.get).toHaveBeenCalledWith('/v1/users/me/streaks');
       expect(result).toEqual({ success: true, streak: 5 });
     });
   });
 
   describe('getWeeklyCriticalFactors', () => {
-    it('calls GET /v1/users/{userId}/weekly-factors', async () => {
+    it('calls GET /v1/users/me/weekly-factors', async () => {
       apiClient.get.mockResolvedValue({ data: { success: true, factors: [] } });
-      const result = await getWeeklyCriticalFactors('user-123');
-      expect(apiClient.get).toHaveBeenCalledWith(
-        '/v1/users/user-123/weekly-factors'
-      );
+      const result = await getWeeklyCriticalFactors();
+      expect(apiClient.get).toHaveBeenCalledWith('/v1/users/me/weekly-factors');
       expect(result).toEqual({ success: true, factors: [] });
     });
   });
 
   describe('getDailySuggestion', () => {
-    it('calls GET /v1/users/{userId}/daily-suggestions', async () => {
+    it('calls GET /v1/users/me/daily-suggestions', async () => {
       apiClient.get.mockResolvedValue({
         data: { success: true, suggestion: 'Get rest' },
       });
-      const result = await getDailySuggestion('user-123');
+      const result = await getDailySuggestion();
       expect(apiClient.get).toHaveBeenCalledWith(
-        '/v1/users/user-123/daily-suggestions'
+        '/v1/users/me/daily-suggestions'
       );
       expect(result).toEqual({ success: true, suggestion: 'Get rest' });
     });

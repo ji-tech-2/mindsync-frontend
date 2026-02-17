@@ -270,7 +270,7 @@ describe('History Component', () => {
       );
 
       await waitFor(() => {
-        expect(fetchSpy).toHaveBeenCalledWith(123);
+        expect(fetchSpy).toHaveBeenCalled();
       });
     });
 
@@ -290,7 +290,7 @@ describe('History Component', () => {
       );
 
       await waitFor(() => {
-        expect(fetchSpy).toHaveBeenCalledWith(456);
+        expect(fetchSpy).toHaveBeenCalled();
       });
     });
 
@@ -312,7 +312,7 @@ describe('History Component', () => {
       );
 
       await waitFor(() => {
-        expect(fetchSpy).toHaveBeenCalledWith(789);
+        expect(fetchSpy).toHaveBeenCalled();
       });
     });
   });
