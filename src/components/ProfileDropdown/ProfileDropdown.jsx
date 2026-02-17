@@ -8,7 +8,7 @@ import styles from './ProfileDropdown.module.css';
 function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { user, logout } = useAuth();
+  const { user, logoutWithTransition } = useAuth();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -33,7 +33,7 @@ function ProfileDropdown() {
 
   const handleLogout = () => {
     setIsOpen(false);
-    logout();
+    logoutWithTransition();
   };
 
   if (!user) return null;

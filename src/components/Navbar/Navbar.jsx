@@ -6,7 +6,7 @@ import logoPrimaryAlt from '@/assets/logo-primary-alt.svg';
 import styles from './Navbar.module.css';
 
 function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logoutWithTransition } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef(null);
 
@@ -43,7 +43,7 @@ function Navbar() {
 
   const handleLogout = () => {
     closeMobileMenu();
-    logout();
+    logoutWithTransition();
   };
 
   return (
