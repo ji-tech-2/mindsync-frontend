@@ -1,43 +1,169 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import Profile from './Profile';
-import { AuthProvider } from '@/features/auth';
-import apiClient from '@/config/api';
+import * as servicesModule from '@/services';
+import { TokenManager } from '@/utils/tokenManager';
 
-// Mock apiClient
-vi.mock('@/config/api', () => ({
-  default: {
-    get: vi.fn(),
-    put: vi.fn(),
-    post: vi.fn(),
-  },
+// Mock services
+vi.mock('@/services', () => ({
+  getProfile: vi.fn(),
+  updateProfile: vi.fn(),
+  changePassword: vi.fn(),
+}));
+
+// Mock auth
+const mockUpdateUser = vi.fn();
+vi.mock('@/features/auth', () => ({
+  useAuth: () => ({ updateUser: mockUpdateUser }),
+}));
+
+// Mock TokenManager
+vi.mock('@/utils/tokenManager', () => ({
   TokenManager: {
-    getUserData: vi.fn(),
     setUserData: vi.fn(),
-    clearUserData: vi.fn(),
   },
 }));
 
-// Mock useNavigate
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
+// Mock validators
+vi.mock('@/features/auth/utils/signUpValidators', () => ({
+  validateNameField: vi.fn().mockReturnValue(''),
+  validateDobField: vi.fn().mockReturnValue({}),
+}));
 
-const renderProfile = () => {
-  return render(
-    <BrowserRouter>
-      <AuthProvider>
-        <Profile />
-      </AuthProvider>
-    </BrowserRouter>
-  );
-};
+vi.mock('@/features/auth/utils/formHandlers', () => ({
+  hasDobFieldError: vi.fn().mockReturnValue(false),
+}));
+
+// Mock components with simple HTML equivalents
+vi.mock('@/components', () => ({
+  TextField: ({ label, value, onChange, disabled, onBlur }) => (
+    <div>
+      <label>{label}</label>
+      <input
+        value={value || ''}
+        onChange={onChange}
+        disabled={disabled}
+        onBlur={onBlur}
+        aria-label={label}
+      />
+    </div>
+  ),
+  Dropdown: ({ label, options, value, onChange }) => (
+    <div>
+      <label>{label}</label>
+      <select
+        aria-label={label}
+        value={value?.value || ''}
+        onChange={(e) => {
+          const opt = options?.find((o) => o.value === e.target.value);
+          if (onChange && opt) onChange(opt);
+        }}
+      >
+        {options?.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  ),
+  Button: ({ children, onClick, disabled, type }) => (
+    <button onClick={onClick} disabled={disabled} type={type || 'button'}>
+      {children}
+    </button>
+  ),
+  Message: ({ type, children }) => (
+    <div data-testid="message" data-type={type}>
+      {children}
+    </div>
+  ),
+  PasswordField: ({ label, value, onChange, disabled, name }) => (
+    <div>
+      <label>{label}</label>
+      <input
+        type="password"
+        name={name}
+        value={value || ''}
+        onChange={onChange}
+        disabled={disabled}
+        aria-label={label}
+      />
+    </div>
+  ),
+  Card: ({ children }) => <div data-testid="card">{children}</div>,
+  DateField: ({
+    label,
+    dayValue,
+    monthValue,
+    yearValue,
+    onDayChange,
+    onMonthChange,
+    onYearChange,
+    onDayBlur,
+    onMonthBlur,
+    onYearBlur,
+  }) => (
+    <div>
+      <label>{label}</label>
+      <input
+        aria-label="Day"
+        value={dayValue || ''}
+        onChange={onDayChange}
+        onBlur={onDayBlur}
+      />
+      <input
+        aria-label="Month"
+        value={monthValue || ''}
+        onChange={(e) => onMonthChange?.({ value: e.target.value })}
+        onBlur={onMonthBlur}
+      />
+      <input
+        aria-label="Year"
+        value={yearValue || ''}
+        onChange={onYearChange}
+        onBlur={onYearBlur}
+      />
+    </div>
+  ),
+}));
+
+vi.mock('@/layouts/PageLayout', () => ({
+  default: ({ title, children }) => (
+    <div data-testid="page-layout">
+      <h1>{title}</h1>
+      {children}
+    </div>
+  ),
+}));
+
+// Mock PasswordChangeModal
+vi.mock('../components/PasswordChangeModal', () => ({
+  default: ({ isOpen, onClose, onSubmit, loading }) => {
+    if (!isOpen) return null;
+    return (
+      <div data-testid="password-modal">
+        <h2>Change Password</h2>
+        <button
+          onClick={async () => {
+            try {
+              await onSubmit({
+                oldPassword: 'old123',
+                newPassword: 'New1234!',
+              });
+            } catch {
+              // Parent re-throws errors for modal to handle
+            }
+          }}
+          disabled={loading}
+        >
+          {loading ? 'Changing...' : 'Submit Password Change'}
+        </button>
+        <button onClick={onClose}>Cancel</button>
+      </div>
+    );
+  },
+}));
 
 const mockUserData = {
   name: 'John Doe',
@@ -48,43 +174,65 @@ const mockUserData = {
   dob: '1990-01-01',
 };
 
+const renderProfile = () => {
+  return render(
+    <MemoryRouter>
+      <Profile />
+    </MemoryRouter>
+  );
+};
+
 describe('Profile Component', () => {
   beforeEach(() => {
-    mockNavigate.mockClear();
     vi.clearAllMocks();
   });
 
   describe('Profile Loading and Display', () => {
     it('should display loading state initially', () => {
-      apiClient.get.mockImplementation(() => new Promise(() => {})); // Never resolves
+      servicesModule.getProfile.mockImplementation(() => new Promise(() => {}));
       renderProfile();
       expect(screen.getByText(/loading profile/i)).toBeInTheDocument();
     });
 
-    it('should fetch and display user profile data', async () => {
-      apiClient.get.mockResolvedValue({
-        data: {
-          success: true,
-          data: mockUserData,
-        },
+    it('should show page title Settings', async () => {
+      servicesModule.getProfile.mockResolvedValue({
+        success: true,
+        data: mockUserData,
       });
 
       renderProfile();
 
       await waitFor(() => {
-        expect(screen.getByText('John Doe')).toBeInTheDocument();
-        expect(screen.getByText('john@example.com')).toBeInTheDocument();
-        expect(screen.getByText('Male')).toBeInTheDocument();
-        expect(screen.getByText('Employed')).toBeInTheDocument();
-        expect(screen.getByText('Remote')).toBeInTheDocument();
+        expect(screen.getByText('Settings')).toBeInTheDocument();
+      });
+    });
+
+    it('should fetch and display user profile data', async () => {
+      servicesModule.getProfile.mockResolvedValue({
+        success: true,
+        data: mockUserData,
       });
 
-      expect(apiClient.get).toHaveBeenCalledWith('/v0-1/auth-profile');
+      renderProfile();
+
+      await waitFor(() => {
+        expect(servicesModule.getProfile).toHaveBeenCalled();
+      });
+
+      // Check Name field has the value
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      expect(nameInput.value).toBe('John Doe');
+
+      // Check Email field has the value and is disabled
+      const emailInput = screen.getByRole('textbox', { name: 'Email' });
+      expect(emailInput.value).toBe('john@example.com');
+      expect(emailInput.disabled).toBe(true);
     });
 
     it('should display avatar with first letter of name', async () => {
-      apiClient.get.mockResolvedValue({
-        data: { success: true, data: mockUserData },
+      servicesModule.getProfile.mockResolvedValue({
+        success: true,
+        data: mockUserData,
       });
 
       renderProfile();
@@ -98,7 +246,7 @@ describe('Profile Component', () => {
       const consoleError = vi
         .spyOn(console, 'error')
         .mockImplementation(() => {});
-      apiClient.get.mockRejectedValue(new Error('Network error'));
+      servicesModule.getProfile.mockRejectedValue(new Error('Network error'));
 
       renderProfile();
 
@@ -108,373 +256,317 @@ describe('Profile Component', () => {
 
       consoleError.mockRestore();
     });
-  });
 
-  describe('Navigation', () => {
-    it('should navigate back to dashboard when back button clicked', async () => {
-      apiClient.get.mockResolvedValue({
-        data: { success: true, data: mockUserData },
+    it('should display error message when profile fetch fails', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      servicesModule.getProfile.mockRejectedValue(new Error('Network error'));
+
+      renderProfile();
+
+      await waitFor(() => {
+        expect(screen.getByText('Failed to load profile')).toBeInTheDocument();
+      });
+
+      console.error.mockRestore();
+    });
+
+    it('should parse DOB into separate fields', async () => {
+      servicesModule.getProfile.mockResolvedValue({
+        success: true,
+        data: mockUserData,
       });
 
       renderProfile();
 
       await waitFor(() => {
-        expect(screen.getByText('John Doe')).toBeInTheDocument();
+        const dayInput = screen.getByRole('textbox', { name: 'Day' });
+        const yearInput = screen.getByRole('textbox', { name: 'Year' });
+        expect(dayInput.value).toBe('01');
+        expect(yearInput.value).toBe('1990');
       });
-
-      const backButton = screen.getByRole('button', {
-        name: /back to dashboard/i,
-      });
-      fireEvent.click(backButton);
-
-      expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
     });
   });
 
-  describe('Edit Modals', () => {
+  describe('Inline Editing', () => {
     beforeEach(async () => {
-      apiClient.get.mockResolvedValue({
-        data: { success: true, data: mockUserData },
+      servicesModule.getProfile.mockResolvedValue({
+        success: true,
+        data: mockUserData,
       });
+    });
 
+    it('should not show Save button when no changes made', async () => {
       renderProfile();
 
       await waitFor(() => {
-        expect(screen.getByText('John Doe')).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
       });
+
+      expect(screen.queryByText('Save')).not.toBeInTheDocument();
     });
 
-    it('should open name edit modal when edit button clicked', async () => {
-      const editButtons = screen.getAllByRole('button', { name: /edit/i });
-      fireEvent.click(editButtons[0]); // First edit button (Name)
-
-      await waitFor(() => {
-        expect(screen.getByText('Edit Name')).toBeInTheDocument();
-        expect(
-          screen.getByPlaceholderText(/enter new name/i)
-        ).toBeInTheDocument();
-      });
-    });
-
-    it('should open gender edit modal', async () => {
-      const editButtons = screen.getAllByRole('button', { name: /edit/i });
-      fireEvent.click(editButtons[1]); // Gender edit button
-
-      await waitFor(() => {
-        expect(screen.getByText('Edit Gender')).toBeInTheDocument();
-      });
-    });
-
-    it('should open occupation edit modal', async () => {
-      const editButtons = screen.getAllByRole('button', { name: /edit/i });
-      fireEvent.click(editButtons[2]); // Occupation edit button
-
-      await waitFor(() => {
-        expect(screen.getByText('Edit Occupation')).toBeInTheDocument();
-      });
-    });
-
-    it('should open work mode edit modal', async () => {
-      const editButtons = screen.getAllByRole('button', { name: /edit/i });
-      fireEvent.click(editButtons[3]); // Work mode edit button
-
-      await waitFor(() => {
-        expect(screen.getByText('Edit Work Mode')).toBeInTheDocument();
-      });
-    });
-
-    it('should open password change modal', async () => {
-      const changeButton = screen.getByRole('button', { name: /change/i });
-      fireEvent.click(changeButton);
-
-      await waitFor(() => {
-        expect(screen.getByText('Change Password')).toBeInTheDocument();
-      });
-    });
-
-    it('should close modal when close button clicked', async () => {
-      const editButtons = screen.getAllByRole('button', { name: /edit/i });
-      fireEvent.click(editButtons[0]);
-
-      await waitFor(() => {
-        expect(screen.getByText('Edit Name')).toBeInTheDocument();
-      });
-
-      const closeButton = screen.getByText('×');
-      fireEvent.click(closeButton);
-
-      await waitFor(() => {
-        expect(screen.queryByText('Edit Name')).not.toBeInTheDocument();
-      });
-    });
-
-    it('should close modal when clicking overlay', async () => {
-      const editButtons = screen.getAllByRole('button', { name: /edit/i });
-      fireEvent.click(editButtons[0]);
-
-      await waitFor(() => {
-        expect(screen.getByText('Edit Name')).toBeInTheDocument();
-      });
-
-      const overlay = screen
-        .getByText('Edit Name')
-        .closest('.modal-content').parentElement;
-      fireEvent.click(overlay);
-
-      await waitFor(() => {
-        expect(screen.queryByText('Edit Name')).not.toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Update Profile Fields', () => {
-    beforeEach(async () => {
-      apiClient.get.mockResolvedValue({
-        data: { success: true, data: mockUserData },
-      });
-
+    it('should show Save button when name is changed', async () => {
       renderProfile();
 
       await waitFor(() => {
-        expect(screen.getByText('John Doe')).toBeInTheDocument();
-      });
-    });
-
-    it('should update name successfully', async () => {
-      apiClient.put.mockResolvedValue({
-        data: {
-          success: true,
-          message: 'Profile updated successfully',
-          data: { ...mockUserData, name: 'Jane Doe' },
-        },
+        expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
       });
 
-      const editButtons = screen.getAllByRole('button', { name: /edit/i });
-      fireEvent.click(editButtons[0]);
-
-      await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/enter new name/i)
-        ).toBeInTheDocument();
-      });
-
-      const nameInput = screen.getByPlaceholderText(/enter new name/i);
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
       fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
 
-      const submitButton = screen.getByRole('button', { name: /update name/i });
-      fireEvent.click(submitButton);
+      expect(screen.getByText('Save')).toBeInTheDocument();
+    });
+
+    it('should show Save button when gender is changed', async () => {
+      renderProfile();
 
       await waitFor(() => {
-        expect(apiClient.put).toHaveBeenCalledWith('/v0-1/auth-profile', {
-          name: 'Jane Doe',
-        });
+        expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
+      });
+
+      const genderSelect = screen.getByRole('combobox', { name: 'Gender' });
+      fireEvent.change(genderSelect, { target: { value: 'Female' } });
+
+      expect(screen.getByText('Save')).toBeInTheDocument();
+    });
+
+    it('should update profile successfully', async () => {
+      servicesModule.updateProfile.mockResolvedValue({
+        success: true,
+        data: { ...mockUserData, name: 'Jane Doe' },
+      });
+
+      renderProfile();
+
+      await waitFor(() => {
+        expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
+      });
+
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
+
+      const saveButton = screen.getByText('Save');
+      fireEvent.click(saveButton);
+
+      await waitFor(() => {
+        expect(servicesModule.updateProfile).toHaveBeenCalled();
         expect(
-          screen.getByText(/profile updated successfully/i)
+          screen.getByText('Profile updated successfully')
         ).toBeInTheDocument();
       });
     });
 
-    it('should update gender successfully', async () => {
-      apiClient.put.mockResolvedValue({
-        data: {
-          success: true,
-          message: 'Profile updated successfully',
-          data: { ...mockUserData, gender: 'Female' },
-        },
+    it('should call TokenManager.setUserData and updateUser on success', async () => {
+      servicesModule.updateProfile.mockResolvedValue({
+        success: true,
+        data: { ...mockUserData, name: 'Jane Doe' },
       });
 
-      const editButtons = screen.getAllByRole('button', { name: /edit/i });
-      fireEvent.click(editButtons[1]);
+      renderProfile();
 
       await waitFor(() => {
-        expect(screen.getByText('Edit Gender')).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
       });
 
-      const genderSelect = screen.getByRole('combobox');
-      fireEvent.change(genderSelect, { target: { value: 'Female' } });
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
 
-      const submitButton = screen.getByRole('button', {
-        name: /update gender/i,
-      });
-      fireEvent.click(submitButton);
+      const saveButton = screen.getByText('Save');
+      fireEvent.click(saveButton);
 
       await waitFor(() => {
-        expect(apiClient.put).toHaveBeenCalledWith('/v0-1/auth-profile', {
-          gender: 'Female',
-        });
-      });
-    });
-
-    it('should update occupation successfully', async () => {
-      apiClient.put.mockResolvedValue({
-        data: {
-          success: true,
-          message: 'Profile updated successfully',
-          data: { ...mockUserData, occupation: 'Student' },
-        },
-      });
-
-      const editButtons = screen.getAllByRole('button', { name: /edit/i });
-      fireEvent.click(editButtons[2]);
-
-      await waitFor(() => {
-        expect(screen.getByText('Edit Occupation')).toBeInTheDocument();
-      });
-
-      const occupationSelect = screen.getByRole('combobox');
-      fireEvent.change(occupationSelect, { target: { value: 'Student' } });
-
-      const submitButton = screen.getByRole('button', {
-        name: /update occupation/i,
-      });
-      fireEvent.click(submitButton);
-
-      await waitFor(() => {
-        expect(apiClient.put).toHaveBeenCalledWith('/v0-1/auth-profile', {
-          occupation: 'Student',
-        });
+        expect(TokenManager.setUserData).toHaveBeenCalled();
+        expect(mockUpdateUser).toHaveBeenCalled();
       });
     });
 
     it('should handle update error', async () => {
-      apiClient.put.mockRejectedValue({
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      servicesModule.updateProfile.mockRejectedValue({
         response: { data: { message: 'Update failed' } },
       });
 
-      const editButtons = screen.getAllByRole('button', { name: /edit/i });
-      fireEvent.click(editButtons[0]);
+      renderProfile();
 
       await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/enter new name/i)
-        ).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
       });
 
-      const nameInput = screen.getByPlaceholderText(/enter new name/i);
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
       fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
 
-      const submitButton = screen.getByRole('button', { name: /update name/i });
-      fireEvent.click(submitButton);
+      const saveButton = screen.getByText('Save');
+      fireEvent.click(saveButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/update failed/i)).toBeInTheDocument();
+        expect(screen.getByText('Update failed')).toBeInTheDocument();
       });
+
+      console.error.mockRestore();
+    });
+
+    it('should show Saving... text while saving', async () => {
+      servicesModule.updateProfile.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            setTimeout(
+              () =>
+                resolve({
+                  success: true,
+                  data: { ...mockUserData, name: 'Jane Doe' },
+                }),
+              100
+            );
+          })
+      );
+
+      renderProfile();
+
+      await waitFor(() => {
+        expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
+      });
+
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
+
+      const saveButton = screen.getByText('Save');
+      fireEvent.click(saveButton);
+
+      expect(screen.getByText('Saving...')).toBeInTheDocument();
     });
   });
 
   describe('Password Change', () => {
     beforeEach(async () => {
-      apiClient.get.mockResolvedValue({
-        data: { success: true, data: mockUserData },
+      servicesModule.getProfile.mockResolvedValue({
+        success: true,
+        data: mockUserData,
+      });
+    });
+
+    it('should open password change modal when Change button clicked', async () => {
+      renderProfile();
+
+      await waitFor(() => {
+        expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
+      });
+
+      const changeButton = screen.getByText('Change');
+      fireEvent.click(changeButton);
+
+      expect(screen.getByTestId('password-modal')).toBeInTheDocument();
+      expect(screen.getByText('Change Password')).toBeInTheDocument();
+    });
+
+    it('should close password modal when Cancel clicked', async () => {
+      renderProfile();
+
+      await waitFor(() => {
+        expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
+      });
+
+      const changeButton = screen.getByText('Change');
+      fireEvent.click(changeButton);
+
+      expect(screen.getByTestId('password-modal')).toBeInTheDocument();
+
+      const cancelButton = screen.getByText('Cancel');
+      fireEvent.click(cancelButton);
+
+      expect(screen.queryByTestId('password-modal')).not.toBeInTheDocument();
+    });
+
+    it('should change password successfully', async () => {
+      servicesModule.changePassword.mockResolvedValue({
+        success: true,
       });
 
       renderProfile();
 
       await waitFor(() => {
-        expect(screen.getByText('John Doe')).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
       });
 
-      const changeButton = screen.getByRole('button', { name: /change/i });
+      const changeButton = screen.getByText('Change');
       fireEvent.click(changeButton);
 
-      await waitFor(() => {
-        expect(screen.getByText('Change Password')).toBeInTheDocument();
-      });
-    });
-
-    it('should send OTP when button clicked', async () => {
-      apiClient.post.mockResolvedValue({
-        data: {
-          success: true,
-          message: 'OTP has been sent to your email',
-        },
-      });
-
-      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
-
-      // First need to enter new password to enable OTP button
-      const passwordInput = screen.getByPlaceholderText(/enter new password/i);
-      fireEvent.change(passwordInput, { target: { value: 'newPassword123' } });
-
-      fireEvent.click(sendOtpButton);
-
-      await waitFor(() => {
-        expect(apiClient.post).toHaveBeenCalledWith(
-          '/v0-1/auth-profile/request-otp',
-          {
-            email: 'john@example.com',
-          }
-        );
-        expect(screen.getByText(/otp has been sent/i)).toBeInTheDocument();
-      });
-    });
-
-    it('should change password successfully with OTP', async () => {
-      apiClient.post.mockResolvedValue({
-        data: {
-          success: true,
-          message: 'Password changed successfully',
-        },
-      });
-
-      const passwordInput = screen.getByPlaceholderText(/enter new password/i);
-      const otpInput = screen.getByPlaceholderText(/enter otp/i);
-
-      fireEvent.change(passwordInput, { target: { value: 'newPassword123' } });
-      fireEvent.change(otpInput, { target: { value: '123456' } });
-
-      const submitButton = screen.getByRole('button', { name: /update/i });
+      const submitButton = screen.getByText('Submit Password Change');
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(apiClient.post).toHaveBeenCalledWith(
-          '/v0-1/auth-profile/change-password',
-          {
-            email: 'john@example.com',
-            otp: '123456',
-            newPassword: 'newPassword123',
-          }
+        expect(servicesModule.changePassword).toHaveBeenCalledWith(
+          'old123',
+          'New1234!'
         );
         expect(
-          screen.getByText(/password changed successfully/i)
+          screen.getByText('Password changed successfully')
         ).toBeInTheDocument();
       });
     });
 
-    it('should handle OTP send error', async () => {
-      apiClient.post.mockRejectedValue({
-        response: { data: { message: 'Failed to send OTP' } },
-      });
+    it('should handle password change error', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      servicesModule.changePassword.mockRejectedValue(
+        new Error('Password change failed')
+      );
 
-      const passwordInput = screen.getByPlaceholderText(/enter new password/i);
-      fireEvent.change(passwordInput, { target: { value: 'newPassword123' } });
-
-      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
-      fireEvent.click(sendOtpButton);
+      renderProfile();
 
       await waitFor(() => {
-        expect(screen.getByText(/failed to send otp/i)).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
       });
+
+      const changeButton = screen.getByText('Change');
+      fireEvent.click(changeButton);
+
+      const submitButton = screen.getByText('Submit Password Change');
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(servicesModule.changePassword).toHaveBeenCalled();
+      });
+
+      console.error.mockRestore();
     });
   });
 
   describe('Email Field', () => {
-    it('should display email without edit button', async () => {
-      apiClient.get.mockResolvedValue({
-        data: { success: true, data: mockUserData },
+    it('should display email as disabled field', async () => {
+      servicesModule.getProfile.mockResolvedValue({
+        success: true,
+        data: mockUserData,
       });
 
       renderProfile();
 
       await waitFor(() => {
-        expect(screen.getByText('john@example.com')).toBeInTheDocument();
+        const emailInput = screen.getByRole('textbox', { name: 'Email' });
+        expect(emailInput.value).toBe('john@example.com');
+        expect(emailInput.disabled).toBe(true);
+      });
+    });
+  });
+
+  describe('Section Headers', () => {
+    it('should display Profile and Your Work section titles', async () => {
+      servicesModule.getProfile.mockResolvedValue({
+        success: true,
+        data: mockUserData,
       });
 
-      // Check that email field row doesn't have edit button
-      const emailLabel = screen.getByText('Email');
-      const emailRow = emailLabel.closest('.field-row');
-      const editButton = emailRow.querySelector('button');
-      expect(editButton).toBeNull();
+      renderProfile();
+
+      await waitFor(() => {
+        expect(screen.getByText('Profile')).toBeInTheDocument();
+        expect(
+          screen.getByText('Set your account profile')
+        ).toBeInTheDocument();
+        expect(screen.getByText('Your Work')).toBeInTheDocument();
+        expect(
+          screen.getByText('Set your work information')
+        ).toBeInTheDocument();
+      });
     });
   });
 });

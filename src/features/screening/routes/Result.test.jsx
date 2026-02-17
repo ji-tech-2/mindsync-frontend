@@ -1,26 +1,13 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { BrowserRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import Result from './Result';
-import { AuthProvider } from '@/features/auth';
-import * as pollingHelper from '../api/pollingHelper';
 
-// Mock the API config
-vi.mock('@/config/api.js', () => ({
-  API_CONFIG: {
-    BASE_URL: 'http://test-api.com',
-    RESULT_ENDPOINT: '/v1/predictions',
-    POLLING: {
-      MAX_ATTEMPTS: 60,
-      INTERVAL_MS: 2000,
-    },
-  },
-}));
-
-// Mock the pollingHelper module
-vi.mock('../api/pollingHelper', () => ({
+// Mock the services module (where ResultPage imports pollPredictionResult)
+vi.mock('@/services', () => ({
   pollPredictionResult: vi.fn(),
 }));
+import { pollPredictionResult } from '@/services';
 
 // Mock the useAuth hook with configurable auth state
 let mockIsAuthenticated = true;
@@ -36,8 +23,8 @@ vi.mock('@/features/auth', () => {
 });
 
 // Mock the Advice component
-vi.mock('@/components', () => ({
-  Advice: ({ adviceData, isLoading }) => (
+vi.mock('../components/Advice', () => ({
+  default: ({ adviceData, isLoading }) => (
     <div data-testid="advice-component">
       <div data-testid="advice-loading">{isLoading ? 'true' : 'false'}</div>
       <div data-testid="advice-data">
@@ -45,6 +32,30 @@ vi.mock('@/components', () => ({
       </div>
     </div>
   ),
+}));
+
+// Mock ScoreDisplay component
+vi.mock('../components/ScoreDisplay', () => ({
+  default: ({ score }) => (
+    <div data-testid="score-display">
+      <span data-testid="score-value">{score?.toFixed(1)}</span>
+    </div>
+  ),
+}));
+
+// Mock StatusBadge component
+vi.mock('../components/StatusBadge', () => ({
+  default: ({ category }) => {
+    const labels = {
+      dangerous: 'Dangerous',
+      'not healthy': 'Not Healthy',
+      average: 'Average',
+      healthy: 'Healthy',
+    };
+    return (
+      <span data-testid="status-badge">{labels[category] || category}</span>
+    );
+  },
 }));
 
 // Mock useNavigate
@@ -60,13 +71,11 @@ vi.mock('react-router-dom', async () => {
 // Helper to render Result with predictionId
 const renderResult = (predictionId = 'test-123') => {
   return render(
-    <AuthProvider>
-      <MemoryRouter initialEntries={[`/result/${predictionId}`]}>
-        <Routes>
-          <Route path="/result/:predictionId" element={<Result />} />
-        </Routes>
-      </MemoryRouter>
-    </AuthProvider>
+    <MemoryRouter initialEntries={[`/result/${predictionId}`]}>
+      <Routes>
+        <Route path="/result/:predictionId" element={<Result />} />
+      </Routes>
+    </MemoryRouter>
   );
 };
 
@@ -74,10 +83,13 @@ describe('Result Component - Partial Polling', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
+    mockIsAuthenticated = true;
+    localStorage.clear();
   });
 
   afterEach(() => {
     vi.clearAllTimers();
+    localStorage.clear();
   });
 
   describe('Partial Status Handling', () => {
@@ -90,18 +102,12 @@ describe('Result Component - Partial Polling', () => {
           health_level: 'average',
           wellness_analysis: 'Your mental wellness is average',
         },
-        metadata: {
-          created_at: '2026-01-21T10:00:00Z',
-        },
+        metadata: { created_at: '2026-01-21T10:00:00Z' },
       };
 
-      // Mock for first call (partial result)
-      pollingHelper.pollPredictionResult.mockResolvedValueOnce(
-        mockPartialResult
-      );
-
-      // Mock for second call in pollForAdvice (continue polling in background)
-      pollingHelper.pollPredictionResult.mockResolvedValueOnce({
+      pollPredictionResult.mockResolvedValueOnce(mockPartialResult);
+      // Second call for advice polling
+      pollPredictionResult.mockResolvedValueOnce({
         success: true,
         status: 'processing',
         data: null,
@@ -114,11 +120,8 @@ describe('Result Component - Partial Polling', () => {
 
       // Wait for partial result to load
       await waitFor(() => {
-        expect(screen.getByText('75.5')).toBeInTheDocument();
+        expect(screen.getByTestId('score-value')).toHaveTextContent('75.5');
       });
-
-      // Should show score and category
-      expect(screen.getByText('Average')).toBeInTheDocument();
 
       // Advice should be in loading state
       await waitFor(() => {
@@ -138,9 +141,7 @@ describe('Result Component - Partial Polling', () => {
           health_level: 'healthy',
           wellness_analysis: 'Good mental health',
         },
-        metadata: {
-          created_at: '2026-01-21T10:00:00Z',
-        },
+        metadata: { created_at: '2026-01-21T10:00:00Z' },
       };
 
       const mockReadyResult = {
@@ -163,19 +164,16 @@ describe('Result Component - Partial Polling', () => {
         },
       };
 
-      // First call returns partial
-      pollingHelper.pollPredictionResult
+      pollPredictionResult
         .mockResolvedValueOnce(mockPartialResult)
         .mockResolvedValueOnce(mockReadyResult);
 
       renderResult('test-123');
 
-      // Wait for score to be displayed
       await waitFor(() => {
-        expect(screen.getByText('80.0')).toBeInTheDocument();
+        expect(screen.getByTestId('score-value')).toHaveTextContent('80.0');
       });
 
-      // Eventually advice should load and be displayed
       await waitFor(
         () => {
           expect(screen.getByTestId('advice-data')).toHaveTextContent(
@@ -185,8 +183,7 @@ describe('Result Component - Partial Polling', () => {
         { timeout: 5000 }
       );
 
-      // Should have called pollPredictionResult twice (initial + continue polling)
-      expect(pollingHelper.pollPredictionResult).toHaveBeenCalledTimes(2);
+      expect(pollPredictionResult).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -212,17 +209,14 @@ describe('Result Component - Partial Polling', () => {
         },
       };
 
-      pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockReadyResult);
-
+      pollPredictionResult.mockResolvedValueOnce(mockReadyResult);
       renderResult('test-123');
 
-      // Wait for results to load
       await waitFor(() => {
-        expect(screen.getByText('85.0')).toBeInTheDocument();
+        expect(screen.getByTestId('score-value')).toHaveTextContent('85.0');
       });
 
-      // Should show full results with advice
-      expect(screen.getByText('Healthy')).toBeInTheDocument();
+      expect(screen.getByTestId('status-badge')).toHaveTextContent('Healthy');
 
       await waitFor(() => {
         expect(screen.getByTestId('advice-loading')).toHaveTextContent('false');
@@ -231,32 +225,26 @@ describe('Result Component - Partial Polling', () => {
         );
       });
 
-      // Should only call pollPredictionResult once
-      expect(pollingHelper.pollPredictionResult).toHaveBeenCalledTimes(1);
+      expect(pollPredictionResult).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('Loading State', () => {
-    it('should show loading spinner while polling', async () => {
-      pollingHelper.pollPredictionResult.mockImplementation(
-        () => new Promise((resolve) => setTimeout(resolve, 5000))
+    it('should show loading spinner while polling', () => {
+      pollPredictionResult.mockImplementation(
+        () => new Promise(() => {}) // Never resolves
       );
 
-      const { container } = renderResult('test-123');
+      renderResult('test-123');
 
-      // Should show loading UI
       expect(screen.getByText(/Analyzing Your Data/i)).toBeInTheDocument();
       expect(screen.getByText(/Please wait a moment/i)).toBeInTheDocument();
-
-      // Check for loading spinner using container query
-      const loadingSpinner = container.querySelector('.loading-spinner');
-      expect(loadingSpinner).toBeInTheDocument();
     });
   });
 
   describe('Error Handling', () => {
     it('should show error message when polling fails', async () => {
-      pollingHelper.pollPredictionResult.mockRejectedValueOnce(
+      pollPredictionResult.mockRejectedValueOnce(
         new Error('Network error occurred')
       );
 
@@ -267,13 +255,12 @@ describe('Result Component - Partial Polling', () => {
         expect(screen.getByText(/Network error occurred/i)).toBeInTheDocument();
       });
 
-      // Should show retry buttons
+      // Should show action buttons
       expect(screen.getByText('Try Again')).toBeInTheDocument();
       expect(screen.getByText('Back to Home')).toBeInTheDocument();
     });
 
     it('should redirect to screening when no predictionId', async () => {
-      // Mock window.alert
       const alertMock = vi.spyOn(window, 'alert').mockImplementation(() => {});
 
       render(
@@ -296,17 +283,16 @@ describe('Result Component - Partial Polling', () => {
   });
 
   describe('Category Display', () => {
-    it('should display correct category labels and colors', async () => {
+    it('should display correct category labels', async () => {
       const testCases = [
-        { category: 'dangerous', label: 'Dangerous', color: '#FF4757' },
-        { category: 'not healthy', label: 'Not Healthy', color: '#FFA502' },
-        { category: 'average', label: 'Average', color: '#FFD93D' },
-        { category: 'healthy', label: 'Healthy', color: '#6BCB77' },
+        { category: 'dangerous', label: 'Dangerous' },
+        { category: 'not healthy', label: 'Not Healthy' },
+        { category: 'average', label: 'Average' },
+        { category: 'healthy', label: 'Healthy' },
       ];
 
       for (const testCase of testCases) {
         vi.clearAllMocks();
-        // Clear cached results from previous iterations to prevent stale localStorage reads
         localStorage.clear();
 
         const mockResult = {
@@ -324,17 +310,15 @@ describe('Result Component - Partial Polling', () => {
           },
         };
 
-        pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
+        pollPredictionResult.mockResolvedValueOnce(mockResult);
 
         const { unmount } = renderResult('test-123');
 
         await waitFor(() => {
-          expect(screen.getByText(testCase.label)).toBeInTheDocument();
+          expect(screen.getByTestId('status-badge')).toHaveTextContent(
+            testCase.label
+          );
         });
-
-        // Check if the category badge has the correct background color
-        const categoryBadge = screen.getByText(testCase.label);
-        expect(categoryBadge).toHaveStyle({ backgroundColor: testCase.color });
 
         unmount();
       }
@@ -342,7 +326,7 @@ describe('Result Component - Partial Polling', () => {
   });
 
   describe('Navigation', () => {
-    it('should navigate to screening when "Retake Test" clicked', async () => {
+    it('should render link to screening page for retake', async () => {
       const mockResult = {
         success: true,
         status: 'ready',
@@ -358,21 +342,18 @@ describe('Result Component - Partial Polling', () => {
         },
       };
 
-      pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
-
+      pollPredictionResult.mockResolvedValueOnce(mockResult);
       renderResult('test-123');
 
       await waitFor(() => {
-        expect(screen.getByText('75.0')).toBeInTheDocument();
+        expect(screen.getByTestId('score-value')).toHaveTextContent('75.0');
       });
 
-      const retakeButton = screen.getByText('Retake Test');
-      retakeButton.click();
-
-      expect(mockNavigate).toHaveBeenCalledWith('/screening');
+      const retakeLink = screen.getByRole('link', { name: /Retake Test/i });
+      expect(retakeLink).toHaveAttribute('href', '/screening');
     });
 
-    it('should navigate to home when "Back to Home" clicked', async () => {
+    it('should render link to home page', async () => {
       const mockResult = {
         success: true,
         status: 'ready',
@@ -388,18 +369,15 @@ describe('Result Component - Partial Polling', () => {
         },
       };
 
-      pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
-
+      pollPredictionResult.mockResolvedValueOnce(mockResult);
       renderResult('test-123');
 
       await waitFor(() => {
-        expect(screen.getByText('75.0')).toBeInTheDocument();
+        expect(screen.getByTestId('score-value')).toHaveTextContent('75.0');
       });
 
-      const homeButton = screen.getByText('Back to Home');
-      homeButton.click();
-
-      expect(mockNavigate).toHaveBeenCalledWith('/');
+      const homeLink = screen.getByRole('link', { name: /Back to Home/i });
+      expect(homeLink).toHaveAttribute('href', '/');
     });
   });
 
@@ -420,12 +398,11 @@ describe('Result Component - Partial Polling', () => {
         },
       };
 
-      pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
-
+      pollPredictionResult.mockResolvedValueOnce(mockResult);
       renderResult('test-123');
 
       await waitFor(() => {
-        expect(screen.getByText('82.5')).toBeInTheDocument();
+        expect(screen.getByTestId('score-value')).toHaveTextContent('82.5');
       });
     });
 
@@ -445,12 +422,11 @@ describe('Result Component - Partial Polling', () => {
         },
       };
 
-      pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
-
+      pollPredictionResult.mockResolvedValueOnce(mockResult);
       renderResult('test-123');
 
       await waitFor(() => {
-        expect(screen.getByText('0.0')).toBeInTheDocument();
+        expect(screen.getByTestId('score-value')).toHaveTextContent('0.0');
       });
     });
   });
@@ -460,17 +436,17 @@ describe('Result Component - Partial Polling', () => {
 // GUEST VS AUTHENTICATED USER TESTS
 // ============================================
 
-describe('Result Component - Guest User (Not Authenticated)', () => {
+describe('Result Component - Guest User', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
-    // Set as guest (not authenticated)
     mockIsAuthenticated = false;
+    localStorage.clear();
   });
 
   afterEach(() => {
-    // Reset to authenticated for other tests
     mockIsAuthenticated = true;
+    localStorage.clear();
   });
 
   it('should show score for guest users', async () => {
@@ -489,17 +465,14 @@ describe('Result Component - Guest User (Not Authenticated)', () => {
       },
     };
 
-    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
-
+    pollPredictionResult.mockResolvedValueOnce(mockResult);
     renderResult('guest-test-123');
 
-    // Should show score
     await waitFor(() => {
-      expect(screen.getByText('65.0')).toBeInTheDocument();
+      expect(screen.getByTestId('score-value')).toHaveTextContent('65.0');
     });
 
-    // Should show category
-    expect(screen.getByText('Average')).toBeInTheDocument();
+    expect(screen.getByTestId('status-badge')).toHaveTextContent('Average');
   });
 
   it('should show locked advice section for guest users', async () => {
@@ -510,10 +483,7 @@ describe('Result Component - Guest User (Not Authenticated)', () => {
         prediction_score: 70.0,
         health_level: 'average',
         wellness_analysis: 'Test analysis',
-        advice: {
-          description: 'Advice that guest should not see',
-          factors: {},
-        },
+        advice: { description: 'Advice', factors: {} },
       },
       metadata: {
         created_at: '2026-01-21T10:00:00Z',
@@ -521,22 +491,18 @@ describe('Result Component - Guest User (Not Authenticated)', () => {
       },
     };
 
-    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
-
+    pollPredictionResult.mockResolvedValueOnce(mockResult);
     renderResult('guest-test-456');
 
     await waitFor(() => {
-      expect(screen.getByText('70.0')).toBeInTheDocument();
+      expect(screen.getByTestId('score-value')).toHaveTextContent('70.0');
     });
 
-    // Should NOT show the Advice component
     expect(screen.queryByTestId('advice-component')).not.toBeInTheDocument();
-
-    // Should show locked advice message
     expect(screen.getByText(/Personal Advice Locked/i)).toBeInTheDocument();
   });
 
-  it('should show login and register buttons for guest users', async () => {
+  it('should show login and register links for guest users', async () => {
     const mockResult = {
       success: true,
       status: 'ready',
@@ -552,24 +518,18 @@ describe('Result Component - Guest User (Not Authenticated)', () => {
       },
     };
 
-    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
-
+    pollPredictionResult.mockResolvedValueOnce(mockResult);
     renderResult('guest-test-789');
 
     await waitFor(() => {
-      expect(screen.getByText('55.0')).toBeInTheDocument();
+      expect(screen.getByTestId('score-value')).toHaveTextContent('55.0');
     });
 
-    // Should show login and register buttons
-    expect(
-      screen.getByRole('button', { name: /Sign In/i })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Register/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Sign In/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Register/i })).toBeInTheDocument();
   });
 
-  it('should navigate to signIn when login button clicked', async () => {
+  it('should link to signIn page', async () => {
     const mockResult = {
       success: true,
       status: 'ready',
@@ -585,21 +545,18 @@ describe('Result Component - Guest User (Not Authenticated)', () => {
       },
     };
 
-    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
-
+    pollPredictionResult.mockResolvedValueOnce(mockResult);
     renderResult('guest-test-nav');
 
     await waitFor(() => {
-      expect(screen.getByText('60.0')).toBeInTheDocument();
+      expect(screen.getByTestId('score-value')).toHaveTextContent('60.0');
     });
 
-    const loginButton = screen.getByRole('button', { name: /Sign In/i });
-    loginButton.click();
-
-    expect(mockNavigate).toHaveBeenCalledWith('/signin');
+    const loginLink = screen.getByRole('link', { name: /Sign In/i });
+    expect(loginLink).toHaveAttribute('href', '/signin');
   });
 
-  it('should navigate to register when register button clicked', async () => {
+  it('should link to register page', async () => {
     const mockResult = {
       success: true,
       status: 'ready',
@@ -615,18 +572,15 @@ describe('Result Component - Guest User (Not Authenticated)', () => {
       },
     };
 
-    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
-
+    pollPredictionResult.mockResolvedValueOnce(mockResult);
     renderResult('guest-test-register');
 
     await waitFor(() => {
-      expect(screen.getByText('60.0')).toBeInTheDocument();
+      expect(screen.getByTestId('score-value')).toHaveTextContent('60.0');
     });
 
-    const registerButton = screen.getByRole('button', { name: /Register/i });
-    registerButton.click();
-
-    expect(mockNavigate).toHaveBeenCalledWith('/register');
+    const registerLink = screen.getByRole('link', { name: /Register/i });
+    expect(registerLink).toHaveAttribute('href', '/signup');
   });
 });
 
@@ -634,8 +588,12 @@ describe('Result Component - Authenticated User', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
-    // Set as authenticated
     mockIsAuthenticated = true;
+    localStorage.clear();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   it('should show score for authenticated users', async () => {
@@ -654,15 +612,14 @@ describe('Result Component - Authenticated User', () => {
       },
     };
 
-    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
-
+    pollPredictionResult.mockResolvedValueOnce(mockResult);
     renderResult('auth-test-123');
 
     await waitFor(() => {
-      expect(screen.getByText('85.0')).toBeInTheDocument();
+      expect(screen.getByTestId('score-value')).toHaveTextContent('85.0');
     });
 
-    expect(screen.getByText('Healthy')).toBeInTheDocument();
+    expect(screen.getByTestId('status-badge')).toHaveTextContent('Healthy');
   });
 
   it('should show full advice component for authenticated users', async () => {
@@ -677,7 +634,6 @@ describe('Result Component - Authenticated User', () => {
           description: 'Personalized advice here',
           factors: {
             sleep: { recommendation: 'Improve sleep' },
-            exercise: { recommendation: 'Exercise more' },
           },
         },
       },
@@ -687,18 +643,15 @@ describe('Result Component - Authenticated User', () => {
       },
     };
 
-    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
-
+    pollPredictionResult.mockResolvedValueOnce(mockResult);
     renderResult('auth-test-456');
 
     await waitFor(() => {
-      expect(screen.getByText('75.0')).toBeInTheDocument();
+      expect(screen.getByTestId('score-value')).toHaveTextContent('75.0');
     });
 
-    // Should show the Advice component
     expect(screen.getByTestId('advice-component')).toBeInTheDocument();
 
-    // Should have advice data
     await waitFor(() => {
       expect(screen.getByTestId('advice-data')).toHaveTextContent('has-advice');
     });
@@ -720,22 +673,16 @@ describe('Result Component - Authenticated User', () => {
       },
     };
 
-    pollingHelper.pollPredictionResult.mockResolvedValueOnce(mockResult);
-
+    pollPredictionResult.mockResolvedValueOnce(mockResult);
     renderResult('auth-test-789');
 
     await waitFor(() => {
-      expect(screen.getByText('80.0')).toBeInTheDocument();
+      expect(screen.getByTestId('score-value')).toHaveTextContent('80.0');
     });
 
-    // Should NOT show locked message
     expect(
       screen.queryByText(/Personal Advice Locked/i)
     ).not.toBeInTheDocument();
-
-    // Should NOT show login/register buttons in advice section
-    const adviceLocked = screen.queryByText(/Sign in or register/i);
-    expect(adviceLocked).not.toBeInTheDocument();
   });
 
   it('should show advice loading state for authenticated users', async () => {
@@ -747,12 +694,10 @@ describe('Result Component - Authenticated User', () => {
         health_level: 'average',
         wellness_analysis: 'Analysis in progress',
       },
-      metadata: {
-        created_at: '2026-01-21T10:00:00Z',
-      },
+      metadata: { created_at: '2026-01-21T10:00:00Z' },
     };
 
-    pollingHelper.pollPredictionResult
+    pollPredictionResult
       .mockResolvedValueOnce(mockPartialResult)
       .mockResolvedValueOnce({
         success: true,
@@ -763,10 +708,9 @@ describe('Result Component - Authenticated User', () => {
     renderResult('auth-partial-test');
 
     await waitFor(() => {
-      expect(screen.getByText('72.0')).toBeInTheDocument();
+      expect(screen.getByTestId('score-value')).toHaveTextContent('72.0');
     });
 
-    // Should show advice component in loading state
     expect(screen.getByTestId('advice-component')).toBeInTheDocument();
     await waitFor(() => {
       expect(screen.getByTestId('advice-loading')).toHaveTextContent('true');

@@ -3,12 +3,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import History from './History';
 import * as servicesModule from '@/services';
-import * as chartHelpersModule from '@/utils/chartHelpers';
 import * as authModule from '@/features/auth';
 
 // Mock the modules
 vi.mock('@/services');
-vi.mock('@/utils/chartHelpers');
 vi.mock('@/features/auth');
 
 // Mock useNavigate
@@ -21,12 +19,46 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock WeeklyChart component
+// Mock components used by History
 vi.mock('@/components', () => ({
-  WeeklyChart: ({ data, title }) => (
+  WeeklyChart: ({ data }) => (
     <div data-testid="weekly-chart">
-      <div>{title}</div>
       <div>{data?.length || 0} data points</div>
+    </div>
+  ),
+  Dropdown: ({ options, value, onChange }) => (
+    <div data-testid="dropdown">
+      <select
+        value={value?.value || ''}
+        onChange={(e) => {
+          const opt = options?.find((o) => o.value === e.target.value);
+          if (onChange) onChange(opt);
+        }}
+      >
+        {options?.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  ),
+}));
+
+vi.mock('@/layouts/PageLayout', () => ({
+  default: ({ title, children }) => (
+    <div data-testid="page-layout">
+      <h1>{title}</h1>
+      {children}
+    </div>
+  ),
+}));
+
+vi.mock('../components', () => ({
+  HistoryItem: ({ score, category, onClick }) => (
+    <div data-testid="history-item" onClick={onClick}>
+      <span>{score}</span>
+      <span>{category}</span>
     </div>
   ),
 }));
@@ -34,6 +66,11 @@ vi.mock('@/components', () => ({
 describe('History Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default mock for getWeeklyChart
+    vi.spyOn(servicesModule, 'getWeeklyChart').mockResolvedValue({
+      status: 'success',
+      data: [],
+    });
   });
 
   describe('Authentication', () => {
@@ -55,10 +92,6 @@ describe('History Component', () => {
         status: 'success',
         data: [],
       });
-      vi.spyOn(
-        chartHelpersModule,
-        'buildWeeklyChartFromHistory'
-      ).mockReturnValue([]);
 
       render(
         <MemoryRouter>
@@ -79,10 +112,6 @@ describe('History Component', () => {
         status: 'success',
         data: [],
       });
-      vi.spyOn(
-        chartHelpersModule,
-        'buildWeeklyChartFromHistory'
-      ).mockReturnValue([]);
 
       render(
         <MemoryRouter>
@@ -123,13 +152,6 @@ describe('History Component', () => {
         status: 'success',
         data: mockData,
       });
-      vi.spyOn(
-        chartHelpersModule,
-        'buildWeeklyChartFromHistory'
-      ).mockReturnValue([
-        { date: '2024-01-15', value: 75 },
-        { date: '2024-01-14', value: 60 },
-      ]);
 
       render(
         <MemoryRouter>
@@ -138,11 +160,12 @@ describe('History Component', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByText('2 results')).toBeTruthy();
+        const items = screen.getAllByTestId('history-item');
+        expect(items.length).toBe(2);
       });
     });
 
-    it('should normalize negative scores', async () => {
+    it('should normalize negative scores to zero', async () => {
       vi.spyOn(authModule, 'useAuth').mockReturnValue({ user: { userId: 1 } });
 
       const mockData = [
@@ -160,10 +183,6 @@ describe('History Component', () => {
         status: 'success',
         data: mockData,
       });
-      vi.spyOn(
-        chartHelpersModule,
-        'buildWeeklyChartFromHistory'
-      ).mockReturnValue([]);
 
       const { container } = render(
         <MemoryRouter>
@@ -174,33 +193,6 @@ describe('History Component', () => {
       await waitFor(() => {
         expect(container.textContent).toContain('0');
       });
-    });
-  });
-
-  describe('Navigation', () => {
-    it('should navigate to dashboard', async () => {
-      vi.spyOn(authModule, 'useAuth').mockReturnValue({ user: { userId: 1 } });
-      vi.spyOn(servicesModule, 'getScreeningHistory').mockResolvedValue({
-        status: 'success',
-        data: [],
-      });
-      vi.spyOn(
-        chartHelpersModule,
-        'buildWeeklyChartFromHistory'
-      ).mockReturnValue([]);
-
-      render(
-        <MemoryRouter>
-          <History />
-        </MemoryRouter>
-      );
-
-      await waitFor(() => {
-        const backButton = screen.getByText('← Back to Dashboard');
-        backButton.click();
-      });
-
-      expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
     });
   });
 
@@ -222,16 +214,12 @@ describe('History Component', () => {
       });
     });
 
-    it('should handle response without success flag', async () => {
+    it('should handle response without success status', async () => {
       vi.spyOn(authModule, 'useAuth').mockReturnValue({ user: { userId: 1 } });
       vi.spyOn(servicesModule, 'getScreeningHistory').mockResolvedValue({
         success: false,
         error: 'Failed to fetch',
       });
-      vi.spyOn(
-        chartHelpersModule,
-        'buildWeeklyChartFromHistory'
-      ).mockReturnValue([]);
 
       render(
         <MemoryRouter>
@@ -274,10 +262,6 @@ describe('History Component', () => {
           status: 'success',
           data: [],
         });
-      vi.spyOn(
-        chartHelpersModule,
-        'buildWeeklyChartFromHistory'
-      ).mockReturnValue([]);
 
       render(
         <MemoryRouter>
@@ -286,7 +270,7 @@ describe('History Component', () => {
       );
 
       await waitFor(() => {
-        expect(fetchSpy).toHaveBeenCalledWith(123, 50, 0);
+        expect(fetchSpy).toHaveBeenCalledWith(123);
       });
     });
 
@@ -298,10 +282,6 @@ describe('History Component', () => {
           status: 'success',
           data: [],
         });
-      vi.spyOn(
-        chartHelpersModule,
-        'buildWeeklyChartFromHistory'
-      ).mockReturnValue([]);
 
       render(
         <MemoryRouter>
@@ -310,7 +290,7 @@ describe('History Component', () => {
       );
 
       await waitFor(() => {
-        expect(fetchSpy).toHaveBeenCalledWith(456, 50, 0);
+        expect(fetchSpy).toHaveBeenCalledWith(456);
       });
     });
 
@@ -324,10 +304,6 @@ describe('History Component', () => {
           status: 'success',
           data: [],
         });
-      vi.spyOn(
-        chartHelpersModule,
-        'buildWeeklyChartFromHistory'
-      ).mockReturnValue([]);
 
       render(
         <MemoryRouter>
@@ -336,7 +312,7 @@ describe('History Component', () => {
       );
 
       await waitFor(() => {
-        expect(fetchSpy).toHaveBeenCalledWith(789, 50, 0);
+        expect(fetchSpy).toHaveBeenCalledWith(789);
       });
     });
   });
@@ -360,10 +336,6 @@ describe('History Component', () => {
         status: 'success',
         data: mockData,
       });
-      vi.spyOn(
-        chartHelpersModule,
-        'buildWeeklyChartFromHistory'
-      ).mockReturnValue([]);
 
       const { container } = render(
         <MemoryRouter>

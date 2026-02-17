@@ -180,7 +180,7 @@ describe('Login Component', () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(apiClient.post).toHaveBeenCalledWith('/v0-1/auth-login', {
+        expect(apiClient.post).toHaveBeenCalledWith('/v1/auth/login', {
           email: 'test@example.com',
           password: 'password123',
         });

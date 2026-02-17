@@ -193,13 +193,13 @@ describe('formHandlers', () => {
       const errors = {};
       const blurredFields = {};
 
-      const result = processFieldChange(
-        'dobDay',
-        'abc',
+      const result = processFieldChange({
+        fieldName: 'dobDay',
+        value: 'abc',
         form,
         errors,
-        blurredFields
-      );
+        blurredFields,
+      });
 
       expect(result).toBeNull();
     });
@@ -209,13 +209,13 @@ describe('formHandlers', () => {
       const errors = { dobDay: 'Required' };
       const blurredFields = {};
 
-      const result = processFieldChange(
-        'dobDay',
-        '15',
+      const result = processFieldChange({
+        fieldName: 'dobDay',
+        value: '15',
         form,
         errors,
-        blurredFields
-      );
+        blurredFields,
+      });
 
       expect(result).not.toBeNull();
       expect(result.updatedForm.dobDay).toBe('15');
@@ -228,13 +228,13 @@ describe('formHandlers', () => {
       const errors = {};
       const blurredFields = { name: true };
 
-      const result = processFieldChange(
-        'name',
-        'John',
+      const result = processFieldChange({
+        fieldName: 'name',
+        value: 'John',
         form,
         errors,
-        blurredFields
-      );
+        blurredFields,
+      });
 
       expect(result.shouldValidate).toBe(true);
     });
@@ -244,13 +244,13 @@ describe('formHandlers', () => {
       const errors = {};
       const blurredFields = { name: false };
 
-      const result = processFieldChange(
-        'name',
-        'John',
+      const result = processFieldChange({
+        fieldName: 'name',
+        value: 'John',
         form,
         errors,
-        blurredFields
-      );
+        blurredFields,
+      });
 
       expect(result.shouldValidate).toBe(false);
     });
@@ -264,13 +264,13 @@ describe('formHandlers', () => {
       };
       const blurredFields = {};
 
-      const result = processFieldChange(
-        'dobDay',
-        '15',
+      const result = processFieldChange({
+        fieldName: 'dobDay',
+        value: '15',
         form,
         errors,
-        blurredFields
-      );
+        blurredFields,
+      });
 
       expect(result.updatedErrors.dobDay).toBeUndefined();
       expect(result.updatedErrors.dob).toBeUndefined();

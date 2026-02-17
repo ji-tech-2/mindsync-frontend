@@ -171,7 +171,7 @@ describe('ForgotPassword Component', () => {
 
       await waitFor(() => {
         expect(apiClient.post).toHaveBeenCalledWith(
-          '/v0-1/auth-profile/request-otp',
+          '/v1/users/me/request-otp',
           { email: 'user@example.com' }
         );
       });
@@ -324,7 +324,7 @@ describe('ForgotPassword Component', () => {
       await waitFor(() => {
         expect(apiClient.post).toHaveBeenCalledTimes(2);
         expect(apiClient.post).toHaveBeenLastCalledWith(
-          '/v0-1/auth-profile/request-otp',
+          '/v1/users/me/request-otp',
           { email: 'user@example.com' }
         );
       });
@@ -589,14 +589,11 @@ describe('ForgotPassword Component', () => {
       fireEvent.click(resetButton);
 
       await waitFor(() => {
-        expect(apiClient.post).toHaveBeenCalledWith(
-          '/v0-1/auth-profile/change-password',
-          {
-            email: 'user@example.com',
-            otp: '123456',
-            newPassword: 'NewPassword1',
-          }
-        );
+        expect(apiClient.post).toHaveBeenCalledWith('/v1/auth/reset-password', {
+          email: 'user@example.com',
+          otp: '123456',
+          newPassword: 'NewPassword1',
+        });
       });
 
       await waitFor(() => {

@@ -76,7 +76,7 @@ describe('Home Component', () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it('should render welcome section when not logged in', () => {
+  it('should render hero section when not logged in', () => {
     vi.mocked(authModule.useAuth).mockReturnValue({
       user: null,
       isLoading: false,
@@ -89,14 +89,11 @@ describe('Home Component', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Welcome')).toBeTruthy();
-    expect(screen.getByText('Mental Wellness Advisor')).toBeTruthy();
-    expect(
-      screen.getByText('Start your mental health journey today.')
-    ).toBeTruthy();
+    expect(screen.getByText('Your Mental Health Companion')).toBeTruthy();
+    expect(screen.getByAltText('MindSync Logo')).toBeTruthy();
   });
 
-  it('should render action cards for anonymous users', () => {
+  it('should render feature cards for anonymous users', () => {
     vi.mocked(authModule.useAuth).mockReturnValue({
       user: null,
       isLoading: false,
@@ -109,81 +106,63 @@ describe('Home Component', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Take Mental Health Test')).toBeTruthy();
-    expect(screen.getByText('Login / Sign Up')).toBeTruthy();
+    expect(screen.getByText('Professional Screening')).toBeTruthy();
+    expect(screen.getByText('Track Progress')).toBeTruthy();
+    expect(screen.getByText('Personalized Advice')).toBeTruthy();
+    expect(screen.getByText('How MindSync Helps You')).toBeTruthy();
+  });
+
+  it('should render CTA buttons with correct links', () => {
+    vi.mocked(authModule.useAuth).mockReturnValue({
+      user: null,
+      isLoading: false,
+      isLoggingOut: false,
+    });
+
+    render(
+      <MemoryRouter>
+        <Home />
+      </MemoryRouter>
+    );
+
+    const getStartedLink = screen.getByText('Get Started').closest('a');
+    expect(getStartedLink).toHaveAttribute('href', '/signup');
+
+    const tryScreeningLink = screen.getByText('Try Screening').closest('a');
+    expect(tryScreeningLink).toHaveAttribute('href', '/screening');
+  });
+
+  it('should render Why Mental Health Matters section', () => {
+    vi.mocked(authModule.useAuth).mockReturnValue({
+      user: null,
+      isLoading: false,
+      isLoggingOut: false,
+    });
+
+    render(
+      <MemoryRouter>
+        <Home />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Why Mental Health Matters')).toBeTruthy();
+  });
+
+  it('should render hero subtitle text', () => {
+    vi.mocked(authModule.useAuth).mockReturnValue({
+      user: null,
+      isLoading: false,
+      isLoggingOut: false,
+    });
+
+    render(
+      <MemoryRouter>
+        <Home />
+      </MemoryRouter>
+    );
+
     expect(
-      screen.getByText(
-        'Start evaluating your mental condition without an account.'
-      )
+      screen.getByText(/Take control of your mental well-being/)
     ).toBeTruthy();
-    expect(
-      screen.getByText('Sign up to save your results and history.')
-    ).toBeTruthy();
-  });
-
-  it('should navigate to screening when take test card is clicked', async () => {
-    vi.mocked(authModule.useAuth).mockReturnValue({
-      user: null,
-      isLoading: false,
-      isLoggingOut: false,
-    });
-
-    const { container } = render(
-      <MemoryRouter>
-        <Home />
-      </MemoryRouter>
-    );
-
-    const actionCards = container.querySelectorAll('.action-card');
-    const testCard = actionCards[0];
-
-    testCard.click();
-
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/screening');
-    });
-  });
-
-  it('should navigate to signin when login card is clicked', async () => {
-    vi.mocked(authModule.useAuth).mockReturnValue({
-      user: null,
-      isLoading: false,
-      isLoggingOut: false,
-    });
-
-    const { container } = render(
-      <MemoryRouter>
-        <Home />
-      </MemoryRouter>
-    );
-
-    const actionCards = container.querySelectorAll('.action-card');
-    const loginCard = actionCards[1];
-
-    loginCard.click();
-
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/signin');
-    });
-  });
-
-  it('should have proper CSS classes for styling', () => {
-    vi.mocked(authModule.useAuth).mockReturnValue({
-      user: null,
-      isLoading: false,
-      isLoggingOut: false,
-    });
-
-    const { container } = render(
-      <MemoryRouter>
-        <Home />
-      </MemoryRouter>
-    );
-
-    expect(container.querySelector('.dashboard-container')).toBeTruthy();
-    expect(container.querySelector('.dashboard-header')).toBeTruthy();
-    expect(container.querySelector('.logged-out-header')).toBeTruthy();
-    expect(container.querySelector('.quick-actions')).toBeTruthy();
-    expect(container.querySelector('.actions-grid.two-columns')).toBeTruthy();
   });
 });

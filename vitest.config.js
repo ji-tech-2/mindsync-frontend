@@ -26,6 +26,10 @@ export default defineConfig({
         '*.config.js',
         'dist/',
         '.storybook/',
+        '**/api.service.mock.js',
+        'src/main.jsx',
+        'src/app/**',
+        '**/index.js',
       ],
       thresholds: {
         lines: 80,

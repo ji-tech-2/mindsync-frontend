@@ -11,7 +11,7 @@ import Navbar from './Navbar';
 import { AuthProvider } from '@/features/auth';
 
 // Mock TokenManager for AuthProvider
-vi.mock('@/config/api', () => ({
+vi.mock('@/utils/tokenManager', () => ({
   TokenManager: {
     getUserData: vi.fn(),
     clearUserData: vi.fn(),
@@ -23,7 +23,7 @@ vi.mock('../ProfileDropdown', () => ({
   default: () => <div data-testid="profile-dropdown">Profile Dropdown</div>,
 }));
 
-import { TokenManager } from '../../config/api';
+import { TokenManager } from '@/utils/tokenManager';
 
 const renderNavbar = (userData = null) => {
   if (userData) {
@@ -72,7 +72,8 @@ describe('Navbar Component', () => {
     it('should show Screening link when not authenticated', () => {
       renderNavbar();
 
-      expect(screen.getByText('Screening')).toBeInTheDocument();
+      const screeningLinks = screen.getAllByText('Screening');
+      expect(screeningLinks.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should not show Dashboard link when not authenticated', () => {
@@ -100,25 +101,31 @@ describe('Navbar Component', () => {
     it('should show Dashboard link when authenticated', () => {
       renderNavbar(mockUser);
 
-      const dashboardLink = screen.getByText('Dashboard');
-      expect(dashboardLink).toBeInTheDocument();
-      expect(dashboardLink.closest('a')).toHaveAttribute('href', '/dashboard');
+      const dashboardLinks = screen.getAllByText('Dashboard');
+      expect(dashboardLinks.length).toBeGreaterThanOrEqual(1);
+      expect(dashboardLinks[0].closest('a')).toHaveAttribute(
+        'href',
+        '/dashboard'
+      );
     });
 
     it('should show History link when authenticated', () => {
       renderNavbar(mockUser);
 
-      const historyLink = screen.getByText('History');
-      expect(historyLink).toBeInTheDocument();
-      expect(historyLink.closest('a')).toHaveAttribute('href', '/history');
+      const historyLinks = screen.getAllByText('History');
+      expect(historyLinks.length).toBeGreaterThanOrEqual(1);
+      expect(historyLinks[0].closest('a')).toHaveAttribute('href', '/history');
     });
 
     it('should show Screening link when authenticated', () => {
       renderNavbar(mockUser);
 
-      const screeningLink = screen.getByText('Screening');
-      expect(screeningLink).toBeInTheDocument();
-      expect(screeningLink.closest('a')).toHaveAttribute('href', '/screening');
+      const screeningLinks = screen.getAllByText('Screening');
+      expect(screeningLinks.length).toBeGreaterThanOrEqual(1);
+      expect(screeningLinks[0].closest('a')).toHaveAttribute(
+        'href',
+        '/screening'
+      );
     });
 
     it('should show profile dropdown when authenticated', () => {

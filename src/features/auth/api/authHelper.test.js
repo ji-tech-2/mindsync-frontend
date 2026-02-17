@@ -14,7 +14,7 @@ import {
 import { TokenManager } from '@/utils/tokenManager';
 
 // Mock TokenManager
-vi.mock('@/config/api', () => ({
+vi.mock('@/utils/tokenManager', () => ({
   TokenManager: {
     getUserData: vi.fn(),
     setUserData: vi.fn(),

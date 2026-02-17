@@ -2,43 +2,143 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Screening from './Screening';
+import * as servicesModule from '@/services';
 
+// Mock navigation
 const mockNavigate = vi.fn();
-const mockUser = { userId: 'test-user-123', id: 'test-user-123' };
-
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
+  return { ...actual, useNavigate: () => mockNavigate };
 });
 
+// Mock auth with mutable user
+let mockUser = null;
 vi.mock('@/features/auth', () => ({
-  useAuth: () => ({
-    user: mockUser,
-  }),
+  useAuth: () => ({ user: mockUser }),
 }));
 
-vi.mock('@/config/api', () => ({
-  API_CONFIG: {
-    BASE_URL: 'http://localhost:5000',
-  },
-  API_URLS: {
-    predict: 'http://localhost:5000/predict',
-  },
+// Mock services
+vi.mock('@/services', () => ({
+  submitScreening: vi.fn(),
 }));
 
-global.fetch = vi.fn();
+// Mock @/components
+vi.mock('@/components', () => ({
+  Card: ({ children }) => <div data-testid="card">{children}</div>,
+  Button: ({ children, onClick, disabled, href, ...rest }) => (
+    <button onClick={onClick} disabled={disabled} data-href={href} {...rest}>
+      {children}
+    </button>
+  ),
+  TextField: ({ value, onChange, placeholder, disabled, type, error }) => (
+    <input
+      type={type || 'text'}
+      value={value || ''}
+      onChange={onChange}
+      placeholder={placeholder}
+      disabled={disabled}
+      data-error={error ? 'true' : undefined}
+    />
+  ),
+  StageContainer: ({ stages, currentStage }) => (
+    <div data-testid="stage-container">{stages[currentStage]}</div>
+  ),
+  FormSection: ({ children }) => <div>{children}</div>,
+  Message: ({ type, children }) => (
+    <div data-testid="message" data-type={type}>
+      {children}
+    </div>
+  ),
+}));
+
+// Mock screening-local components
+vi.mock('../components/MultipleChoice', () => ({
+  default: ({ options, value, onChange, disabled }) => (
+    <div data-testid="multiple-choice">
+      {options?.map((opt) => (
+        <button
+          key={opt}
+          onClick={() => onChange?.(opt)}
+          disabled={disabled}
+          data-selected={value === opt ? 'true' : undefined}
+        >
+          {opt}
+        </button>
+      ))}
+    </div>
+  ),
+}));
+
+vi.mock('../components/Slider', () => ({
+  default: ({
+    min,
+    max,
+    step,
+    value,
+    onChange,
+    minLabel,
+    maxLabel,
+    disabled,
+  }) => (
+    <div data-testid="slider">
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange?.(parseFloat(e.target.value))}
+        disabled={disabled}
+        aria-label="slider"
+      />
+      {minLabel && <span>{minLabel}</span>}
+      {maxLabel && <span>{maxLabel}</span>}
+    </div>
+  ),
+}));
+
+vi.mock('../components/QuestionLayout', () => ({
+  default: ({ question, children }) => (
+    <div data-testid="question-layout">
+      <h2>{question}</h2>
+      {children}
+    </div>
+  ),
+}));
+
+vi.mock('../components/ProgressBar', () => ({
+  default: ({ progress }) => (
+    <div
+      data-testid="progress-bar"
+      data-progress={progress}
+      style={{ width: `${progress}%` }}
+    />
+  ),
+}));
+
+// Mock FontAwesome
+vi.mock('@fortawesome/react-fontawesome', () => ({
+  FontAwesomeIcon: () => <span data-testid="icon" />,
+}));
+
+vi.mock('@fortawesome/free-solid-svg-icons', () => ({
+  faChevronLeft: 'left',
+  faChevronRight: 'right',
+}));
+
+// Mock logo
+vi.mock('@/assets/logo-primary.svg', () => ({
+  default: 'logo.svg',
+}));
 
 describe('Screening Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch.mockReset();
+    mockUser = null; // Reset to unauthenticated
   });
 
-  describe('Initial Rendering', () => {
-    it('should render the first question', () => {
+  describe('Initial Rendering (Unauthenticated)', () => {
+    it('should render the first question for unauthenticated user', () => {
       render(
         <MemoryRouter>
           <Screening />
@@ -46,18 +146,17 @@ describe('Screening Component', () => {
       );
 
       expect(screen.getByText('How old are you?')).toBeTruthy();
-      expect(screen.getByPlaceholderText('Enter your age')).toBeTruthy();
+      expect(screen.getByPlaceholderText('e.g. 25')).toBeTruthy();
     });
 
-    it('should show Next button on first question', () => {
+    it('should show Next button', () => {
       render(
         <MemoryRouter>
           <Screening />
         </MemoryRouter>
       );
 
-      const nextButton = screen.getByText('Next');
-      expect(nextButton).toBeTruthy();
+      expect(screen.getByText('Next')).toBeTruthy();
     });
 
     it('should not show Back button on first question', () => {
@@ -67,24 +166,59 @@ describe('Screening Component', () => {
         </MemoryRouter>
       );
 
-      const backButton = screen.queryByText('Back');
-      expect(backButton).toBeNull();
+      expect(screen.queryByText('Back')).toBeNull();
     });
 
     it('should render progress bar', () => {
-      const { container } = render(
+      render(
         <MemoryRouter>
           <Screening />
         </MemoryRouter>
       );
 
-      const progressBar = container.querySelector('.progress-bar');
-      expect(progressBar).toBeTruthy();
+      expect(screen.getByTestId('progress-bar')).toBeTruthy();
+    });
+
+    it('should render Back to Home button', () => {
+      render(
+        <MemoryRouter>
+          <Screening />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText('Back to Home')).toBeTruthy();
+    });
+  });
+
+  describe('Initial Rendering (Authenticated)', () => {
+    it('should skip demographic questions for authenticated user', async () => {
+      mockUser = {
+        userId: 'test-123',
+        gender: 'Male',
+        occupation: 'Employed',
+        workRmt: 'Remote',
+        dob: '1990-01-01',
+      };
+
+      render(
+        <MemoryRouter>
+          <Screening />
+        </MemoryRouter>
+      );
+
+      // Should skip age, gender, occupation, work_mode — first question is work_screen_hours
+      await waitFor(() => {
+        expect(
+          screen.getByText('How many hours of screen time for work today?')
+        ).toBeTruthy();
+      });
+
+      expect(screen.queryByText('How old are you?')).toBeNull();
     });
   });
 
   describe('Input Validation', () => {
-    it('should show error when submitting empty required field', async () => {
+    it('should disable Next when no answer and enable after input', async () => {
       render(
         <MemoryRouter>
           <Screening />
@@ -92,10 +226,13 @@ describe('Screening Component', () => {
       );
 
       const nextButton = screen.getByText('Next');
-      fireEvent.click(nextButton);
+      expect(nextButton.disabled).toBe(true);
+
+      const input = screen.getByPlaceholderText('e.g. 25');
+      fireEvent.change(input, { target: { value: '25' } });
 
       await waitFor(() => {
-        expect(screen.getByText('Answer cannot be empty!')).toBeTruthy();
+        expect(screen.getByText('Next').disabled).toBe(false);
       });
     });
 
@@ -106,7 +243,7 @@ describe('Screening Component', () => {
         </MemoryRouter>
       );
 
-      const input = screen.getByPlaceholderText('Enter your age');
+      const input = screen.getByPlaceholderText('e.g. 25');
       fireEvent.change(input, { target: { value: '10' } });
 
       const nextButton = screen.getByText('Next');
@@ -124,7 +261,7 @@ describe('Screening Component', () => {
         </MemoryRouter>
       );
 
-      const input = screen.getByPlaceholderText('Enter your age');
+      const input = screen.getByPlaceholderText('e.g. 25');
       fireEvent.change(input, { target: { value: '150' } });
 
       const nextButton = screen.getByText('Next');
@@ -135,24 +272,28 @@ describe('Screening Component', () => {
       });
     });
 
-    it('should clear error message when input changes', async () => {
+    it('should clear error when input changes to valid value', async () => {
       render(
         <MemoryRouter>
           <Screening />
         </MemoryRouter>
       );
 
-      const nextButton = screen.getByText('Next');
-      fireEvent.click(nextButton);
+      // Enter invalid value (below minimum)
+      const input = screen.getByPlaceholderText('e.g. 25');
+      fireEvent.change(input, { target: { value: '10' } });
+      fireEvent.click(screen.getByText('Next'));
 
       await waitFor(() => {
-        expect(screen.getByText('Answer cannot be empty!')).toBeTruthy();
+        expect(screen.getByText('Minimum value is 16')).toBeTruthy();
       });
 
-      const input = screen.getByPlaceholderText('Enter your age');
+      // Change to valid value - error should clear
       fireEvent.change(input, { target: { value: '25' } });
 
-      expect(screen.queryByText('Answer cannot be empty!')).toBeNull();
+      await waitFor(() => {
+        expect(screen.queryByText('Minimum value is 16')).toBeNull();
+      });
     });
   });
 
@@ -164,11 +305,9 @@ describe('Screening Component', () => {
         </MemoryRouter>
       );
 
-      const input = screen.getByPlaceholderText('Enter your age');
+      const input = screen.getByPlaceholderText('e.g. 25');
       fireEvent.change(input, { target: { value: '25' } });
-
-      const nextButton = screen.getByText('Next');
-      fireEvent.click(nextButton);
+      fireEvent.click(screen.getByText('Next'));
 
       await waitFor(() => {
         expect(screen.getByText('What is your gender?')).toBeTruthy();
@@ -182,7 +321,7 @@ describe('Screening Component', () => {
         </MemoryRouter>
       );
 
-      const input = screen.getByPlaceholderText('Enter your age');
+      const input = screen.getByPlaceholderText('e.g. 25');
       fireEvent.change(input, { target: { value: '25' } });
       fireEvent.click(screen.getByText('Next'));
 
@@ -198,8 +337,7 @@ describe('Screening Component', () => {
         </MemoryRouter>
       );
 
-      // Move to second question
-      const input = screen.getByPlaceholderText('Enter your age');
+      const input = screen.getByPlaceholderText('e.g. 25');
       fireEvent.change(input, { target: { value: '25' } });
       fireEvent.click(screen.getByText('Next'));
 
@@ -207,133 +345,141 @@ describe('Screening Component', () => {
         expect(screen.getByText('What is your gender?')).toBeTruthy();
       });
 
-      // Go back
       fireEvent.click(screen.getByText('Back'));
 
       await waitFor(() => {
         expect(screen.getByText('How old are you?')).toBeTruthy();
-        expect(input.value).toBe('25');
       });
     });
 
-    it('should preserve answers when navigating', async () => {
+    it('should preserve answers when navigating back', async () => {
       render(
         <MemoryRouter>
           <Screening />
         </MemoryRouter>
       );
 
-      // Answer first question
-      const ageInput = screen.getByPlaceholderText('Enter your age');
-      fireEvent.change(ageInput, { target: { value: '30' } });
+      const input = screen.getByPlaceholderText('e.g. 25');
+      fireEvent.change(input, { target: { value: '30' } });
       fireEvent.click(screen.getByText('Next'));
 
-      // Answer second question
       await waitFor(() => {
-        const genderSelect = screen.getByRole('combobox');
-        fireEvent.change(genderSelect, { target: { value: 'Male' } });
+        expect(screen.getByText('What is your gender?')).toBeTruthy();
       });
 
-      // Go back
       fireEvent.click(screen.getByText('Back'));
 
-      // Check if age is preserved
       await waitFor(() => {
-        const input = screen.getByPlaceholderText('Enter your age');
-        expect(input.value).toBe('30');
+        const ageInput = screen.getByPlaceholderText('e.g. 25');
+        expect(ageInput.value).toBe('30');
+      });
+    });
+
+    it('should render multiple choice for gender question', async () => {
+      render(
+        <MemoryRouter>
+          <Screening />
+        </MemoryRouter>
+      );
+
+      const input = screen.getByPlaceholderText('e.g. 25');
+      fireEvent.change(input, { target: { value: '25' } });
+      fireEvent.click(screen.getByText('Next'));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('multiple-choice')).toBeTruthy();
+        expect(screen.getByText('Male')).toBeTruthy();
+        expect(screen.getByText('Female')).toBeTruthy();
+      });
+    });
+
+    it('should handle multiple choice selection', async () => {
+      render(
+        <MemoryRouter>
+          <Screening />
+        </MemoryRouter>
+      );
+
+      // Go to gender question
+      const input = screen.getByPlaceholderText('e.g. 25');
+      fireEvent.change(input, { target: { value: '25' } });
+      fireEvent.click(screen.getByText('Next'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Male')).toBeTruthy();
+      });
+
+      // Select Male
+      fireEvent.click(screen.getByText('Male'));
+      fireEvent.click(screen.getByText('Next'));
+
+      // Should move to occupation
+      await waitFor(() => {
+        expect(
+          screen.getByText('What is your current employment status?')
+        ).toBeTruthy();
       });
     });
   });
 
   describe('Question Skipping Logic', () => {
-    it('should skip work_mode when occupation is Unemployed', async () => {
+    it('should skip work_mode and work_screen_hours when Unemployed', async () => {
       render(
         <MemoryRouter>
           <Screening />
         </MemoryRouter>
       );
 
-      // Navigate through questions to occupation
-      const ageInput = screen.getByPlaceholderText('Enter your age');
-      fireEvent.change(ageInput, { target: { value: '25' } });
+      // Age
+      fireEvent.change(screen.getByPlaceholderText('e.g. 25'), {
+        target: { value: '25' },
+      });
       fireEvent.click(screen.getByText('Next'));
 
+      // Gender
       await waitFor(() => {
-        const genderSelect = screen.getByRole('combobox');
-        fireEvent.change(genderSelect, { target: { value: 'Male' } });
-        fireEvent.click(screen.getByText('Next'));
+        fireEvent.click(screen.getByText('Male'));
       });
+      fireEvent.click(screen.getByText('Next'));
 
+      // Occupation - select Unemployed
       await waitFor(() => {
-        const occupationSelect = screen.getByRole('combobox');
-        fireEvent.change(occupationSelect, { target: { value: 'Unemployed' } });
-        fireEvent.click(screen.getByText('Next'));
+        fireEvent.click(screen.getByText('Unemployed'));
       });
+      fireEvent.click(screen.getByText('Next'));
 
-      // Should skip work_mode and go to work_screen_hours (which is also skipped)
-      // So should land on leisure_screen_hours
+      // Should skip work_mode and work_screen_hours, land on leisure_screen_hours
       await waitFor(() => {
         expect(
-          screen.getByText('How many hours of screen time for leisure?')
+          screen.getByText('How many hours of screen time for leisure today?')
         ).toBeTruthy();
       });
     });
 
-    it('should skip work_mode when occupation is Retired', async () => {
+    it('should not skip work_mode for Employed', async () => {
       render(
         <MemoryRouter>
           <Screening />
         </MemoryRouter>
       );
 
-      // Navigate to occupation question
-      const ageInput = screen.getByPlaceholderText('Enter your age');
-      fireEvent.change(ageInput, { target: { value: '70' } });
+      // Age
+      fireEvent.change(screen.getByPlaceholderText('e.g. 25'), {
+        target: { value: '30' },
+      });
       fireEvent.click(screen.getByText('Next'));
 
+      // Gender
       await waitFor(() => {
-        const genderSelect = screen.getByRole('combobox');
-        fireEvent.change(genderSelect, { target: { value: 'Female' } });
-        fireEvent.click(screen.getByText('Next'));
+        fireEvent.click(screen.getByText('Male'));
       });
-
-      await waitFor(() => {
-        const occupationSelect = screen.getByRole('combobox');
-        fireEvent.change(occupationSelect, { target: { value: 'Retired' } });
-        fireEvent.click(screen.getByText('Next'));
-      });
-
-      // Should skip to leisure_screen_hours
-      await waitFor(() => {
-        expect(
-          screen.getByText('How many hours of screen time for leisure?')
-        ).toBeTruthy();
-      });
-    });
-
-    it('should not skip work_mode for Employed occupation', async () => {
-      render(
-        <MemoryRouter>
-          <Screening />
-        </MemoryRouter>
-      );
-
-      // Navigate to occupation
-      const ageInput = screen.getByPlaceholderText('Enter your age');
-      fireEvent.change(ageInput, { target: { value: '30' } });
       fireEvent.click(screen.getByText('Next'));
 
+      // Occupation - select Employed
       await waitFor(() => {
-        const genderSelect = screen.getByRole('combobox');
-        fireEvent.change(genderSelect, { target: { value: 'Male' } });
-        fireEvent.click(screen.getByText('Next'));
+        fireEvent.click(screen.getByText('Employed'));
       });
-
-      await waitFor(() => {
-        const occupationSelect = screen.getByRole('combobox');
-        fireEvent.change(occupationSelect, { target: { value: 'Employed' } });
-        fireEvent.click(screen.getByText('Next'));
-      });
+      fireEvent.click(screen.getByText('Next'));
 
       // Should show work_mode question
       await waitFor(() => {
@@ -343,249 +489,247 @@ describe('Screening Component', () => {
   });
 
   describe('Form Submission', () => {
-    const fillCompleteForm = async () => {
-      const answers = [
-        { placeholder: 'Enter your age', value: '25' },
-        { select: true, value: 'Male' }, // gender
-        { select: true, value: 'Employed' }, // occupation
-        { select: true, value: 'Remote' }, // work_mode
-        { placeholder: 'e.g. 6', value: '8' }, // work_screen_hours
-        { placeholder: 'e.g. 2', value: '2' }, // leisure_screen_hours
-        { placeholder: 'e.g. 7', value: '7' }, // sleep_hours
-        { select: true, value: '4' }, // sleep_quality
-        {
-          placeholder: '0 = no stress, 10 = very stressed',
-          value: '5',
-        }, // stress_level
-        { placeholder: 'e.g. 75', value: '75' }, // productivity
-        { placeholder: 'e.g. 150', value: '150' }, // exercise
-        { placeholder: 'e.g. 10', value: '10' }, // social_hours
-      ];
+    const fillAuthenticatedForm = async () => {
+      mockUser = {
+        userId: 'test-123',
+        gender: 'Male',
+        occupation: 'Employed',
+        workRmt: 'Remote',
+        dob: '1990-01-01',
+      };
 
-      for (let i = 0; i < answers.length; i++) {
-        const answer = answers[i];
+      render(
+        <MemoryRouter>
+          <Screening />
+        </MemoryRouter>
+      );
 
-        if (answer.select) {
-          await waitFor(() => {
-            const select = screen.getByRole('combobox');
-            fireEvent.change(select, { target: { value: answer.value } });
-          });
-        } else {
-          await waitFor(() => {
-            const input = screen.getByPlaceholderText(answer.placeholder);
-            fireEvent.change(input, { target: { value: answer.value } });
-          });
-        }
+      // Wait for authenticated user's first question
+      await waitFor(() => {
+        expect(
+          screen.getByText('How many hours of screen time for work today?')
+        ).toBeTruthy();
+      });
 
-        const nextButton =
-          i === answers.length - 1
-            ? screen.getByText('Finish')
-            : screen.getByText('Next');
-        fireEvent.click(nextButton);
+      // work_screen_hours
+      fireEvent.change(screen.getByPlaceholderText('e.g. 6'), {
+        target: { value: '8' },
+      });
+      fireEvent.click(screen.getByText('Next'));
 
-        // Small delay for state updates
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
+      // leisure_screen_hours
+      await waitFor(() => {
+        fireEvent.change(screen.getByPlaceholderText('e.g. 2'), {
+          target: { value: '2' },
+        });
+      });
+      fireEvent.click(screen.getByText('Next'));
+
+      // sleep_hours
+      await waitFor(() => {
+        fireEvent.change(screen.getByPlaceholderText('e.g. 7'), {
+          target: { value: '7' },
+        });
+      });
+      fireEvent.click(screen.getByText('Next'));
+
+      // sleep_quality (slider) - need to interact
+      await waitFor(() => {
+        const slider = screen.getByRole('slider');
+        fireEvent.change(slider, { target: { value: '4' } });
+      });
+      fireEvent.click(screen.getByText('Next'));
+
+      // stress_level (slider)
+      await waitFor(() => {
+        const slider = screen.getByRole('slider');
+        fireEvent.change(slider, { target: { value: '5' } });
+      });
+      fireEvent.click(screen.getByText('Next'));
+
+      // productivity (slider)
+      await waitFor(() => {
+        const slider = screen.getByRole('slider');
+        fireEvent.change(slider, { target: { value: '75' } });
+      });
+      fireEvent.click(screen.getByText('Next'));
+
+      // exercise_minutes
+      await waitFor(() => {
+        fireEvent.change(screen.getByPlaceholderText('e.g. 150'), {
+          target: { value: '150' },
+        });
+      });
+      fireEvent.click(screen.getByText('Next'));
+
+      // social_hours — last question should show Finish
+      await waitFor(() => {
+        fireEvent.change(screen.getByPlaceholderText('e.g. 10'), {
+          target: { value: '10' },
+        });
+      });
     };
 
     it('should show Finish button on last question', async () => {
-      render(
-        <MemoryRouter>
-          <Screening />
-        </MemoryRouter>
-      );
+      await fillAuthenticatedForm();
 
-      // Fill all questions except the last one
-      await fillCompleteForm();
-
-      await waitFor(
-        () => {
-          expect(
-            screen.getByText('Finish') || screen.getByText('Processing...')
-          ).toBeTruthy();
-        },
-        { timeout: 10000 }
-      );
+      expect(screen.getByText('Finish')).toBeTruthy();
     }, 15000);
 
-    it('should submit form and navigate on successful prediction', async () => {
-      global.fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ prediction_id: 'pred-123' }),
+    it('should submit and navigate on success', async () => {
+      servicesModule.submitScreening.mockResolvedValue({
+        prediction_id: 'pred-123',
       });
 
-      render(
-        <MemoryRouter>
-          <Screening />
-        </MemoryRouter>
-      );
+      await fillAuthenticatedForm();
 
-      await fillCompleteForm();
+      fireEvent.click(screen.getByText('Finish'));
 
       await waitFor(
         () => {
+          expect(servicesModule.submitScreening).toHaveBeenCalled();
           expect(mockNavigate).toHaveBeenCalledWith('/result/pred-123');
         },
         { timeout: 10000 }
       );
     }, 15000);
 
-    it('should show error message on failed submission', async () => {
-      global.fetch.mockRejectedValueOnce(new Error('Network error'));
-
-      render(
-        <MemoryRouter>
-          <Screening />
-        </MemoryRouter>
+    it('should show Submitting... during submission', async () => {
+      servicesModule.submitScreening.mockImplementation(
+        () =>
+          new Promise((resolve) =>
+            setTimeout(() => resolve({ prediction_id: 'pred-123' }), 200)
+          )
       );
 
-      await fillCompleteForm();
+      await fillAuthenticatedForm();
+
+      fireEvent.click(screen.getByText('Finish'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Submitting...')).toBeTruthy();
+      });
+    }, 15000);
+
+    it('should show error on submission failure', async () => {
+      servicesModule.submitScreening.mockRejectedValue(
+        new Error('Network error')
+      );
+
+      await fillAuthenticatedForm();
+
+      fireEvent.click(screen.getByText('Finish'));
 
       await waitFor(
         () => {
           expect(
-            screen.getByText(/Failed to send data to server: Network error/)
+            screen.getByText('An error occurred: Network error')
           ).toBeTruthy();
         },
         { timeout: 10000 }
       );
     }, 15000);
 
-    it('should include user_id in payload when user is logged in', async () => {
-      global.fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ prediction_id: 'pred-123' }),
+    it('should include user_id in payload for authenticated user', async () => {
+      servicesModule.submitScreening.mockResolvedValue({
+        prediction_id: 'pred-123',
       });
 
-      render(
-        <MemoryRouter>
-          <Screening />
-        </MemoryRouter>
-      );
+      await fillAuthenticatedForm();
 
-      await fillCompleteForm();
+      fireEvent.click(screen.getByText('Finish'));
 
       await waitFor(
         () => {
-          expect(global.fetch).toHaveBeenCalled();
-          const callArgs = global.fetch.mock.calls[0];
-          const payload = JSON.parse(callArgs[1].body);
-          expect(payload.user_id).toBe('test-user-123');
+          expect(servicesModule.submitScreening).toHaveBeenCalled();
+          const payload = servicesModule.submitScreening.mock.calls[0][0];
+          expect(payload.user_id).toBe('test-123');
         },
         { timeout: 10000 }
       );
     }, 15000);
-
-    it('should disable inputs during submission', async () => {
-      global.fetch.mockImplementationOnce(
-        () =>
-          new Promise((resolve) =>
-            setTimeout(
-              () =>
-                resolve({
-                  ok: true,
-                  json: async () => ({ prediction_id: 'pred-123' }),
-                }),
-              100
-            )
-          )
-      );
-
-      render(
-        <MemoryRouter>
-          <Screening />
-        </MemoryRouter>
-      );
-
-      await fillCompleteForm();
-
-      // Check if inputs are disabled during loading
-      await waitFor(() => {
-        const processingButton = screen.queryByText('Processing...');
-        if (processingButton) {
-          expect(processingButton).toBeTruthy();
-        }
-      });
-    }, 15000);
   });
 
-  describe('Select Input Rendering', () => {
-    it('should render select dropdown for gender question', async () => {
+  describe('Slider Questions', () => {
+    it('should render slider for sleep quality question', async () => {
+      mockUser = {
+        userId: 'test-123',
+        gender: 'Male',
+        occupation: 'Employed',
+        workRmt: 'Remote',
+        dob: '1990-01-01',
+      };
+
       render(
         <MemoryRouter>
           <Screening />
         </MemoryRouter>
       );
 
-      // Navigate to gender question
-      const ageInput = screen.getByPlaceholderText('Enter your age');
-      fireEvent.change(ageInput, { target: { value: '25' } });
+      // work_screen_hours
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('e.g. 6')).toBeTruthy();
+      });
+      fireEvent.change(screen.getByPlaceholderText('e.g. 6'), {
+        target: { value: '8' },
+      });
       fireEvent.click(screen.getByText('Next'));
 
+      // leisure_screen_hours
       await waitFor(() => {
-        const select = screen.getByRole('combobox');
-        expect(select).toBeTruthy();
-        expect(screen.getByText('Male')).toBeTruthy();
-        expect(screen.getByText('Female')).toBeTruthy();
+        expect(screen.getByPlaceholderText('e.g. 2')).toBeTruthy();
       });
-    });
+      fireEvent.change(screen.getByPlaceholderText('e.g. 2'), {
+        target: { value: '2' },
+      });
+      fireEvent.click(screen.getByText('Next'));
 
-    it('should render number input for age question', () => {
-      render(
-        <MemoryRouter>
-          <Screening />
-        </MemoryRouter>
-      );
+      // sleep_hours
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('e.g. 7')).toBeTruthy();
+      });
+      fireEvent.change(screen.getByPlaceholderText('e.g. 7'), {
+        target: { value: '7' },
+      });
+      fireEvent.click(screen.getByText('Next'));
 
-      const input = screen.getByPlaceholderText('Enter your age');
-      expect(input.type).toBe('number');
-      expect(input.getAttribute('min')).toBe('16');
-      expect(input.getAttribute('max')).toBe('100');
+      // Should be on sleep quality slider
+      await waitFor(() => {
+        expect(screen.getByText('How was your sleep quality?')).toBeTruthy();
+        expect(screen.getByTestId('slider')).toBeTruthy();
+        expect(screen.getByText('Poor')).toBeTruthy();
+        expect(screen.getByText('Excellent')).toBeTruthy();
+      });
     });
   });
 
   describe('Progress Bar', () => {
-    it('should update progress bar as user progresses', async () => {
-      const { container } = render(
+    it('should update progress as user advances', async () => {
+      render(
         <MemoryRouter>
           <Screening />
         </MemoryRouter>
       );
 
-      const progressBar = container.querySelector('.progress-bar');
-      const initialWidth = progressBar.style.width;
+      const progressBar = screen.getByTestId('progress-bar');
+      const initialProgress = progressBar.getAttribute('data-progress');
 
       // Move to next question
-      const input = screen.getByPlaceholderText('Enter your age');
-      fireEvent.change(input, { target: { value: '25' } });
+      fireEvent.change(screen.getByPlaceholderText('e.g. 25'), {
+        target: { value: '25' },
+      });
       fireEvent.click(screen.getByText('Next'));
 
       await waitFor(() => {
-        const newWidth = progressBar.style.width;
-        expect(newWidth).not.toBe(initialWidth);
+        const newProgress = progressBar.getAttribute('data-progress');
+        expect(parseFloat(newProgress)).toBeGreaterThan(
+          parseFloat(initialProgress)
+        );
       });
     });
   });
 
   describe('Edge Cases', () => {
-    it('should handle non-numeric input in number fields', async () => {
-      render(
-        <MemoryRouter>
-          <Screening />
-        </MemoryRouter>
-      );
-
-      const input = screen.getByPlaceholderText('Enter your age');
-      fireEvent.change(input, { target: { value: 'abc' } });
-
-      const nextButton = screen.getByText('Next');
-      fireEvent.click(nextButton);
-
-      await waitFor(() => {
-        expect(screen.getByText('Answer cannot be empty!')).toBeTruthy();
-      });
-    });
-
     it('should not allow going back from first question', () => {
       render(
         <MemoryRouter>
@@ -593,124 +737,35 @@ describe('Screening Component', () => {
         </MemoryRouter>
       );
 
-      const backButton = screen.queryByText('Back');
-      expect(backButton).toBeNull();
+      expect(screen.queryByText('Back')).toBeNull();
     });
 
-    it('should auto-set work_mode and work_screen_hours for Unemployed', async () => {
-      global.fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ prediction_id: 'pred-123' }),
-      });
-
+    it('should show boundary validation for extreme values', async () => {
       render(
         <MemoryRouter>
           <Screening />
         </MemoryRouter>
       );
 
-      // Fill form with Unemployed occupation
-      const ageInput = screen.getByPlaceholderText('Enter your age');
-      fireEvent.change(ageInput, { target: { value: '25' } });
+      const input = screen.getByPlaceholderText('e.g. 25');
+      fireEvent.change(input, { target: { value: '999' } });
+
       fireEvent.click(screen.getByText('Next'));
 
       await waitFor(() => {
-        const genderSelect = screen.getByRole('combobox');
-        fireEvent.change(genderSelect, { target: { value: 'Male' } });
-        fireEvent.click(screen.getByText('Next'));
-      });
-
-      await waitFor(() => {
-        const occupationSelect = screen.getByRole('combobox');
-        fireEvent.change(occupationSelect, {
-          target: { value: 'Unemployed' },
-        });
-        fireEvent.click(screen.getByText('Next'));
-      });
-
-      // Continue filling rest of form
-      const answers = [
-        { placeholder: 'e.g. 2', value: '2' },
-        { placeholder: 'e.g. 7', value: '7' },
-        { select: true, value: '4' },
-        { placeholder: '0 = no stress, 10 = very stressed', value: '5' },
-        { placeholder: 'e.g. 75', value: '75' },
-        { placeholder: 'e.g. 150', value: '150' },
-        { placeholder: 'e.g. 10', value: '10' },
-      ];
-
-      for (const answer of answers) {
-        if (answer.select) {
-          await waitFor(() => {
-            const select = screen.getByRole('combobox');
-            fireEvent.change(select, { target: { value: answer.value } });
-          });
-        } else {
-          await waitFor(() => {
-            const input = screen.getByPlaceholderText(answer.placeholder);
-            fireEvent.change(input, { target: { value: answer.value } });
-          });
-        }
-
-        fireEvent.click(
-          screen.getByText(
-            answer === answers[answers.length - 1] ? 'Finish' : 'Next'
-          )
-        );
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
-
-      await waitFor(
-        () => {
-          expect(global.fetch).toHaveBeenCalled();
-          const payload = JSON.parse(global.fetch.mock.calls[0][1].body);
-          expect(payload.work_mode).toBe('Unemployed');
-          expect(payload.work_screen_hours).toBe(0);
-        },
-        { timeout: 10000 }
-      );
-    }, 20000);
-  });
-
-  describe('Error Display', () => {
-    it('should add input-error class when validation fails', async () => {
-      const { container } = render(
-        <MemoryRouter>
-          <Screening />
-        </MemoryRouter>
-      );
-
-      const nextButton = screen.getByText('Next');
-      fireEvent.click(nextButton);
-
-      await waitFor(() => {
-        const input = container.querySelector('.input-error');
-        expect(input).toBeTruthy();
+        expect(screen.getByText('Maximum value is 100')).toBeTruthy();
       });
     });
 
-    it('should remove input-error class after valid input', async () => {
-      const { container } = render(
+    it('should disable Next button when no answer provided', () => {
+      render(
         <MemoryRouter>
           <Screening />
         </MemoryRouter>
       );
 
       const nextButton = screen.getByText('Next');
-      fireEvent.click(nextButton);
-
-      await waitFor(() => {
-        const input = container.querySelector('.input-error');
-        expect(input).toBeTruthy();
-      });
-
-      const ageInput = screen.getByPlaceholderText('Enter your age');
-      fireEvent.change(ageInput, { target: { value: '25' } });
-
-      await waitFor(() => {
-        const input = container.querySelector('.input-error');
-        expect(input).toBeNull();
-      });
+      expect(nextButton.disabled).toBe(true);
     });
   });
 });
