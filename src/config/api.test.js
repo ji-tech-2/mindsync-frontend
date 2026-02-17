@@ -204,29 +204,27 @@ describe('getScreeningHistory', () => {
   it('should return response data directly on success', async () => {
     const responseData = { status: 'success', data: [{ id: 1 }], total: 1 };
     apiClient.get.mockResolvedValue({ data: responseData });
-    const result = await getScreeningHistory('user-1');
+    const result = await getScreeningHistory();
     expect(result).toEqual(responseData);
     expect(result.status).toBe('success');
     expect(result.data).toEqual([{ id: 1 }]);
   });
 
-  it('should call correct API endpoint with userId', async () => {
+  it('should call correct API endpoint', async () => {
     apiClient.get.mockResolvedValue({ data: { status: 'success', data: [] } });
-    await getScreeningHistory('user-1');
-    expect(apiClient.get).toHaveBeenCalledWith('/v1/users/user-1/history');
+    await getScreeningHistory();
+    expect(apiClient.get).toHaveBeenCalledWith('/v1/users/me/history');
   });
 
   it('should propagate network errors', async () => {
     apiClient.get.mockRejectedValue(new Error('Network error'));
-    await expect(getScreeningHistory('user-1')).rejects.toThrow(
-      'Network error'
-    );
+    await expect(getScreeningHistory()).rejects.toThrow('Network error');
   });
 
   it('should return error status response as-is', async () => {
     const responseData = { status: 'error', message: 'Not found' };
     apiClient.get.mockResolvedValue({ data: responseData });
-    const result = await getScreeningHistory('user-1');
+    const result = await getScreeningHistory();
     expect(result.status).toBe('error');
     expect(result.message).toBe('Not found');
   });
@@ -234,7 +232,7 @@ describe('getScreeningHistory', () => {
   it('should return raw response data without wrapping', async () => {
     const responseData = { status: 'fail', message: 'No data' };
     apiClient.get.mockResolvedValue({ data: responseData });
-    const result = await getScreeningHistory('user-1');
+    const result = await getScreeningHistory();
     expect(result).toEqual(responseData);
   });
 });
@@ -257,27 +255,27 @@ describe('getWeeklyChart', () => {
       ],
     };
     apiClient.get.mockResolvedValue({ data: responseData });
-    const result = await getWeeklyChart('user-1');
+    const result = await getWeeklyChart();
     expect(result).toEqual(responseData);
     expect(result.status).toBe('success');
     expect(result.data).toHaveLength(2);
   });
 
-  it('should call correct API endpoint with userId', async () => {
+  it('should call correct API endpoint', async () => {
     apiClient.get.mockResolvedValue({ data: { status: 'success', data: [] } });
-    await getWeeklyChart('user-1');
-    expect(apiClient.get).toHaveBeenCalledWith('/v1/users/user-1/weekly-chart');
+    await getWeeklyChart();
+    expect(apiClient.get).toHaveBeenCalledWith('/v1/users/me/weekly-chart');
   });
 
   it('should propagate network errors', async () => {
     apiClient.get.mockRejectedValue(new Error('timeout'));
-    await expect(getWeeklyChart('user-1')).rejects.toThrow('timeout');
+    await expect(getWeeklyChart()).rejects.toThrow('timeout');
   });
 
   it('should return error status response as-is', async () => {
     const responseData = { status: 'error', message: 'No data' };
     apiClient.get.mockResolvedValue({ data: responseData });
-    const result = await getWeeklyChart('user-1');
+    const result = await getWeeklyChart();
     expect(result.status).toBe('error');
     expect(result.message).toBe('No data');
   });
@@ -285,7 +283,7 @@ describe('getWeeklyChart', () => {
   it('should return raw response data without wrapping', async () => {
     const responseData = { status: 'fail' };
     apiClient.get.mockResolvedValue({ data: responseData });
-    const result = await getWeeklyChart('user-1');
+    const result = await getWeeklyChart();
     expect(result).toEqual(responseData);
   });
 });

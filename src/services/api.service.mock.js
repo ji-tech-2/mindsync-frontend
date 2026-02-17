@@ -534,10 +534,10 @@ export async function pollPredictionResult(
 /**
  * Get screening history (mock)
  */
-export async function getScreeningHistory(userId) {
+export async function getScreeningHistory() {
   await delay(600);
 
-  console.log('🎭 [MOCK] Get screening history:', userId);
+  console.log('🎭 [MOCK] Get screening history');
 
   // Generate mock history if empty
   if (mockScreenings.length === 0) {
@@ -548,7 +548,7 @@ export async function getScreeningHistory(userId) {
 
       mockScreenings.push({
         prediction_id: 'mock-pred-' + i,
-        user_id: userId,
+        user_id: mockUser.userId,
         prediction_score: randomScore(),
         health_level: randomCategory(),
         created_at: date.toISOString(),
@@ -571,10 +571,10 @@ export async function getScreeningHistory(userId) {
 /**
  * Get weekly chart (mock)
  */
-export async function getWeeklyChart(userId) {
+export async function getWeeklyChart() {
   await delay(500);
 
-  console.log('🎭 [MOCK] Get weekly chart:', userId);
+  console.log('🎭 [MOCK] Get weekly chart');
 
   const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const today = new Date();
@@ -609,10 +609,10 @@ export async function getWeeklyChart(userId) {
 /**
  * Get streak data (mock)
  */
-export async function getStreak(userId) {
+export async function getStreak() {
   await delay(400);
 
-  console.log('🎭 [MOCK] Get streak:', userId);
+  console.log('🎭 [MOCK] Get streak');
 
   // Calculate current week dates
   const today = new Date();
@@ -673,7 +673,7 @@ export async function getStreak(userId) {
   return {
     status: 'success',
     data: {
-      user_id: userId,
+      user_id: mockUser.userId,
       current_streak: {
         daily: dailyStreak,
         daily_last_date: today.toISOString().split('T')[0],
@@ -689,10 +689,10 @@ export async function getStreak(userId) {
 /**
  * Get weekly critical factors (mock)
  */
-export async function getWeeklyCriticalFactors(userId) {
+export async function getWeeklyCriticalFactors() {
   await delay(700);
 
-  console.log('🎭 [MOCK] Get weekly critical factors:', userId);
+  console.log('🎭 [MOCK] Get weekly critical factors');
 
   return {
     status: 'success',
@@ -747,10 +747,10 @@ export async function getWeeklyCriticalFactors(userId) {
 /**
  * Get daily suggestion (mock)
  */
-export async function getDailySuggestion(userId) {
+export async function getDailySuggestion() {
   await delay(450);
 
-  console.log('🎭 [MOCK] Get daily suggestion:', userId);
+  console.log('🎭 [MOCK] Get daily suggestion');
 
   const suggestions = [
     'Take a 10-minute walk outside to refresh your mind.',

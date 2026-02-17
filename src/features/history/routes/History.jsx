@@ -9,7 +9,6 @@ import {
   generateMonthOptions,
   filterHistoryByMonth,
   transformHistoryData,
-  getUserId,
 } from '../utils/historyHelpers';
 import styles from './History.module.css';
 
@@ -48,18 +47,10 @@ export default function History() {
     }
 
     const fetchHistory = async () => {
-      const userId = getUserId(user);
-
-      if (!userId) {
-        console.warn('No user ID found in user object:', user);
-        setIsLoading(false);
-        return;
-      }
-
       setIsLoading(true);
 
       try {
-        const response = await getScreeningHistory(userId);
+        const response = await getScreeningHistory();
 
         if (response.status === 'success' && response.data) {
           console.log('✅ Screening history loaded:', response.data);
@@ -81,11 +72,8 @@ export default function History() {
     };
 
     const fetchWeeklyChart = async () => {
-      const userId = getUserId(user);
-      if (!userId) return;
-
       try {
-        const response = await getWeeklyChart(userId);
+        const response = await getWeeklyChart();
         if (response.status === 'success' && response.data) {
           console.log('✅ Weekly chart loaded:', response.data);
           setWeeklyData(response.data);
