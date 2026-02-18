@@ -84,12 +84,10 @@ describe('Result Component - Partial Polling', () => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
     mockIsAuthenticated = true;
-    localStorage.clear();
   });
 
   afterEach(() => {
     vi.clearAllTimers();
-    localStorage.clear();
   });
 
   describe('Partial Status Handling', () => {
@@ -243,6 +241,40 @@ describe('Result Component - Partial Polling', () => {
   });
 
   describe('Error Handling', () => {
+    it('should always make a fresh request on page load (no caching)', async () => {
+      const mockResult = {
+        success: true,
+        status: 'ready',
+        data: {
+          prediction_score: 75.0,
+          health_level: 'average',
+          wellness_analysis: 'Test',
+          advice: { description: 'Advice', factors: {} },
+        },
+        metadata: {
+          created_at: '2026-01-21T10:00:00Z',
+          completed_at: '2026-01-21T10:01:00Z',
+        },
+      };
+
+      // First render
+      pollPredictionResult.mockResolvedValueOnce(mockResult);
+      const { unmount } = renderResult('test-123');
+      await waitFor(() => {
+        expect(screen.getByTestId('score-value')).toHaveTextContent('75.0');
+      });
+      unmount();
+
+      // Second render of the same predictionId should still call the API
+      pollPredictionResult.mockResolvedValueOnce(mockResult);
+      renderResult('test-123');
+      await waitFor(() => {
+        expect(screen.getByTestId('score-value')).toHaveTextContent('75.0');
+      });
+
+      expect(pollPredictionResult).toHaveBeenCalledTimes(2);
+    });
+
     it('should show error message when polling fails', async () => {
       pollPredictionResult.mockRejectedValueOnce(
         new Error('Network error occurred')
@@ -293,7 +325,6 @@ describe('Result Component - Partial Polling', () => {
 
       for (const testCase of testCases) {
         vi.clearAllMocks();
-        localStorage.clear();
 
         const mockResult = {
           success: true,
@@ -441,12 +472,10 @@ describe('Result Component - Guest User', () => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
     mockIsAuthenticated = false;
-    localStorage.clear();
   });
 
   afterEach(() => {
     mockIsAuthenticated = true;
-    localStorage.clear();
   });
 
   it('should show score for guest users', async () => {
@@ -589,11 +618,6 @@ describe('Result Component - Authenticated User', () => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
     mockIsAuthenticated = true;
-    localStorage.clear();
-  });
-
-  afterEach(() => {
-    localStorage.clear();
   });
 
   it('should show score for authenticated users', async () => {
