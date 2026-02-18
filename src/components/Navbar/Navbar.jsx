@@ -165,7 +165,7 @@ function Navbar() {
                 className={styles.mobileNavLink}
                 onClick={closeMobileMenu}
               >
-                Log In
+                Sign In
               </Link>
               <Link
                 to="/signup"
@@ -184,7 +184,7 @@ function Navbar() {
               Settings
             </Button>
             <Button variant="filled" fullWidth onClick={handleLogout}>
-              Logout
+              Sign Out
             </Button>
           </div>
         )}
