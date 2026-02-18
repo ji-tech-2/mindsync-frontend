@@ -5,6 +5,7 @@ import {
   logout,
   requestOTP,
   requestSignupOTP,
+  verifyOTP,
   resetPassword,
   changePassword,
   getProfile,
@@ -92,6 +93,18 @@ describe('api.service', () => {
           email: 'user@test.com',
         }
       );
+      expect(result).toEqual({ success: true });
+    });
+  });
+
+  describe('verifyOTP', () => {
+    it('calls POST /v1/auth/verify-otp with email and otp', async () => {
+      apiClient.post.mockResolvedValue({ data: { success: true } });
+      const result = await verifyOTP('user@test.com', '123456');
+      expect(apiClient.post).toHaveBeenCalledWith('/v1/auth/verify-otp', {
+        email: 'user@test.com',
+        otp: '123456',
+      });
       expect(result).toEqual({ success: true });
     });
   });

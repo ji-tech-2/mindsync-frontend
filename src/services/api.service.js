@@ -70,6 +70,20 @@ export async function requestSignupOTP(email) {
 }
 
 /**
+ * Verify OTP for password reset or signup
+ * @param {string} email - User email
+ * @param {string} otp - OTP code
+ * @returns {Promise} Response with verification status
+ */
+export async function verifyOTP(email, otp) {
+  const response = await apiClient.post(API_ROUTES.AUTH_VERIFY_OTP, {
+    email,
+    otp,
+  });
+  return response.data;
+}
+
+/**
  * Reset password with OTP (forgot password flow)
  * @param {string} email - User email
  * @param {string} otp - OTP code

@@ -15,6 +15,7 @@ export const API_ROUTES = {
   AUTH_RESET_PASSWORD: '/v1/auth/reset-password',
   AUTH_REQUEST_OTP: '/v1/auth/request-otp',
   AUTH_REQUEST_SIGNUP_OTP: '/v1/auth/request-signup-otp',
+  AUTH_VERIFY_OTP: '/v1/auth/verify-otp',
 
   // User Profile (JWT cookie auth — /me/ prefix)
   PROFILE: '/v1/users/me/profile',

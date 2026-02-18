@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   requestOTP as requestOTPService,
   resetPassword as resetPasswordService,
+  verifyOTP as verifyOTPService,
 } from '@/services';
 import { Message, Link, FormContainer, StageContainer } from '@/components';
 import AuthPageLayout from '../components/AuthPageLayout';
@@ -64,7 +65,7 @@ export default function ForgotPassword() {
 
   const refs = { emailRef, otpRef, passwordRef };
 
-  const handleNextStage = () => {
+  const handleNextStage = async () => {
     const validator = getStageValidator(currentStage, form);
     const stageErrors = validator();
 
@@ -74,6 +75,36 @@ export default function ForgotPassword() {
     const hasErrors = Object.keys(stageErrors).length > 0;
     if (hasErrors) {
       scrollToError(stageErrors, currentStage, refs);
+      return;
+    }
+
+    // Special handling for OTP stage (stage 1): verify OTP before proceeding
+    if (currentStage === 1) {
+      setLoading(true);
+      setMessage('');
+      setIsError(false);
+
+      try {
+        const data = await verifyOTPService(form.email, form.otp);
+
+        if (data.success) {
+          setMessage('OTP verified successfully!');
+          setIsError(false);
+          setIsGoingBack(false);
+          setCurrentStage(currentStage + 1);
+        } else {
+          setMessage(data.message || 'Invalid OTP');
+          setIsError(true);
+        }
+      } catch (error) {
+        console.error('Error verifying OTP:', error);
+        const errorMessage =
+          error.response?.data?.message || 'Invalid OTP. Please try again.';
+        setMessage(errorMessage);
+        setIsError(true);
+      } finally {
+        setLoading(false);
+      }
       return;
     }
 

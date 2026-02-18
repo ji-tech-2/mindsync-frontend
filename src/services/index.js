@@ -34,6 +34,7 @@ export const {
   logout,
   requestOTP,
   requestSignupOTP,
+  verifyOTP,
   resetPassword,
   changePassword,
 
