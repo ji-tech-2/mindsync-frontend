@@ -12,7 +12,7 @@
     linear-gradient(to bottom, rgb(92 86 67 / 40%), rgb(66 62 54 / 60%)),
     url('@/assets/background.jpg');
   background-size: cover;
-  background-position: center;
+  background-position: bottom;
   background-attachment: fixed;
 }
 

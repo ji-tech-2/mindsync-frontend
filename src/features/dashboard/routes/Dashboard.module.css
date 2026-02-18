@@ -19,6 +19,7 @@
     url('@/assets/background.jpg');
   background-size: cover;
   background-attachment: fixed;
+  background-position: bottom;
   margin-bottom: var(--space-2xl);
   position: relative;
   left: 50%;
@@ -54,6 +55,10 @@
   margin: 0;
   font-weight: var(--font-weight-regular);
   opacity: 0.95;
+}
+
+.screeningButton {
+  margin-top: var(--space-md);
 }
 
 /* ======================================= */

@@ -126,7 +126,14 @@ export default function Dashboard() {
         <div className={styles.headerContent}>
           <h1 className={styles.greeting}>Hello, {userName}!</h1>
           <p className={styles.subtitle}>How are you feeling today?</p>
-          <Button variant="filled" size="lg" href="/screening">
+          <Button
+            variant="filled"
+            theme="light"
+            bold
+            size="lg"
+            href="/screening"
+            className={styles.screeningButton}
+          >
             Take Screening Now
           </Button>
         </div>
