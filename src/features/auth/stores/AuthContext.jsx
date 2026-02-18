@@ -48,20 +48,11 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const logoutTimeoutRef = useRef(null);
 
-  // Initialize auth state on mount - restore session from HttpOnly cookie
+  // Initialize auth state on mount - validate session with backend
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // First check if we have user data in memory (fast path)
-        const cachedUserData = TokenManager.getUserData();
-        if (cachedUserData) {
-          const normalizedUser = normalizeUser(cachedUserData);
-          setUser(normalizedUser);
-          setIsLoading(false);
-          return;
-        }
-
-        // No cached data - validate session with backend using HttpOnly cookie
+        // Always call backend to set/validate session cookie
         console.log('🔐 Validating session with backend...');
         const response = await getProfile();
 
