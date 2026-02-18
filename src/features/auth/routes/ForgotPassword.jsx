@@ -238,7 +238,15 @@ export default function ForgotPassword() {
         Remember your password? <Link href="/signin">Back to Sign In</Link>
       </p>
 
-      {isError && <Message type="error">{message}</Message>}
+      {/* Show messages */}
+      {message && (
+        <Message
+          type={isError ? 'error' : 'success'}
+          style={{ textAlign: 'center', marginTop: 'var(--space-md)' }}
+        >
+          {message}
+        </Message>
+      )}
     </AuthPageLayout>
   );
 }

@@ -686,21 +686,15 @@ export default function SignUp() {
         </Link>
       </p>
 
-      {/* Show success messages */}
-      {message && !isMessageError && (
-        <p
-          style={{
-            color: 'var(--color-success, green)',
-            textAlign: 'center',
-            marginTop: 'var(--space-md)',
-          }}
+      {/* Show messages */}
+      {message && (
+        <Message
+          type={isMessageError ? 'error' : 'success'}
+          style={{ textAlign: 'center', marginTop: 'var(--space-md)' }}
         >
           {message}
-        </p>
+        </Message>
       )}
-
-      {/* Show error messages */}
-      {isMessageError && message && <Message type="error">{message}</Message>}
     </AuthPageLayout>
   );
 }

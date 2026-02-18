@@ -8,13 +8,22 @@ import styles from './Message.module.css';
  * @param {'error' | 'success' | 'info'} [props.type='info'] - Type of message (default: 'info')
  * @param {string} props.className - Additional CSS classes
  */
-const Message = ({ message, children, type = 'info', className = '' }) => {
+const Message = ({
+  message,
+  children,
+  type = 'info',
+  className = '',
+  ...props
+}) => {
   const content = children || message;
 
   if (!content) return null;
 
   return (
-    <div className={`${styles.message} ${styles[type]} ${className}`}>
+    <div
+      className={`${styles.message} ${styles[type]} ${className}`}
+      {...props}
+    >
       {content}
     </div>
   );
