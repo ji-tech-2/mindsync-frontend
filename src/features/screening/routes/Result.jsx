@@ -301,19 +301,15 @@ const ResultPage = () => {
               <div className={styles.buttonGroup}>
                 <Button
                   variant="filled"
-                  onClick={() =>
-                    navigate('/signin', { state: { from: location } })
-                  }
+                  href="/signin"
+                  state={{ from: location }}
                 >
                   Sign In
                 </Button>
                 <Button
                   variant="outlined"
-                  onClick={() =>
-                    navigate('/signup', {
-                      state: { from: location, guestResultId: predictionId },
-                    })
-                  }
+                  href="/signup"
+                  state={{ from: location, guestResultId: predictionId }}
                 >
                   Register
                 </Button>
