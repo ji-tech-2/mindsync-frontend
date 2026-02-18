@@ -60,6 +60,7 @@ function buildPartialResponse(data) {
 
   // Calculate total end-to-end latency (including network + polling)
   let totalLatencyMs = null;
+  console.log('⚡ Partial result timing data:', startTimestamp);
   if (startTimestamp) {
     totalLatencyMs = (Date.now() / 1000 - startTimestamp) * 1000;
     console.log(
@@ -140,7 +141,7 @@ export async function pollPredictionResult(predictionId, options = {}) {
           // Extract timing data for benchmarking
           const timing = data.result?.timing || {};
           const startTimestamp = timing.start_timestamp;
-
+          console.log('⚡ Partial result timing data:', startTimestamp);
           // Calculate total end-to-end latency (including network + polling)
           let totalLatencyMs = null;
           if (startTimestamp) {
