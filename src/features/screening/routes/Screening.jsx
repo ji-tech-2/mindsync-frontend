@@ -24,8 +24,10 @@ import {
   faChevronLeft,
   faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
-import logoPrimary from '@/assets/logo-primary.svg';
+import logoPrimaryAlt from '@/assets/logo-primary-alt.svg';
 import styles from './Screening.module.css';
+import VANTA from 'vanta/dist/vanta.fog.min';
+import * as THREE from 'three';
 
 // ============= HELPER FUNCTIONS =============
 
@@ -234,6 +236,10 @@ export default function Screening() {
   // Track if we've initialized answers from user data
   const hasInitialized = useRef(false);
 
+  // Ref for Vanta background
+  const vantaRef = useRef(null);
+  const vantaEffect = useRef(null);
+
   // Filter questions based on user authentication and occupation
   // For authenticated users, exclude demographic questions entirely
   const activeQuestions = useMemo(() => {
@@ -296,6 +302,35 @@ export default function Screening() {
       });
     }
   }, [user]);
+
+  // Initialize Vanta fog effect
+  useEffect(() => {
+    if (!vantaEffect.current && vantaRef.current) {
+      vantaEffect.current = VANTA({
+        el: vantaRef.current,
+        THREE: THREE,
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.0,
+        minWidth: 200.0,
+        highlightColor: 0xfffbea,
+        midtoneColor: 0xfffbea,
+        lowlightColor: 0xfffbea,
+        baseColor: 0x869959,
+        blurFactor: 0.3,
+        speed: 0.15,
+        zoom: 0.1,
+      });
+    }
+
+    return () => {
+      if (vantaEffect.current) {
+        vantaEffect.current.destroy();
+        vantaEffect.current = null;
+      }
+    };
+  }, []);
 
   const currentQ = activeQuestions[currentIndex];
   const isLastQuestion = currentIndex === activeQuestions.length - 1;
@@ -478,16 +513,17 @@ export default function Screening() {
       <div className={styles.header}>
         <Button
           variant="outlined"
+          theme="light"
           href={user ? '/dashboard' : '/'}
           icon={<FontAwesomeIcon icon={faChevronLeft} />}
           className={styles.exitButton}
         >
           Back to Home
         </Button>
-        <img src={logoPrimary} alt="MindSync" className={styles.logo} />
+        <img src={logoPrimaryAlt} alt="MindSync" className={styles.logo} />
       </div>
 
-      <div className={styles.wrapper}>
+      <div ref={vantaRef} className={styles.wrapper}>
         <Card
           padded
           clipOverflow={false}

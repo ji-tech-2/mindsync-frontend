@@ -98,7 +98,7 @@ function Navbar() {
                 Sign In
               </Link>
               <Link to="/signup" className={styles.buttonLink}>
-                <Button variant="light" bold>
+                <Button variant="filled" theme="light" bold>
                   Get Started
                 </Button>
               </Link>

@@ -4,6 +4,17 @@ import { MemoryRouter } from 'react-router-dom';
 import Screening from './Screening';
 import * as servicesModule from '@/services';
 
+// Mock Vanta and Three.js to prevent WebGL errors in tests
+vi.mock('vanta/dist/vanta.fog.min', () => ({
+  default: vi.fn(() => ({
+    destroy: vi.fn(),
+  })),
+}));
+
+vi.mock('three', () => ({
+  default: {},
+}));
+
 // Mock navigation
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {

@@ -57,7 +57,9 @@
   font-weight: var(--font-weight-bold);
 }
 
-/* Outlined variant */
+/* ========== Variants (Dark theme by default) ========== */
+
+/* Outlined variant - dark theme */
 .outlined {
   border: var(--border-md) solid var(--color-primary);
   background-color: transparent;
@@ -68,7 +70,7 @@
   background-color: var(--color-primary-light);
 }
 
-/* Filled variant */
+/* Filled variant - dark theme */
 .filled {
   background-color: var(--color-primary);
   color: var(--color-text-dark);
@@ -81,16 +83,6 @@
   color: var(--color-text-dark);
 }
 
-/* Light variant */
-.light {
-  background-color: var(--color-bg-light);
-  color: var(--color-primary-dark);
-}
-
-.light:is(:hover, :active):not(:disabled) {
-  background-color: var(--color-primary-light);
-}
-
 /* Ghost variant - text/icon only with padding */
 .ghost {
   background-color: transparent;
@@ -100,6 +92,41 @@
 
 .ghost:is(:hover, :active):not(:disabled) {
   background-color: rgb(90 124 89 / 10%);
+}
+
+/* ========== Light Theme Modifications ========== */
+
+/* Outlined variant - light theme */
+.outlined.themeLight {
+  border-color: var(--color-text-dark);
+  background-color: transparent;
+  color: var(--color-text-dark);
+}
+
+.outlined.themeLight:is(:hover, :active):not(:disabled) {
+  background-color: var(--color-primary-dark);
+}
+
+/* Filled variant - light theme */
+.filled.themeLight {
+  background-color: var(--color-bg-light);
+  border-color: var(--color-bg-light);
+  color: var(--color-primary-dark);
+}
+
+.filled.themeLight:is(:hover, :active):not(:disabled) {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary-light);
+}
+
+/* Ghost variant - light theme */
+.ghost.themeLight {
+  background-color: transparent;
+  color: var(--color-primary-dark);
+}
+
+.ghost.themeLight:is(:hover, :active):not(:disabled) {
+  background-color: var(--color-bg-light);
 }
 
 /* Icon styling - color inherits from button text color */

@@ -6,6 +6,7 @@ import styles from './Button.module.css';
  */
 function getButtonClasses({
   variant,
+  theme,
   size,
   fullWidth,
   bold,
@@ -19,6 +20,7 @@ function getButtonClasses({
   return [
     styles.button,
     styles[variant],
+    theme === 'light' && styles.themeLight,
     size && styles[size],
     fullWidth && styles.fullWidth,
     bold && styles.bold,
@@ -54,7 +56,8 @@ function renderButtonContent({ icon, iconPosition, iconOnly, children }) {
 /**
  * Button Component (renders as <button> or <a> tag)
  * @param {Object} props
- * @param {string} props.variant - 'outlined', 'filled', 'light', 'ghost' (default: 'outlined')
+ * @param {string} props.variant - 'outlined', 'filled', 'ghost' (default: 'outlined')
+ * @param {string} props.theme - 'dark', 'light' (default: 'dark')
  * @param {string} props.size - 'lg' for large (default: normal)
  * @param {boolean} props.fullWidth - Fill container width (default: false)
  * @param {boolean} props.bold - Use bold font weight (default: false)
@@ -71,6 +74,7 @@ function renderButtonContent({ icon, iconPosition, iconOnly, children }) {
  */
 function Button({
   variant = 'outlined',
+  theme = 'dark',
   size = '',
   fullWidth = false,
   bold = false,
@@ -88,6 +92,7 @@ function Button({
 }) {
   const buttonClass = getButtonClasses({
     variant,
+    theme,
     size,
     fullWidth,
     bold,

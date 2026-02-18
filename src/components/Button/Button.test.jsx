@@ -44,16 +44,58 @@ describe('Button Component', () => {
       expect(button.className).toMatch(/filled/);
     });
 
-    it('renders light variant when variant="light"', () => {
-      const { container } = render(<Button variant="light">Click</Button>);
-      const button = container.querySelector('button');
-      expect(button.className).toMatch(/light/);
-    });
-
     it('renders ghost variant when variant="ghost"', () => {
       const { container } = render(<Button variant="ghost">Click</Button>);
       const button = container.querySelector('button');
       expect(button.className).toMatch(/ghost/);
+    });
+  });
+
+  // ==================== Theme ====================
+  describe('Theme', () => {
+    it('renders dark theme by default', () => {
+      const { container } = render(<Button>Click</Button>);
+      const button = container.querySelector('button');
+      expect(button.className).not.toMatch(/themeLight/);
+    });
+
+    it('renders light theme when theme="light"', () => {
+      const { container } = render(<Button theme="light">Click</Button>);
+      const button = container.querySelector('button');
+      expect(button.className).toMatch(/themeLight/);
+    });
+
+    it('combines variant and theme correctly', () => {
+      const { container } = render(
+        <Button variant="filled" theme="light">
+          Click
+        </Button>
+      );
+      const button = container.querySelector('button');
+      expect(button.className).toMatch(/filled/);
+      expect(button.className).toMatch(/themeLight/);
+    });
+
+    it('applies light theme to outlined variant', () => {
+      const { container } = render(
+        <Button variant="outlined" theme="light">
+          Click
+        </Button>
+      );
+      const button = container.querySelector('button');
+      expect(button.className).toMatch(/outlined/);
+      expect(button.className).toMatch(/themeLight/);
+    });
+
+    it('applies light theme to ghost variant', () => {
+      const { container } = render(
+        <Button variant="ghost" theme="light">
+          Click
+        </Button>
+      );
+      const button = container.querySelector('button');
+      expect(button.className).toMatch(/ghost/);
+      expect(button.className).toMatch(/themeLight/);
     });
   });
 

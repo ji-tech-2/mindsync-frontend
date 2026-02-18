@@ -10,8 +10,13 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['outlined', 'filled', 'light', 'ghost'],
+      options: ['outlined', 'filled', 'ghost'],
       description: 'Button variant',
+    },
+    theme: {
+      control: { type: 'radio' },
+      options: ['dark', 'light'],
+      description: 'Button theme (dark or light)',
     },
     size: {
       control: { type: 'select' },
@@ -69,11 +74,12 @@ export const Filled = {
   },
 };
 
-// Light button
-export const Light = {
+// Light theme filled button
+export const LightTheme = {
   args: {
-    children: 'Light Button',
-    variant: 'light',
+    children: 'Light Theme Button',
+    variant: 'filled',
+    theme: 'light',
   },
 };
 
@@ -197,8 +203,8 @@ export const AsLink = {
   render: (args) => <Button {...args} />,
 };
 
-// All variants comparison
-export const AllVariants = {
+// All variants and themes comparison
+export const AllVariantsAndThemes = {
   render: () => (
     <div
       style={{
@@ -208,10 +214,23 @@ export const AllVariants = {
         alignItems: 'flex-start',
       }}
     >
-      <Button variant="outlined">Outlined Button</Button>
-      <Button variant="filled">Filled Button</Button>
-      <Button variant="light">Light Button</Button>
-      <Button variant="ghost">Ghost Button</Button>
+      <div style={{ fontWeight: 'bold', marginTop: '8px' }}>Dark Theme:</div>
+      <Button variant="outlined">Outlined Dark</Button>
+      <Button variant="filled">Filled Dark</Button>
+      <Button variant="ghost">Ghost Dark</Button>
+
+      <div style={{ fontWeight: 'bold', marginTop: '16px' }}>Light Theme:</div>
+      <Button variant="outlined" theme="light">
+        Outlined Light
+      </Button>
+      <Button variant="filled" theme="light">
+        Filled Light
+      </Button>
+      <Button variant="ghost" theme="light">
+        Ghost Light
+      </Button>
+
+      <div style={{ fontWeight: 'bold', marginTop: '16px' }}>Other States:</div>
       <Button variant="filled" disabled>
         Disabled Button
       </Button>
