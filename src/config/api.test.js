@@ -250,8 +250,20 @@ describe('getWeeklyChart', () => {
     const responseData = {
       status: 'success',
       data: [
-        { label: 'Mon', date: '2024-01-01', mental_health_index: 75 },
-        { label: 'Tue', date: '2024-01-02', mental_health_index: 50 },
+        {
+          label: 'Mon',
+          date: '2024-01-01',
+          mental_health_index: 75,
+          work_screen: 5,
+          leisure_screen: 3,
+        },
+        {
+          label: 'Tue',
+          date: '2024-01-02',
+          mental_health_index: 50,
+          work_screen: 6,
+          leisure_screen: 2,
+        },
       ],
     };
     apiClient.get.mockResolvedValue({ data: responseData });

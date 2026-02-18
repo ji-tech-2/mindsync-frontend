@@ -34,7 +34,8 @@ const COLORS = {
 // Metric mappings to friendly names
 const METRIC_LABELS = {
   mental_health_index: 'Mental Health Index',
-  screen_time: 'Screen Time (hours)',
+  work_screen: 'Work Screen Time (hours)',
+  leisure_screen: 'Leisure Screen Time (hours)',
   sleep_duration: 'Sleep Duration (hours)',
   sleep_quality: 'Sleep Quality (1-5)',
   stress_level: 'Stress Level (0-10)',
@@ -127,7 +128,7 @@ const CustomTooltip = ({ active, payload, selectedMetric }) => {
  *
  * Props:
  * - data: Array of objects with format from /chart/weekly API:
- *   { date, label, has_data, mental_health_index, screen_time, sleep_duration, etc. }
+ *   { date, label, has_data, mental_health_index, work_screen, leisure_screen, sleep_duration, etc. }
  * - title: Chart title (optional)
  * - compact: Compact layout (optional)
  * - minimal: Minimal variant without title and button (optional)
@@ -165,7 +166,8 @@ export default function WeeklyChart({
       return [0, 100];
     }
     if (
-      selectedMetric === 'screen_time' ||
+      selectedMetric === 'work_screen' ||
+      selectedMetric === 'leisure_screen' ||
       selectedMetric === 'sleep_duration'
     ) {
       return [0, 12];
