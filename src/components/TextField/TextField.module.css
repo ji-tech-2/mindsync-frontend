@@ -31,7 +31,7 @@
 }
 
 .input::placeholder {
-  color: transparent;
+  color: var(--color-text-muted);
 }
 
 /* Hover state - similar to stroked button */

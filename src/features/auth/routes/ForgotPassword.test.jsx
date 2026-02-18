@@ -345,14 +345,26 @@ describe('ForgotPassword Component', () => {
       });
     });
 
-    it('should transition to Stage 3 when OTP is filled and Next is clicked', async () => {
+    it('should transition to Stage 3 when OTP is valid and Next is clicked', async () => {
       await goToStage2();
+
+      // Mock verifyOTP API call
+      apiClient.post.mockResolvedValueOnce({
+        data: { success: true, message: 'OTP verified successfully!' },
+      });
 
       const otpInput = document.querySelector('input[name="otp"]');
       fireEvent.change(otpInput, { target: { value: '123456' } });
 
       const nextButton = screen.getByRole('button', { name: /next/i });
       fireEvent.click(nextButton);
+
+      await waitFor(() => {
+        expect(apiClient.post).toHaveBeenCalledWith('/v1/auth/verify-otp', {
+          email: 'user@example.com',
+          otp: '123456',
+        });
+      });
 
       await waitFor(() => {
         expect(
@@ -362,6 +374,53 @@ describe('ForgotPassword Component', () => {
           document.querySelector('input[name="confirmPassword"]')
         ).toBeInTheDocument();
       });
+    });
+
+    it('should show error when OTP is invalid and stay on Stage 2', async () => {
+      await goToStage2();
+
+      // Mock verifyOTP API call with invalid OTP
+      apiClient.post.mockResolvedValueOnce({
+        data: { success: false, message: 'Invalid OTP' },
+      });
+
+      const otpInput = document.querySelector('input[name="otp"]');
+      fireEvent.change(otpInput, { target: { value: '999999' } });
+
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('Invalid OTP')).toBeInTheDocument();
+      });
+
+      // Should still be on Stage 2
+      expect(document.querySelector('input[name="otp"]')).toBeInTheDocument();
+      expect(
+        document.querySelector('input[name="newPassword"]')
+      ).not.toBeInTheDocument();
+    });
+
+    it('should show error when OTP verification fails', async () => {
+      await goToStage2();
+
+      // Mock verifyOTP API call with error
+      apiClient.post.mockRejectedValueOnce({
+        response: { data: { message: 'OTP expired' } },
+      });
+
+      const otpInput = document.querySelector('input[name="otp"]');
+      fireEvent.change(otpInput, { target: { value: '123456' } });
+
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('OTP expired')).toBeInTheDocument();
+      });
+
+      // Should still be on Stage 2
+      expect(document.querySelector('input[name="otp"]')).toBeInTheDocument();
     });
   });
 
@@ -384,6 +443,11 @@ describe('ForgotPassword Component', () => {
 
       await waitFor(() => {
         expect(document.querySelector('input[name="otp"]')).toBeInTheDocument();
+      });
+
+      // Mock verifyOTP API call
+      apiClient.post.mockResolvedValueOnce({
+        data: { success: true, message: 'OTP verified successfully!' },
       });
 
       const otpInput = document.querySelector('input[name="otp"]');
@@ -548,6 +612,11 @@ describe('ForgotPassword Component', () => {
 
       await waitFor(() => {
         expect(document.querySelector('input[name="otp"]')).toBeInTheDocument();
+      });
+
+      // Mock verifyOTP API call
+      apiClient.post.mockResolvedValueOnce({
+        data: { success: true, message: 'OTP verified successfully!' },
       });
 
       const otpInput = document.querySelector('input[name="otp"]');

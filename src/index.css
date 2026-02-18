@@ -236,6 +236,26 @@ a:hover {
 
 /* ======================================= */
 
+/* INPUT STYLES */
+
+/* ======================================= */
+
+/* Remove spinner arrows from number inputs */
+
+/* Chrome, Safari, Edge, Opera */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  appearance: textfield;
+}
+
+/* ======================================= */
+
 /* UTILITY CLASSES */
 
 /* ======================================= */

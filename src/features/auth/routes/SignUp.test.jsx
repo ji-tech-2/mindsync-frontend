@@ -60,12 +60,15 @@ describe('Register Component', () => {
       expect(dobFieldset).toBeInTheDocument();
       expect(screen.getByText(/Date of Birth/i)).toBeInTheDocument();
 
-      // Stage 2 fields should not be present
+      // Stage 2 fields (email, passwords) should not be present
       expect(
         document.querySelector('input[name="email"]')
       ).not.toBeInTheDocument();
       expect(
         document.querySelector('input[name="password"]')
+      ).not.toBeInTheDocument();
+      expect(
+        document.querySelector('input[name="otp"]')
       ).not.toBeInTheDocument();
     });
 
@@ -114,13 +117,16 @@ describe('Register Component', () => {
       const nextButton = screen.getByRole('button', { name: /next/i });
       fireEvent.click(nextButton);
 
-      // Wait for transition and Stage 2 fields to appear
+      // Wait for transition and Stage 2 fields (email, passwords) to appear
       await waitFor(() => {
         expect(
           document.querySelector('input[name="email"]')
         ).toBeInTheDocument();
         expect(
           document.querySelector('input[name="password"]')
+        ).toBeInTheDocument();
+        expect(
+          document.querySelector('input[name="confirmPassword"]')
         ).toBeInTheDocument();
       });
     });
@@ -167,7 +173,8 @@ describe('Register Component', () => {
 
   // SKIPPED: Stage 2 tests require completing Stage 1 which includes filling Dropdown components
   // (gender, occupation, workRmt). These are custom components that require extensive mocking.
-  describe.skip('Stage 2: Credentials', () => {
+  // Stage 2 now includes Email, Password, and Confirm Password fields with "Send OTP" button
+  describe.skip('Stage 2: Email and Passwords', () => {
     it('should render Stage 2 fields after transition', async () => {
       renderRegister();
 
@@ -190,7 +197,7 @@ describe('Register Component', () => {
       });
     });
 
-    it('should show "Sign Up" button on Stage 2', async () => {
+    it('should show "Send OTP" button on Stage 2', async () => {
       renderRegister();
 
       const nameInput = document.querySelector('input[name="name"]');
@@ -201,13 +208,99 @@ describe('Register Component', () => {
 
       await waitFor(() => {
         expect(
+          screen.getByRole('button', { name: /send otp/i })
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('should send OTP and transition to Stage 3 when Send OTP is clicked with valid data', async () => {
+      renderRegister();
+
+      apiClient.post.mockResolvedValueOnce({
+        data: { success: true, message: 'OTP sent successfully!' },
+      });
+
+      const nameInput = document.querySelector('input[name="name"]');
+      fireEvent.change(nameInput, { target: { value: 'Test User' } });
+
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
+
+      await waitFor(() => {
+        const emailInput = document.querySelector('input[name="email"]');
+        expect(emailInput).toBeInTheDocument();
+        fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+      });
+
+      const passwordInput = document.querySelector('input[name="password"]');
+      fireEvent.change(passwordInput, { target: { value: 'Password123' } });
+
+      const confirmPasswordInput = document.querySelector(
+        'input[name="confirmPassword"]'
+      );
+      fireEvent.change(confirmPasswordInput, {
+        target: { value: 'Password123' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      await waitFor(() => {
+        expect(apiClient.post).toHaveBeenCalledWith(
+          '/v1/auth/request-signup-otp',
+          { email: 'test@example.com' }
+        );
+      });
+
+      await waitFor(() => {
+        expect(document.querySelector('input[name="otp"]')).toBeInTheDocument();
+      });
+    });
+  });
+
+  // Stage 3 is now OTP verification with Sign Up button
+  describe.skip('Stage 3: OTP Verification', () => {
+    it('should render OTP field and Sign Up button on Stage 3', async () => {
+      renderRegister();
+
+      // Navigate through stages to Stage 3
+      // This would require completing Stage 1 and Stage 2
+
+      await waitFor(() => {
+        expect(document.querySelector('input[name="otp"]')).toBeInTheDocument();
+        expect(
           screen.getByRole('button', { name: /sign up/i })
         ).toBeInTheDocument();
+      });
+    });
+
+    it('should submit registration with OTP on Stage 3', async () => {
+      renderRegister();
+
+      apiClient.post.mockResolvedValueOnce({
+        data: { success: true, message: 'Registration successful!' },
+      });
+
+      // After navigating to Stage 3 and entering OTP
+      const otpInput = document.querySelector('input[name="otp"]');
+      fireEvent.change(otpInput, { target: { value: '123456' } });
+
+      const signUpButton = screen.getByRole('button', { name: /sign up/i });
+      fireEvent.click(signUpButton);
+
+      await waitFor(() => {
+        expect(apiClient.post).toHaveBeenCalledWith(
+          '/v1/auth/register',
+          expect.objectContaining({
+            otp: '123456',
+          })
+        );
       });
     });
   });
 
   // SKIPPED: Cannot reach Stage 2 without completing Stage 1 (requires Dropdown mocking)
+  // Stage 2 now includes Email and Password fields
   describe.skip('Stage 2: Email Validation', () => {
     it('should show error when email is empty on Stage 2', async () => {
       renderRegister();
@@ -219,15 +312,15 @@ describe('Register Component', () => {
       const nextButton = screen.getByRole('button', { name: /next/i });
       fireEvent.click(nextButton);
 
-      // Now on Stage 2, clear email and submit
+      // Now on Stage 2, clear email and click Send OTP
       await waitFor(() => {
         const emailInput = document.querySelector('input[name="email"]');
         expect(emailInput).toBeInTheDocument();
         fireEvent.change(emailInput, { target: { value: '' } });
       });
 
-      const submitButton = screen.getByRole('button', { name: /sign up/i });
-      fireEvent.click(submitButton);
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
 
       await waitFor(() => {
         expect(screen.getByText('Email is required')).toBeInTheDocument();
@@ -258,6 +351,7 @@ describe('Register Component', () => {
   });
 
   // SKIPPED: Cannot reach Stage 2 without completing Stage 1 (requires Dropdown mocking)
+  // Stage 2 now includes Password fields alongside Email
   describe.skip('Stage 2: Password Validation', () => {
     it('should show error when password is empty on Stage 2', async () => {
       renderRegister();
@@ -275,8 +369,8 @@ describe('Register Component', () => {
         fireEvent.change(passwordInput, { target: { value: '' } });
       });
 
-      const submitButton = screen.getByRole('button', { name: /sign up/i });
-      fireEvent.click(submitButton);
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
 
       await waitFor(() => {
         expect(screen.getByText('Password is required')).toBeInTheDocument();
@@ -493,72 +587,82 @@ describe('Register Component', () => {
 
 describe('Stage Completion & API Submission', () => {
   // Skipped: These tests would require properly filling complex Dropdown components
-  // and multiple date/time fields from Stage 1 to transition to Stage 2
+  // and multiple date/time fields from Stage 1 to transition to Stage 2, then Stage 3
+  // The new flow has 3 stages: Personal Info -> Email+Passwords -> OTP
   // Such integration testing requires either mocking Dropdown components or using
   // more complex testing utilities
 
-  it.skip('should allow form submission after both stages complete', async () => {
-    // Helper to navigate through both stages
-    const navigateToStage2 = async () => {
+  it.skip('should allow form submission after all stages complete', async () => {
+    // Helper to navigate through all stages
+    const navigateToStage3 = async () => {
+      // Stage 1: Personal info
       const nameInput = document.querySelector('input[name="name"]');
       fireEvent.change(nameInput, { target: { value: 'Test User' } });
 
       const nextButton = screen.getByRole('button', { name: /next/i });
       fireEvent.click(nextButton);
 
+      // Stage 2: Email and Passwords
       await waitFor(() => {
         expect(
           document.querySelector('input[name="email"]')
         ).toBeInTheDocument();
       });
+
+      const emailInput = document.querySelector('input[name="email"]');
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
+      const passwordInput = document.querySelector('input[name="password"]');
+      fireEvent.change(passwordInput, { target: { value: 'Password123' } });
+
+      const confirmPasswordInput = document.querySelector(
+        'input[name="confirmPassword"]'
+      );
+      fireEvent.change(confirmPasswordInput, {
+        target: { value: 'Password123' },
+      });
+
+      const sendOtpButton = screen.getByRole('button', { name: /send otp/i });
+      fireEvent.click(sendOtpButton);
+
+      // Stage 3: OTP
+      await waitFor(() => {
+        expect(document.querySelector('input[name="otp"]')).toBeInTheDocument();
+      });
     };
 
-    // Fill Stage 2 fields after navigating
-    await navigateToStage2();
+    await navigateToStage3();
 
-    const emailInput = document.querySelector('input[name="email"]');
-    fireEvent.change(emailInput, {
-      target: { value: 'test@example.com' },
-    });
-
-    const passwordInput = document.querySelector('input[name="password"]');
-    fireEvent.change(passwordInput, {
-      target: { value: 'Password123' },
-    });
-
-    const confirmPasswordInput = document.querySelector(
-      'input[name="confirmPassword"]'
-    );
-    fireEvent.change(confirmPasswordInput, {
-      target: { value: 'Password123' },
-    });
+    const otpInput = document.querySelector('input[name="otp"]');
+    fireEvent.change(otpInput, { target: { value: '123456' } });
 
     // Submit form and verify API call
     const submitButton = screen.getByRole('button', { name: /sign up/i });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(apiClient.post).toHaveBeenCalledWith('/v0-1/auth-register', {
+      expect(apiClient.post).toHaveBeenCalledWith('/v1/auth/register', {
         email: 'test@example.com',
         password: 'Password123',
         name: 'Test User',
         dob: expect.any(String),
         gender: expect.any(String),
         occupation: expect.any(String),
+        otp: '123456',
       });
     });
   });
 
   it.skip('should handle successful registration after multi-stage flow', async () => {
-    // Skipped: Requires Stage 1 completion with complex dropdowns
+    // Skipped: Requires completing all 3 stages with complex dropdowns
   });
 
   it.skip('should handle registration failure', async () => {
-    // Skipped: Requires Stage 1 completion with complex dropdowns
+    // Skipped: Requires completing all 3 stages with complex dropdowns
   });
 
   it.skip('should handle network error', async () => {
-    // Skipped: Requires Stage 1 completion with complex dropdowns
+    // Skipped: Requires completing all 3 stages with complex dropdowns
   });
 });
 
@@ -575,14 +679,14 @@ describe('Loading and Redirect Behavior', () => {
     expect(nextButton).not.toBeDisabled();
 
     // This test verifies the button behavior exists in the component
-    // Full integration test would require completing Stage 1
+    // Full integration test would require completing all 3 stages
   });
 
   it('should navigate immediately after successful registration', async () => {
     // This test verifies the component behavior without going through full stage flow
     // The actual implementation immediately redirects on success without a success screen
-    // If we could complete both stages, we would verify:
-    // 1. Submit form with valid data
+    // If we could complete all 3 stages, we would verify:
+    // 1. Submit form with valid data (including OTP)
     // 2. API returns success
     // 3. Component immediately calls navigate('/signin')
     // 4. No intermediate success screen is shown

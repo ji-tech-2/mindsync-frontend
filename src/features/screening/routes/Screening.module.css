@@ -7,7 +7,7 @@
   min-height: 100vh;
   padding: var(--gutter);
   padding-top: calc(48px + var(--gutter));
-  background-color: var(--color-primary-light);
+  background-color: var(--color-primary);
 }
 
 .header {

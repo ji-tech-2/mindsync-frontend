@@ -68,7 +68,7 @@ export function OTPStage({
           <div style={{ flex: 1, marginTop: 'var(--border-md)' }}>
             <TextField
               label="OTP"
-              type="text"
+              type="number"
               name="otp"
               value={form.otp}
               onChange={handleChange}

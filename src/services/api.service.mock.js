@@ -157,6 +157,28 @@ export async function requestSignupOTP(email) {
 }
 
 /**
+ * Verify OTP (mock)
+ */
+export async function verifyOTP(email, otp) {
+  await delay(500);
+
+  console.log('🎭 [MOCK] Verify OTP:', email, 'OTP:', otp);
+
+  // Simulate OTP validation
+  if (otp !== '123456' && otp !== '000000') {
+    return {
+      success: false,
+      message: 'Invalid OTP',
+    };
+  }
+
+  return {
+    success: true,
+    message: 'OTP verified successfully',
+  };
+}
+
+/**
  * Reset password with OTP (mock - forgot password flow)
  */
 export async function resetPassword(email, otp, newPassword) {
