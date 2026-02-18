@@ -36,7 +36,12 @@ export default function Home() {
             >
               {user ? 'Go to Dashboard' : 'Get Started'}
             </Button>
-            <Button variant="filled" size="lg" href="/screening">
+            <Button
+              variant="outlined"
+              theme="light"
+              size="lg"
+              href="/screening"
+            >
               Try Screening
             </Button>
           </div>
