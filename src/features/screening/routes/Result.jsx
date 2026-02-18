@@ -29,27 +29,6 @@ const ResultPage = () => {
         return;
       }
 
-      // Check localStorage first for cached result
-      const cachedResult = localStorage.getItem(`result_${predictionId}`);
-      if (cachedResult) {
-        try {
-          const cached = JSON.parse(cachedResult);
-          console.log('✅ Using cached result from localStorage:', cached);
-          setResultData(cached.resultData);
-          if (cached.adviceData) {
-            setAdviceData(cached.adviceData);
-          }
-          setIsPolling(false);
-          setIsLoadingAdvice(false);
-          setLoadingStage(3);
-          return; // Skip polling, use cached data
-        } catch {
-          console.warn(
-            '⚠️ Failed to parse cached result, will fetch fresh data'
-          );
-        }
-      }
-
       setIsPolling(true);
       setPollingError(null);
       setLoadingStage(1);
@@ -107,37 +86,15 @@ const ResultPage = () => {
             setIsPolling(false);
             setIsLoadingAdvice(true);
 
-            // Save partial result to localStorage
-            localStorage.setItem(
-              `result_${predictionId}`,
-              JSON.stringify({
-                resultData: resultDataToSave,
-                adviceData: null,
-                timestamp: new Date().toISOString(),
-              })
-            );
-
             // Continue polling for full result with advice
             pollForAdvice(predictionId);
           }
           // If ready, set advice data
           else if (pollResult.status === 'ready') {
             console.log('✅ Full results with advice ready');
-            let adviceToSave = null;
             if (prediction.advice) {
               setAdviceData(prediction.advice);
-              adviceToSave = prediction.advice;
             }
-
-            // Save complete result to localStorage
-            localStorage.setItem(
-              `result_${predictionId}`,
-              JSON.stringify({
-                resultData: resultDataToSave,
-                adviceData: adviceToSave,
-                timestamp: new Date().toISOString(),
-              })
-            );
 
             setIsPolling(false);
             setIsLoadingAdvice(false);
@@ -175,17 +132,6 @@ const ResultPage = () => {
             if (prediction.advice) {
               console.log('✅ Advice data received:', prediction.advice);
               setAdviceData(prediction.advice);
-
-              // Update localStorage with complete advice
-              const cachedData = localStorage.getItem(`result_${predictionId}`);
-              if (cachedData) {
-                const parsed = JSON.parse(cachedData);
-                parsed.adviceData = prediction.advice;
-                localStorage.setItem(
-                  `result_${predictionId}`,
-                  JSON.stringify(parsed)
-                );
-              }
             }
             setIsLoadingAdvice(false);
             return;
