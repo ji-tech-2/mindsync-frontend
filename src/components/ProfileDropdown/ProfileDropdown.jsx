@@ -66,7 +66,7 @@ function ProfileDropdown() {
                 Settings
               </Button>
               <Button variant="filled" fullWidth onClick={handleLogout}>
-                Logout
+                Sign Out
               </Button>
             </div>
           </div>
