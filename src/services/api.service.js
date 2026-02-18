@@ -173,6 +173,30 @@ export async function pollPredictionResult(
     // Handle different statuses
     if (data.status === 'ready') {
       console.log('✅ Prediction ready with advice:', data);
+
+      // Timing benchmark
+      const readyTiming = data.result?.timing || {};
+      const readyStart = readyTiming.start_timestamp;
+      let readyLatencyMs = null;
+      if (readyStart) {
+        readyLatencyMs = (Date.now() / 1000 - readyStart) * 1000;
+        console.log(
+          '⏱️  [BENCHMARK] Ridge Prediction - Model.pkl only:',
+          readyTiming.ridge_prediction_ms,
+          'ms'
+        );
+        console.log(
+          '⏱️  [BENCHMARK] Ridge Prediction - Server processing:',
+          readyTiming.server_processing_ms,
+          'ms'
+        );
+        console.log(
+          '⏱️  [BENCHMARK] Ridge Prediction - Total end-to-end latency:',
+          readyLatencyMs.toFixed(2),
+          'ms'
+        );
+      }
+
       return {
         success: true,
         status: 'ready',
@@ -182,18 +206,57 @@ export async function pollPredictionResult(
           numeric_completed_at: data.numeric_completed_at,
           advisory_completed_at:
             data.completed_at || data.advisory_completed_at,
+          timing: {
+            ridge_prediction_ms: readyTiming.ridge_prediction_ms,
+            server_processing_ms: readyTiming.server_processing_ms,
+            total_end_to_end_ms: readyLatencyMs,
+          },
         },
       };
     }
 
     if (data.status === 'partial') {
       console.log('⚡ Partial result ready (without advice):', data);
+
+      // Timing benchmark
+      const timing = data.result?.timing || {};
+      const startTimestamp = timing.start_timestamp;
+      let totalLatencyMs = null;
+      if (startTimestamp) {
+        totalLatencyMs = (Date.now() / 1000 - startTimestamp) * 1000;
+        console.log(
+          '⏱️  [BENCHMARK] Ridge Prediction - Model.pkl only:',
+          timing.ridge_prediction_ms,
+          'ms'
+        );
+        console.log(
+          '⏱️  [BENCHMARK] Ridge Prediction - Server processing:',
+          timing.server_processing_ms,
+          'ms'
+        );
+        console.log(
+          '⏱️  [BENCHMARK] Ridge Prediction - Total end-to-end latency:',
+          totalLatencyMs.toFixed(2),
+          'ms'
+        );
+      } else {
+        console.log(
+          '⚠️ No start_timestamp in response — backend may not be sending timing data. Raw timing:',
+          timing
+        );
+      }
+
       return {
         success: true,
         status: 'partial',
         data: data.result,
         metadata: {
           created_at: data.created_at,
+          timing: {
+            ridge_prediction_ms: timing.ridge_prediction_ms,
+            server_processing_ms: timing.server_processing_ms,
+            total_end_to_end_ms: totalLatencyMs,
+          },
         },
       };
     }
