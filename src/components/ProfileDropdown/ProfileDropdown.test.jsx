@@ -154,7 +154,7 @@ describe('ProfileDropdown Component', () => {
       renderWithRouter(<ProfileDropdown />);
 
       await user.click(screen.getByLabelText('Profile menu'));
-      const logoutButton = screen.getByRole('button', { name: /logout/i });
+      const logoutButton = screen.getByRole('button', { name: /sign out/i });
       expect(logoutButton).toBeInTheDocument();
     });
 
@@ -177,7 +177,7 @@ describe('ProfileDropdown Component', () => {
       const button = screen.getByLabelText('Profile menu');
       await user.click(button);
 
-      const logoutButton = screen.getByRole('button', { name: /logout/i });
+      const logoutButton = screen.getByRole('button', { name: /sign out/i });
       await user.click(logoutButton);
 
       expect(mockLogoutWithTransition).toHaveBeenCalled();
@@ -191,7 +191,7 @@ describe('ProfileDropdown Component', () => {
       await user.click(button);
       expect(screen.getByText(`Hi, ${mockUser.name}!`)).toBeInTheDocument();
 
-      const logoutButton = screen.getByRole('button', { name: /logout/i });
+      const logoutButton = screen.getByRole('button', { name: /sign out/i });
       await user.click(logoutButton);
 
       // Dropdown should be closed after logout

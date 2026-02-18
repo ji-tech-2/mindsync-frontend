@@ -95,7 +95,7 @@ function Navbar() {
                 Screening
               </Link>
               <Link to="/signin" className={styles.navLink}>
-                Log In
+                Sign In
               </Link>
               <Link to="/signup" className={styles.buttonLink}>
                 <Button variant="light" bold>
