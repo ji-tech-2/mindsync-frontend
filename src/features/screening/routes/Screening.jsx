@@ -54,39 +54,73 @@ function calculateAge(dateOfBirth) {
 
 // ============= TRANSFORM & SUBMIT FUNCTIONS =============
 
-function transformToJSON(screeningData, userId = null, user = null) {
-  // Use user data for demographic fields if user is authenticated
-  const age =
-    user && user.dob ? calculateAge(user.dob) : parseInt(screeningData.age);
+function getAge(user, screeningData) {
+  if (user && user.dob) {
+    return calculateAge(user.dob);
+  }
+  return parseInt(screeningData.age);
+}
 
-  const gender =
-    user && user.gender
-      ? toApiGender(user.gender)
-      : toApiGender(screeningData.gender);
+function getGender(user, screeningData) {
+  const genderValue = user && user.gender ? user.gender : screeningData.gender;
+  return toApiGender(genderValue);
+}
 
-  const occupation =
-    user && user.occupation
-      ? toApiOccupation(user.occupation)
-      : toApiOccupation(screeningData.occupation);
+function getOccupation(user, screeningData) {
+  const occupationValue =
+    user && user.occupation ? user.occupation : screeningData.occupation;
+  return toApiOccupation(occupationValue);
+}
 
-  // Handle work_mode and work_screen_hours for Unemployed/Retired
-  const isUnemployedOrRetired =
-    occupation === 'unemployed' ||
-    occupation === 'retired' ||
-    (user &&
-      (user.occupation === 'Unemployed' || user.occupation === 'Retired')) ||
+function isUnemployedOrRetiredOccupation(occupation, user, screeningData) {
+  if (occupation === 'unemployed' || occupation === 'retired') {
+    return true;
+  }
+  if (
+    user &&
+    (user.occupation === 'Unemployed' || user.occupation === 'Retired')
+  ) {
+    return true;
+  }
+  if (
     screeningData.occupation === 'Unemployed' ||
-    screeningData.occupation === 'Retired';
+    screeningData.occupation === 'Retired'
+  ) {
+    return true;
+  }
+  return false;
+}
 
-  const workMode = isUnemployedOrRetired
-    ? toApiWorkMode('Unemployed')
-    : user && user.workRmt
-      ? toApiWorkMode(user.workRmt)
-      : toApiWorkMode(screeningData.work_mode);
+function getWorkMode(isUnemployedOrRetired, user, screeningData) {
+  if (isUnemployedOrRetired) {
+    return toApiWorkMode('Unemployed');
+  }
+  const workModeValue =
+    user && user.workRmt ? user.workRmt : screeningData.work_mode;
+  return toApiWorkMode(workModeValue);
+}
 
-  const workScreenHours = isUnemployedOrRetired
-    ? 0
-    : parseFloat(screeningData.work_screen_hours);
+function getWorkScreenHours(isUnemployedOrRetired, screeningData) {
+  if (isUnemployedOrRetired) {
+    return 0;
+  }
+  return parseFloat(screeningData.work_screen_hours);
+}
+
+function transformToJSON(screeningData, userId = null, user = null) {
+  const age = getAge(user, screeningData);
+  const gender = getGender(user, screeningData);
+  const occupation = getOccupation(user, screeningData);
+  const isUnemployedOrRetired = isUnemployedOrRetiredOccupation(
+    occupation,
+    user,
+    screeningData
+  );
+  const workMode = getWorkMode(isUnemployedOrRetired, user, screeningData);
+  const workScreenHours = getWorkScreenHours(
+    isUnemployedOrRetired,
+    screeningData
+  );
 
   const payload = {
     age: age,
