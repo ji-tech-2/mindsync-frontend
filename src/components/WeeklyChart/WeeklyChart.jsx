@@ -191,7 +191,11 @@ export default function WeeklyChart({
         {!minimal && (
           <div className={styles['chart-header']}>
             <h2>{title}</h2>
-            <Button iconOnly icon="↗" href="/history" />
+            <Button
+              iconOnly
+              icon={<span style={{ fontSize: '1.25rem' }}>↗</span>}
+              href="/history"
+            />
           </div>
         )}
 
