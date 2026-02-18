@@ -117,6 +117,7 @@
 .filled.themeLight:is(:hover, :active):not(:disabled) {
   background-color: var(--color-primary-light);
   border-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
 }
 
 /* Ghost variant - light theme */
