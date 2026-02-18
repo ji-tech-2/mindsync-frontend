@@ -64,30 +64,40 @@ describe('WeeklyChart', () => {
       label: 'Mon',
       has_data: true,
       mental_health_index: 75,
+      work_screen: 5,
+      leisure_screen: 3,
     },
     {
       date: '2024-01-02',
       label: 'Tue',
       has_data: true,
       mental_health_index: 45,
+      work_screen: 6,
+      leisure_screen: 2,
     },
     {
       date: '2024-01-03',
       label: 'Wed',
       has_data: true,
       mental_health_index: 20,
+      work_screen: 4,
+      leisure_screen: 4,
     },
     {
       date: '2024-01-04',
       label: 'Thu',
       has_data: true,
       mental_health_index: 8,
+      work_screen: 8,
+      leisure_screen: 1,
     },
     {
       date: '2024-01-05',
       label: 'Fri',
       has_data: true,
       mental_health_index: 90,
+      work_screen: 3,
+      leisure_screen: 5,
     },
   ];
 
@@ -201,6 +211,15 @@ describe('WeeklyChart', () => {
       expect(screen.getByTestId('dropdown')).toBeTruthy();
     });
 
+    it('should include work_screen and leisure_screen options and exclude screen_time', () => {
+      renderChart({ data: mockData });
+      const select = document.querySelector('select');
+      const optionValues = Array.from(select.options).map((o) => o.value);
+      expect(optionValues).toContain('work_screen');
+      expect(optionValues).toContain('leisure_screen');
+      expect(optionValues).not.toContain('screen_time');
+    });
+
     it('should render reference lines for mental_health_index metric', () => {
       renderChart({ data: mockData });
       const referenceLines = screen.getAllByTestId('reference-line');
@@ -227,6 +246,8 @@ describe('WeeklyChart', () => {
           label: 'Mon',
           has_data: true,
           mental_health_index: 50,
+          work_screen: 4,
+          leisure_screen: 2,
         },
       ];
       renderChart({ data: singleData });
@@ -240,12 +261,16 @@ describe('WeeklyChart', () => {
           label: 'Mon',
           has_data: true,
           mental_health_index: 100,
+          work_screen: 12,
+          leisure_screen: 12,
         },
       ];
       renderChart({ data: highValueData });
       const barChart = screen.getByTestId('bar-chart');
       const chartData = JSON.parse(barChart.getAttribute('data-chart-data'));
       expect(chartData[0].mental_health_index).toBe(100);
+      expect(chartData[0].work_screen).toBe(12);
+      expect(chartData[0].leisure_screen).toBe(12);
     });
 
     it('should handle data with zero values', () => {
@@ -255,12 +280,16 @@ describe('WeeklyChart', () => {
           label: 'Mon',
           has_data: true,
           mental_health_index: 0,
+          work_screen: 0,
+          leisure_screen: 0,
         },
       ];
       renderChart({ data: zeroData });
       const barChart = screen.getByTestId('bar-chart');
       const chartData = JSON.parse(barChart.getAttribute('data-chart-data'));
       expect(chartData[0].mental_health_index).toBe(0);
+      expect(chartData[0].work_screen).toBe(0);
+      expect(chartData[0].leisure_screen).toBe(0);
     });
 
     it('should handle empty string title', () => {
@@ -275,12 +304,16 @@ describe('WeeklyChart', () => {
           label: 'Mon',
           has_data: true,
           mental_health_index: 75,
+          work_screen: 5,
+          leisure_screen: 3,
         },
         {
           date: '2024-01-02',
           label: 'Tue',
           has_data: false,
           mental_health_index: 0,
+          work_screen: 0,
+          leisure_screen: 0,
         },
       ];
       renderChart({ data: dataWithNoData });
@@ -297,12 +330,16 @@ describe('WeeklyChart', () => {
           label: 'Mon',
           has_data: false,
           mental_health_index: 0,
+          work_screen: 0,
+          leisure_screen: 0,
         },
         {
           date: '2024-01-02',
           label: 'Tue',
           has_data: false,
           mental_health_index: 0,
+          work_screen: 0,
+          leisure_screen: 0,
         },
       ];
       renderChart({ data: allNoData });
