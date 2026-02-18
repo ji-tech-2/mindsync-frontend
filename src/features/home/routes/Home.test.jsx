@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Home from './Home';
 import * as authModule from '@/features/auth';
@@ -40,7 +40,7 @@ describe('Home Component', () => {
     expect(screen.getByText('Loading...')).toBeTruthy();
   });
 
-  it('should redirect to dashboard if user is logged in', async () => {
+  it('should show Go to Dashboard button when user is logged in', () => {
     vi.mocked(authModule.useAuth).mockReturnValue({
       user: { id: 1, name: 'Test User' },
       isLoading: false,
@@ -53,27 +53,8 @@ describe('Home Component', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/dashboard', {
-        replace: true,
-      });
-    });
-  });
-
-  it('should not redirect if user is logging out', () => {
-    vi.mocked(authModule.useAuth).mockReturnValue({
-      user: { id: 1, name: 'Test User' },
-      isLoading: false,
-      isLoggingOut: true,
-    });
-
-    render(
-      <MemoryRouter>
-        <Home />
-      </MemoryRouter>
-    );
-
-    expect(mockNavigate).not.toHaveBeenCalled();
+    const dashboardLink = screen.getByText('Go to Dashboard').closest('a');
+    expect(dashboardLink).toHaveAttribute('href', '/dashboard');
   });
 
   it('should render hero section when not logged in', () => {

@@ -29,7 +29,8 @@ export default function SignIn() {
   const passwordRef = useRef(null);
 
   // Get the page they were trying to visit, or default to dashboard
-  const from = location.state?.from?.pathname || '/dashboard';
+  const from =
+    location.state?.from?.pathname || location.state?.from || '/dashboard';
 
   const [form, setForm] = useState({
     email: '',
@@ -181,6 +182,7 @@ export default function SignIn() {
         variant="outlined"
         fullWidth
         href="/signup"
+        state={{ from: from }}
         style={{ marginTop: 'var(--space-sm)' }}
       >
         Create Account

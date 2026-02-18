@@ -54,7 +54,7 @@ const TextField = forwardRef(function TextField(
           ref={ref}
           type={type}
           value={value}
-          onChange={onChange}
+          onChange={onChange || (() => {})}
           disabled={disabled}
           className={styles.input}
           placeholder=" "

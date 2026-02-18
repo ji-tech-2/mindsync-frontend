@@ -1,20 +1,10 @@
-import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 import { useAuth } from '@/features/auth';
 import { Button, Card } from '@/components';
 import logoPrimaryAlt from '@/assets/logo-primary-alt.svg';
 import styles from './Home.module.css';
 
 export default function Home() {
-  const navigate = useNavigate();
-  const { user, isLoading, isLoggingOut } = useAuth();
-
-  // Redirect to dashboard if user is logged in
-  useEffect(() => {
-    if (!isLoading && user && !isLoggingOut) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [user, isLoading, isLoggingOut, navigate]);
+  const { user, isLoading } = useAuth();
 
   // Show nothing while checking auth status
   if (isLoading) {
@@ -39,8 +29,12 @@ export default function Home() {
             and data-backed recommendations
           </p>
           <div className={styles.heroCtas}>
-            <Button variant="filled" size="lg" href="/signup">
-              Get Started
+            <Button
+              variant="filled"
+              size="lg"
+              href={user ? '/dashboard' : '/signup'}
+            >
+              {user ? 'Go to Dashboard' : 'Get Started'}
             </Button>
             <Button variant="filled" size="lg" href="/screening">
               Try Screening
