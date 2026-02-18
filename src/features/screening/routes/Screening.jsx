@@ -478,7 +478,7 @@ export default function Screening() {
       <div className={styles.header}>
         <Button
           variant="outlined"
-          href="/dashboard"
+          href={user ? '/dashboard' : '/'}
           icon={<FontAwesomeIcon icon={faChevronLeft} />}
           className={styles.exitButton}
         >
