@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   register as registerService,
   requestSignupOTP as requestSignupOTPService,
@@ -50,6 +50,7 @@ import {
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentStage, setCurrentStage] = useState(0);
   const [isGoingBack, setIsGoingBack] = useState(false);
 
@@ -82,6 +83,7 @@ export default function SignUp() {
   const [errors, setErrors] = useState({});
   const [blurredFields, setBlurredFields] = useState({});
   const [isMessageError, setIsMessageError] = useState(false);
+  const from = location.state?.from;
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -353,7 +355,7 @@ export default function SignUp() {
         setMessage('Registration successful! Redirecting to login...');
         setIsMessageError(false);
         setLoading(false);
-        navigate('/signin');
+        navigate('/signin', { state: { from: from } });
       } else {
         setLoading(false);
         setMessage(
@@ -678,7 +680,10 @@ export default function SignUp() {
 
       {/* Login Link Container */}
       <p style={{ textAlign: 'center', marginTop: 'var(--space-md)' }}>
-        Already have an account? <Link href="/signin">Sign In Here</Link>
+        Already have an account?{' '}
+        <Link href="/signin" state={{ from: from }}>
+          Sign In Here
+        </Link>
       </p>
 
       {/* Show success messages */}

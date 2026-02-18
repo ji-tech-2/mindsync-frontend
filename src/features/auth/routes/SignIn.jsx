@@ -181,6 +181,7 @@ export default function SignIn() {
         variant="outlined"
         fullWidth
         href="/signup"
+        state={{ from: from }}
         style={{ marginTop: 'var(--space-sm)' }}
       >
         Create Account

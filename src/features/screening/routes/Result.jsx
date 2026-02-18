@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
 import { pollPredictionResult } from '@/services';
 import { Button } from '@/components';
@@ -10,6 +10,7 @@ import styles from './Result.module.css';
 
 const ResultPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { predictionId } = useParams();
   const { user } = useAuth();
   const [resultData, setResultData] = useState(null);
@@ -298,10 +299,19 @@ const ResultPage = () => {
                 based on your results.
               </p>
               <div className={styles.buttonGroup}>
-                <Button variant="filled" href="/signin">
+                <Button
+                  variant="filled"
+                  href="/signin"
+                  state={{ from: location }}
+                >
                   Sign In
                 </Button>
-                <Button variant="outlined" href="/signup">
+
+                <Button
+                  variant="outlined"
+                  href="/signup"
+                  state={{ from: location }}
+                >
                   Register
                 </Button>
               </div>
