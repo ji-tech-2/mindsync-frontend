@@ -14,6 +14,8 @@ import styles from './WeeklyChart.module.css';
 import Card from '../Card';
 import Button from '../Button';
 import Dropdown from '../Dropdown';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
 // Category thresholds from Flask model (model.py categorize_mental_health_score)
 const THRESHOLDS = { DANGEROUS: 12, NOT_HEALTHY: 28.6, AVERAGE: 61.4 };
@@ -191,7 +193,11 @@ export default function WeeklyChart({
         {!minimal && (
           <div className={styles['chart-header']}>
             <h2>{title}</h2>
-            <Button iconOnly icon="↗" href="/history" />
+            <Button
+              iconOnly
+              icon={<FontAwesomeIcon icon={faAngleRight} />}
+              href="/history"
+            />
           </div>
         )}
 
