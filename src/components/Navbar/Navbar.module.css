@@ -59,6 +59,14 @@
 .logo {
   height: 2rem;
   width: auto;
+  transition:
+    opacity 0.35s ease,
+    transform var(--transition-fast);
+}
+
+.logoHidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Navigation Actions */
