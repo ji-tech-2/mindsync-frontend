@@ -26,7 +26,7 @@
 
 .title {
   font-family: var(--font-body);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-light);
   text-align: left;
