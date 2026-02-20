@@ -1,5 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLink } from '@fortawesome/free-solid-svg-icons';
 import styles from './CriticalFactorCard.module.css';
 import Card from '@/components/Card';
 import { getFeatureImage } from '@/utils/featureNames';
@@ -69,18 +70,32 @@ const CriticalFactorCard = ({ data, loading }) => {
           <div className={styles.referenceSection}>
             <h4 className={styles.refTitle}>References:</h4>
             <ul className={styles.refList}>
-              {data.references.map((ref, idx) => (
-                <li key={idx} className={styles.refItem}>
-                  <a
-                    href={typeof ref === 'object' ? ref.url : ref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.refLink}
-                  >
-                    Resource {idx + 1}
-                  </a>
-                </li>
-              ))}
+              {data.references.map((ref, idx) => {
+                const href = typeof ref === 'object' ? ref.url : ref;
+                let label;
+                try {
+                  label = new URL(href).hostname.replace(/^www\./, '');
+                } catch {
+                  label = `Resource ${idx + 1}`;
+                }
+                return (
+                  <li key={idx} className={styles.refItem}>
+                    <FontAwesomeIcon
+                      icon={faLink}
+                      className={styles.refIcon}
+                      aria-hidden="true"
+                    />
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.refLink}
+                    >
+                      {label}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}

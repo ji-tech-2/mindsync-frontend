@@ -39,15 +39,15 @@
 }
 
 .refItem {
-  padding-left: var(--space-lg);
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
 }
 
-.refItem::before {
-  content: '🔗';
-  position: absolute;
-  left: 0;
+.refIcon {
+  color: var(--color-primary);
   font-size: 0.75rem;
+  flex-shrink: 0;
 }
 
 .refLink {
