@@ -269,7 +269,7 @@ const ResultPage = () => {
           <Button variant="outlined" href="/screening">
             Retake Test
           </Button>
-          <Button variant="filled" href="/">
+          <Button variant="filled" href={user ? '/dashboard' : '/'}>
             Back to Home
           </Button>
         </div>
