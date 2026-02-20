@@ -71,7 +71,7 @@ describe('Slider', () => {
 
   it('calculates correct background gradient', () => {
     const { container } = render(<Slider min={0} max={10} value={5} />);
-    const input = container.querySelector('input[type="range"]');
-    expect(input.style.background).toContain('50%');
+    const trackOverlay = container.querySelector('[class*="trackOverlay"]');
+    expect(trackOverlay.style.background).toContain('50%');
   });
 });

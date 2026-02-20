@@ -158,12 +158,14 @@ describe('AdviceFactor', () => {
 
       expect(screen.getByText('References:')).toBeTruthy();
 
-      mockFactorData.references.forEach((ref, index) => {
-        const link = screen.getByRole('link', {
-          name: `Resource ${index + 1}`,
-        });
-        expect(link).toBeTruthy();
-        expect(link.href).toBe(ref);
+      const links = screen.getAllByRole('link');
+      const refLinks = links.filter(
+        (l) =>
+          l.getAttribute('href') === mockFactorData.references[0] ||
+          l.getAttribute('href') === mockFactorData.references[1]
+      );
+      expect(refLinks).toHaveLength(2);
+      refLinks.forEach((link) => {
         expect(link.target).toBe('_blank');
         expect(link.rel).toContain('noopener');
       });

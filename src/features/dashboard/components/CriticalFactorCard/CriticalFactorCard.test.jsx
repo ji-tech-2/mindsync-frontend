@@ -94,11 +94,16 @@ describe('CriticalFactorCard Component', () => {
         ],
       };
 
-      render(<CriticalFactorCard data={mockData} loading={false} />);
+      const { container } = render(
+        <CriticalFactorCard data={mockData} loading={false} />
+      );
 
       expect(screen.getByText('References:')).toBeTruthy();
-      expect(screen.getByText('Resource 1')).toBeTruthy();
-      expect(screen.getByText('Resource 2')).toBeTruthy();
+      const links = container.querySelectorAll('a[href]');
+      expect(links.length).toBeGreaterThanOrEqual(2);
+      const hrefs = Array.from(links).map((l) => l.getAttribute('href'));
+      expect(hrefs).toContain('https://example.com/sleep-study');
+      expect(hrefs).toContain('https://example.com/mental-health');
     });
 
     it('should handle object references with url property', () => {
