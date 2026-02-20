@@ -1,11 +1,13 @@
 import React from 'react';
 import CollapsibleCard from '@/components/CollapsibleCard';
-import { getFeatureDisplayName } from '@/utils/featureNames';
+import { getFeatureDisplayName, getFeatureIcon } from '@/utils/featureNames';
 import styles from './AdviceFactor.module.css';
 
 const AdviceFactor = ({ factorKey, factorData }) => {
+  const displayName = getFeatureDisplayName(factorKey);
+  const icon = getFeatureIcon(displayName);
   return (
-    <CollapsibleCard title={getFeatureDisplayName(factorKey)}>
+    <CollapsibleCard title={displayName} icon={icon}>
       <div className={styles.content}>
         <ul className={styles.list}>
           {factorData.advices.map((item, index) => (
