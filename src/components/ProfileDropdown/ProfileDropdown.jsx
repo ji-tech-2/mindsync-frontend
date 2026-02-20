@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGear, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '@/features/auth';
 import Card from '../Card';
 import Button from '../Button';
@@ -62,10 +64,22 @@ function ProfileDropdown() {
 
             {/* Action Buttons */}
             <div className={styles.actions}>
-              <Button variant="outlined" fullWidth href="/profile">
+              <Button
+                variant="outlined"
+                fullWidth
+                href="/profile"
+                icon={<FontAwesomeIcon icon={faGear} />}
+                iconPosition="left"
+              >
                 Settings
               </Button>
-              <Button variant="filled" fullWidth onClick={handleLogout}>
+              <Button
+                variant="filled"
+                fullWidth
+                onClick={handleLogout}
+                icon={<FontAwesomeIcon icon={faRightFromBracket} />}
+                iconPosition="left"
+              >
                 Sign Out
               </Button>
             </div>

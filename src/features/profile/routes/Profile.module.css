@@ -75,14 +75,15 @@
 /* Password Field */
 .passwordField {
   display: flex;
-  flex-direction: column;
-  gap: var(--gutter);
+  flex-direction: row;
+  gap: var(--space-sm);
   align-items: flex-start;
 }
 
 .changePasswordButton {
   flex-shrink: 0;
-  width: 100%;
+  width: auto;
+  margin-top: 0;
 }
 
 /* Loading State */
@@ -176,16 +177,6 @@
 
   .contentSection > .fieldGroup {
     grid-column: span 1;
-  }
-
-  .passwordField {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-
-  .changePasswordButton {
-    width: auto;
-    margin-top: 0;
   }
 
   .sectionTitle h2 {
