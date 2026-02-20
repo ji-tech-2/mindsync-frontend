@@ -10,6 +10,23 @@
  */
 
 // ============================================
+// Font Awesome Icon Imports
+// ============================================
+
+import {
+  faBed,
+  faMoon,
+  faUserClock,
+  faDisplay,
+  faBrain,
+  faPersonRunning,
+  faBriefcase,
+  faScaleBalanced,
+  faChartLine,
+  faLightbulb,
+} from '@fortawesome/free-solid-svg-icons';
+
+// ============================================
 // Image Imports (Optimized with vite-imagetools)
 // ============================================
 
@@ -48,19 +65,19 @@ export const FEATURE_DISPLAY_NAMES = {
 };
 
 // ============================================
-// Icon Mapping for UI Display
+// Icon Mapping for UI Display (Font Awesome icon objects)
 // ============================================
 
 export const FEATURE_ICONS = {
-  'Sleep Quality': '🛏️',
-  'Sleep Duration': '😴',
-  'Age-Related Sleep Needs': '🛏️',
-  'Total Screen Time': '📱',
-  'Stress Level': '😰',
-  'Physical Activity': '🏃',
-  Productivity: '💼',
-  'Sleep & Productivity Balance': '⚖️',
-  'Stress & Productivity Impact': '📊',
+  'Sleep Quality': faBed,
+  'Sleep Duration': faMoon,
+  'Age-Related Sleep Needs': faUserClock,
+  'Total Screen Time': faDisplay,
+  'Stress Level': faBrain,
+  'Physical Activity': faPersonRunning,
+  Productivity: faBriefcase,
+  'Sleep & Productivity Balance': faScaleBalanced,
+  'Stress & Productivity Impact': faChartLine,
 };
 
 // ============================================
@@ -107,9 +124,9 @@ export const getFeatureDisplayName = (featureName) => {
 };
 
 /**
- * Get icon for a feature based on its display name
+ * Get Font Awesome icon object for a feature based on its display name
  * @param {string} displayName - Customer-friendly feature name
- * @returns {string} Emoji icon
+ * @returns {object} Font Awesome icon object
  */
 export const getFeatureIcon = (displayName) => {
   // Check explicit mapping first
@@ -119,16 +136,16 @@ export const getFeatureIcon = (displayName) => {
 
   // Fallback: determine icon based on keywords
   const lowerName = displayName.toLowerCase();
-  if (lowerName.includes('sleep')) return '🛏️';
+  if (lowerName.includes('sleep')) return faBed;
   if (lowerName.includes('exercise') || lowerName.includes('activity'))
-    return '🏃';
-  if (lowerName.includes('screen')) return '📱';
-  if (lowerName.includes('social')) return '👥';
-  if (lowerName.includes('stress')) return '😰';
-  if (lowerName.includes('productivity')) return '💼';
-  if (lowerName.includes('age')) return '👤';
+    return faPersonRunning;
+  if (lowerName.includes('screen')) return faDisplay;
+  if (lowerName.includes('social')) return faBriefcase;
+  if (lowerName.includes('stress')) return faBrain;
+  if (lowerName.includes('productivity')) return faBriefcase;
+  if (lowerName.includes('age')) return faUserClock;
 
-  return '💡'; // Default icon
+  return faLightbulb; // Default icon
 };
 
 /**

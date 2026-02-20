@@ -408,7 +408,7 @@ describe('Result Component - Partial Polling', () => {
       });
 
       const homeLink = screen.getByRole('link', { name: /Back to Home/i });
-      expect(homeLink).toHaveAttribute('href', '/');
+      expect(homeLink).toHaveAttribute('href', '/dashboard');
     });
   });
 

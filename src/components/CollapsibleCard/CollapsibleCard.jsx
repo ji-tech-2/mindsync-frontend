@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Card from '../Card';
 import styles from './CollapsibleCard.module.css';
 
@@ -15,6 +16,7 @@ import styles from './CollapsibleCard.module.css';
  */
 function CollapsibleCard({
   title,
+  icon,
   children,
   defaultExpanded = false,
   className = '',
@@ -43,7 +45,16 @@ function CollapsibleCard({
         aria-expanded={isExpanded}
         type="button"
       >
-        <h3 className={styles.title}>{title}</h3>
+        <h3 className={styles.title}>
+          {icon && (
+            <FontAwesomeIcon
+              icon={icon}
+              className={styles.titleIcon}
+              aria-hidden="true"
+            />
+          )}
+          {title}
+        </h3>
         <svg
           className={`${styles.icon} ${isExpanded ? styles.iconExpanded : ''}`}
           width="24"

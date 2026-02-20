@@ -67,6 +67,8 @@
   font-weight: var(--font-weight-semibold);
   color: white;
   white-space: nowrap;
+  min-width: 7.2rem;
+  text-align: center;
 }
 
 /* Status Badge Colors - Using Semantic Colors */

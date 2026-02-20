@@ -38,7 +38,7 @@ function ScoreDisplay({ score, category, className = '' }) {
         style={{ borderColor: color, color: color }}
       >
         <div className={styles.scoreValue}>{Math.round(score)}</div>
-        <div className={styles.scoreMax}>/100</div>
+        <div className={styles.scoreMax}>/ 100</div>
       </div>
     </div>
   );

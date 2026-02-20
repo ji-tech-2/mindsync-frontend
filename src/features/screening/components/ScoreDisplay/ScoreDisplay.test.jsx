@@ -6,7 +6,7 @@ describe('ScoreDisplay', () => {
   it('renders rounded score', () => {
     render(<ScoreDisplay score={75.6} category="healthy" />);
     expect(screen.getByText('76')).toBeTruthy();
-    expect(screen.getByText('/100')).toBeTruthy();
+    expect(screen.getByText('/ 100')).toBeTruthy();
   });
 
   it('renders integer score', () => {

@@ -26,10 +26,23 @@ const calculatePercentage = (value, min, max) => {
 };
 
 /**
- * Build slider background style
+ * Build track gradient style for the custom track overlay
  */
-const buildSliderBackground = (percentage) => {
-  return `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${percentage}%, var(--color-primary-light) ${percentage}%, var(--color-primary-light) 100%)`;
+const buildTrackGradient = (percentage) => {
+  return `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${percentage}%, var(--color-text-muted) ${percentage}%, var(--color-text-muted) 100%)`;
+};
+
+/**
+ * Build ticks array for each valid step position
+ */
+const buildTicks = (min, max, step) => {
+  const ticks = [];
+  for (let v = min; v <= max + step * 0.001; v += step) {
+    ticks.push(parseFloat(v.toFixed(10)));
+  }
+  // Ensure max is always included
+  if (ticks[ticks.length - 1] !== max) ticks.push(max);
+  return ticks;
 };
 
 /**
@@ -65,6 +78,9 @@ function Slider({
   className = '',
 }) {
   const percentage = calculatePercentage(value, min, max);
+  const ticks = buildTicks(min, max, step);
+  const showTicks = ticks.length <= 11;
+  const showTickLabels = showLabels && ticks.length <= 5;
 
   const handleChange = (e) => {
     const newValue = parseFloat(e.target.value);
@@ -76,23 +92,78 @@ function Slider({
       {showValue && <div className={styles.valueDisplay}>{value}</div>}
 
       <div className={styles.sliderWrapper}>
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step={step}
-          value={value}
-          onChange={handleChange}
-          disabled={disabled}
-          className={styles.slider}
-          style={{ background: buildSliderBackground(percentage) }}
-        />
-
-        {showLabels && (
-          <div className={styles.labels}>
-            <span className={styles.label}>{getLabelText(min, minLabel)}</span>
-            <span className={styles.label}>{getLabelText(max, maxLabel)}</span>
+        <div className={styles.sliderTrackWrapper}>
+          {/* Custom track + tick dots (inset by thumbSize/2 — matches thumb travel range) */}
+          <div
+            className={styles.trackOverlay}
+            style={{ background: buildTrackGradient(percentage) }}
+          >
+            {showTicks && (
+              <div className={styles.ticksContainer}>
+                {ticks.map((tick) => {
+                  const pct = calculatePercentage(tick, min, max);
+                  const isFilled = tick <= value;
+                  return (
+                    <div
+                      key={tick}
+                      className={`${styles.tick} ${isFilled ? styles.tickFilled : styles.tickEmpty}`}
+                      style={{ left: `${pct}%` }}
+                    />
+                  );
+                })}
+              </div>
+            )}
           </div>
+
+          {/* Native input — transparent track, thumb only */}
+          <input
+            type="range"
+            min={min}
+            max={max}
+            step={step}
+            value={value}
+            onChange={handleChange}
+            disabled={disabled}
+            className={styles.slider}
+          />
+        </div>
+
+        {showTickLabels ? (
+          <div className={styles.tickLabels}>
+            {ticks.map((tick, i) => {
+              const pct = calculatePercentage(tick, min, max);
+              const label =
+                tick === min && minLabel !== undefined
+                  ? minLabel
+                  : tick === max && maxLabel !== undefined
+                    ? maxLabel
+                    : tick;
+              // Edge labels: anchor to the dot without centering so they don't overflow
+              const isFirst = i === 0;
+              const isLast = i === ticks.length - 1;
+              const edgeStyle = isFirst
+                ? { left: 0 }
+                : isLast
+                  ? { right: 0 }
+                  : { left: `${pct}%`, transform: 'translateX(-50%)' };
+              return (
+                <span key={tick} className={styles.tickLabel} style={edgeStyle}>
+                  {label}
+                </span>
+              );
+            })}
+          </div>
+        ) : (
+          showLabels && (
+            <div className={styles.labels}>
+              <span className={styles.label}>
+                {getLabelText(min, minLabel)}
+              </span>
+              <span className={styles.label}>
+                {getLabelText(max, maxLabel)}
+              </span>
+            </div>
+          )
         )}
       </div>
     </div>

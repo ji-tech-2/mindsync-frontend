@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '@/features/auth';
 import { ProfileDropdown, Button, ProfileAvatar } from '@/components';
 import logoPrimaryAlt from '@/assets/logo-primary-alt.svg';
@@ -7,8 +9,22 @@ import styles from './Navbar.module.css';
 
 function Navbar() {
   const { user, logoutWithTransition } = useAuth();
+  const { pathname } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(() => window.scrollY < 150);
   const mobileMenuRef = useRef(null);
+
+  const isLogoHidden = isAtTop && pathname === '/';
+
+  // Track scroll position for logo visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsAtTop(window.scrollY < 150);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Close mobile menu when clicking outside
   useEffect(() => {
@@ -67,7 +83,11 @@ function Navbar() {
           className={styles.logoButton}
           aria-label="Home"
         >
-          <img src={logoPrimaryAlt} alt="MindSync" className={styles.logo} />
+          <img
+            src={logoPrimaryAlt}
+            alt="MindSync"
+            className={`${styles.logo}${isLogoHidden ? ` ${styles.logoHidden}` : ''}`}
+          />
         </Link>
 
         {/* Desktop Navigation Items */}
@@ -115,8 +135,16 @@ function Navbar() {
       {/* Mobile Menu Drawer */}
       <div
         ref={mobileMenuRef}
-        className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''}`}
+        className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''} ${!user ? styles.mobileMenuPaddedTop : ''}`}
       >
+        <button
+          className={`${styles.drawerClose}${user ? ` ${styles.drawerCloseDark}` : ''}`}
+          onClick={closeMobileMenu}
+          aria-label="Close menu"
+        >
+          <FontAwesomeIcon icon={faXmark} />
+        </button>
+
         {user && (
           <div className={styles.mobileProfileSection}>
             <ProfileAvatar name={user.name} size="medium" />

@@ -1,4 +1,5 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getFeatureIcon } from '@/utils/featureNames';
 import styles from './DashboardSuggestion.module.css';
 
@@ -46,7 +47,12 @@ const DashboardSuggestion = ({ data, loading }) => {
         {suggestions.map((item, index) => (
           <li key={index} className={styles.suggestionItem}>
             <span className={styles.icon}>
-              {getFeatureIcon(typeof item === 'string' ? item : String(item))}
+              <FontAwesomeIcon
+                icon={getFeatureIcon(
+                  typeof item === 'string' ? item : String(item)
+                )}
+                aria-hidden="true"
+              />
             </span>
             <span className={styles.text}>
               {typeof item === 'string' ? item : String(item)}
