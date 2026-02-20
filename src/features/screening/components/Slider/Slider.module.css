@@ -26,18 +26,40 @@
   width: 100%;
 }
 
+.sliderTrackWrapper {
+  position: relative;
+  width: 100%;
+
+  --thumb-size: 24px;
+  --track-height: 8px;
+}
+
 .slider {
   appearance: none;
+  display: block;
+  position: relative;
   width: 100%;
-  height: 8px;
-  border-radius: var(--radius-full);
+  height: var(--thumb-size);
+  background: transparent;
   outline: none;
-  transition: background var(--transition-fast);
   cursor: pointer;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
 }
 
 .slider:disabled {
   cursor: not-allowed;
+}
+
+/* Hide native track — we render our own */
+.slider::-webkit-slider-runnable-track {
+  background: transparent;
+}
+
+.slider::-moz-range-track {
+  background: transparent;
+  border: none;
 }
 
 /* Webkit browsers (Chrome, Safari, Edge) */
@@ -51,6 +73,7 @@
   border: 3px solid var(--color-bg-light);
   box-shadow: var(--shadow-md);
   transition: all var(--transition-fast);
+  margin-top: 0;
 }
 
 .slider::-webkit-slider-thumb:hover:not(:disabled) {
@@ -84,13 +107,13 @@
 }
 
 /* Error state */
-.container.error .slider {
+.container.error .trackOverlay {
   background: linear-gradient(
     to right,
     var(--color-error) 0%,
     var(--color-error) 0%,
-    var(--color-primary-light) 0%,
-    var(--color-primary-light) 100%
+    var(--color-text-muted) 0%,
+    var(--color-text-muted) 100%
   ) !important;
 }
 
@@ -102,6 +125,70 @@
   background: var(--color-error);
 }
 
+/* Custom track overlay: exactly fills the thumb's travel range */
+.trackOverlay {
+  position: absolute;
+  left: calc(var(--thumb-size) / 2);
+  right: calc(var(--thumb-size) / 2);
+  top: 50%;
+  height: var(--track-height);
+  transform: translateY(-50%);
+  border-radius: var(--radius-full);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Tick slot dots — relative to trackOverlay, so top:50% is perfectly centered */
+.ticksContainer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tick {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: background-color var(--transition-fast);
+}
+
+.tickFilled {
+  background-color: var(--color-primary);
+}
+
+.tickEmpty {
+  background-color: var(--color-text-muted);
+}
+
+/* Per-tick labels (shown when ≤ 10 ticks) */
+
+/* Margins match trackOverlay inset so labels align with dots */
+.tickLabels {
+  position: relative;
+  height: 1.2rem;
+  margin-top: var(--space-xs);
+
+  /* inset matches trackOverlay so pct% positions align with dots */
+  margin-left: calc(var(--thumb-size) / 2);
+  margin-right: calc(var(--thumb-size) / 2);
+  width: calc(100% - var(--thumb-size));
+}
+
+.tickLabel {
+  position: absolute;
+  top: 0;
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Min/max-only fallback labels (> 10 ticks) */
 .labels {
   display: flex;
   justify-content: space-between;
@@ -120,8 +207,8 @@
     font-size: var(--font-size-2xl);
   }
 
-  .slider {
-    height: 6px;
+  .sliderTrackWrapper {
+    --thumb-size: 20px;
   }
 
   .slider::-webkit-slider-thumb {
@@ -132,5 +219,14 @@
   .slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
+  }
+
+  .tick {
+    width: 12px;
+    height: 12px;
+  }
+
+  .tickLabel {
+    font-size: var(--font-size-xs);
   }
 }
