@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '@/features/auth';
 import { ProfileDropdown, Button, ProfileAvatar } from '@/components';
 import logoPrimaryAlt from '@/assets/logo-primary-alt.svg';
@@ -115,8 +117,16 @@ function Navbar() {
       {/* Mobile Menu Drawer */}
       <div
         ref={mobileMenuRef}
-        className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''}`}
+        className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''} ${!user ? styles.mobileMenuPaddedTop : ''}`}
       >
+        <button
+          className={`${styles.drawerClose}${user ? ` ${styles.drawerCloseDark}` : ''}`}
+          onClick={closeMobileMenu}
+          aria-label="Close menu"
+        >
+          <FontAwesomeIcon icon={faXmark} />
+        </button>
+
         {user && (
           <div className={styles.mobileProfileSection}>
             <ProfileAvatar name={user.name} size="medium" />
