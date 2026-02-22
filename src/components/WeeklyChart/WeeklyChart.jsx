@@ -8,7 +8,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-  ReferenceLine,
 } from 'recharts';
 import styles from './WeeklyChart.module.css';
 import Card from '../Card';

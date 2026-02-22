@@ -30,9 +30,6 @@ vi.mock('recharts', () => ({
     <div data-testid="responsive-container">{children}</div>
   ),
   Cell: ({ fill }) => <div data-testid="cell" data-fill={fill} />,
-  ReferenceLine: ({ y, stroke }) => (
-    <div data-testid="reference-line" data-y={y} data-stroke={stroke} />
-  ),
 }));
 
 // Mock Dropdown component
@@ -218,12 +215,6 @@ describe('WeeklyChart', () => {
       expect(optionValues).toContain('work_screen');
       expect(optionValues).toContain('leisure_screen');
       expect(optionValues).not.toContain('screen_time');
-    });
-
-    it('should render reference lines for mental_health_index metric', () => {
-      renderChart({ data: mockData });
-      const referenceLines = screen.getAllByTestId('reference-line');
-      expect(referenceLines.length).toBe(3);
     });
   });
 
