@@ -167,6 +167,7 @@ describe('Login Component', () => {
       };
 
       apiClient.post.mockResolvedValue({ data: mockResponse });
+      apiClient.get.mockRejectedValue(new Error('not mocked'));
 
       renderLogin();
 
@@ -200,6 +201,8 @@ describe('Login Component', () => {
       };
 
       apiClient.post.mockResolvedValue({ data: mockResponse });
+      // getProfile falls back silently when get is not set up
+      apiClient.get.mockRejectedValue(new Error('not mocked'));
 
       renderLogin();
 
@@ -220,6 +223,48 @@ describe('Login Component', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/dashboard', {
         replace: true,
       });
+    });
+
+    it('should hydrate login with full profile data when getProfile succeeds', async () => {
+      const mockSignInResponse = {
+        success: true,
+        user: { email: 'test@example.com', name: 'Test User', userId: 1 },
+      };
+      const mockProfileResponse = {
+        success: true,
+        data: {
+          email: 'test@example.com',
+          name: 'Test User',
+          userId: 1,
+          gender: 'Male',
+          occupation: 'Employed',
+          workRmt: 'Remote',
+          dob: '1990-01-01',
+        },
+      };
+
+      apiClient.post.mockResolvedValue({ data: mockSignInResponse });
+      apiClient.get.mockResolvedValue({ data: mockProfileResponse });
+
+      renderLogin();
+
+      const emailInput = document.querySelector('input[name="email"]');
+      const passwordInput = document.querySelector('input[name="password"]');
+
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+      fireEvent.change(passwordInput, { target: { value: 'password123' } });
+
+      const submitButton = screen.getByRole('button', { name: /sign in/i });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/dashboard', {
+          replace: true,
+        });
+      });
+
+      // getProfile should have been called to hydrate the auth context
+      expect(apiClient.get).toHaveBeenCalled();
     });
 
     it('should handle login failure response', async () => {
@@ -302,6 +347,7 @@ describe('Login Component', () => {
       };
 
       apiClient.post.mockResolvedValue({ data: mockResponse });
+      apiClient.get.mockRejectedValue(new Error('not mocked'));
 
       renderLogin();
 

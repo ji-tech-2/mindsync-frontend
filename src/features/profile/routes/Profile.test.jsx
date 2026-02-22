@@ -285,6 +285,22 @@ describe('Profile Component', () => {
         expect(yearInput.value).toBe('1990');
       });
     });
+
+    it('should reverse-map In-person workRmt from API to On-site for autofill', async () => {
+      servicesModule.getProfile.mockResolvedValue({
+        success: true,
+        data: { ...mockUserData, workRmt: 'In-person' },
+      });
+
+      renderProfile();
+
+      await waitFor(() => {
+        const workRemoteSelect = screen.getByRole('combobox', {
+          name: 'Work Remote',
+        });
+        expect(workRemoteSelect.value).toBe('On-site');
+      });
+    });
   });
 
   describe('Inline Editing', () => {

@@ -1,7 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { signIn as signInService } from '@/services';
+import {
+  signIn as signInService,
+  getProfile as getProfileService,
+} from '@/services';
 import {
   Button,
   TextField,
@@ -106,11 +109,26 @@ export default function SignIn() {
       if (data.success && data.user) {
         setMessage('Sign in successful!');
         setIsMessageError(false);
+
+        // Fetch the full profile so context includes workRmt, occupation, gender,
+        // dob etc. — the sign-in endpoint only returns { email, name, userId }.
+        // Without this, Screening would skip demographic questions but have no
+        // values to build the payload from, causing a 400 from the backend.
+        let fullUser = data.user;
+        try {
+          const profileResponse = await getProfileService();
+          if (profileResponse.success && profileResponse.data) {
+            fullUser = profileResponse.data;
+          }
+        } catch {
+          // Non-fatal: fall back to thin user data; profile can be fetched later
+        }
+
         setLoading(false);
 
         // Use AuthContext login to update global auth state
         // Cookie is automatically sent with subsequent requests
-        login(data.user);
+        login(fullUser);
 
         // Redirect to the page they were trying to visit, or dashboard
         navigate(from, { replace: true });

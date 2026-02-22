@@ -47,6 +47,10 @@ describe('TokenManager - Security', () => {
         email: 'test@example.com',
         name: 'Test User',
         userId: '123',
+        gender: 'Male',
+        occupation: 'Employed',
+        workRmt: 'Remote',
+        dob: '1990-01-01',
         password: 'should-not-store', // This should NOT be stored
       };
       TokenManager.setUserData(userData);
@@ -57,6 +61,11 @@ describe('TokenManager - Security', () => {
       // Should contain safe fields
       expect(stored.email).toBe('test@example.com');
       expect(stored.name).toBe('Test User');
+      // Should contain profile fields needed for screening pre-fill
+      expect(stored.gender).toBe('Male');
+      expect(stored.occupation).toBe('Employed');
+      expect(stored.workRmt).toBe('Remote');
+      expect(stored.dob).toBe('1990-01-01');
     });
   });
 
