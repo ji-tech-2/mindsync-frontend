@@ -6,8 +6,13 @@ import {
 
 // Alias so the badge always shows uppercase text
 const getStatusColor = (category) => getCategoryColor(category);
-const getCategoryLabel = (category) =>
-  getCategoryLabelBase(category).toUpperCase();
+const getCategoryLabel = (category) => {
+  const label = getCategoryLabelBase(category);
+  // If the base function returned the raw input (unknown category), default to Healthy
+  // to stay consistent with the colour which also defaults to healthy.
+  if (category && label === category) return 'HEALTHY';
+  return label.toUpperCase();
+};
 
 /**
  * StatusBadge Component
