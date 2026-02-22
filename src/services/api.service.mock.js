@@ -38,8 +38,23 @@ const setMockSession = (value) => {
 const randomScore = () => Math.floor(Math.random() * 100);
 
 const randomCategory = () => {
-  const categories = ['healthy', 'average', 'not healthy', 'dangerous'];
+  const categories = [
+    'healthy',
+    'above_average',
+    'average',
+    'not healthy',
+    'dangerous',
+  ];
   return categories[Math.floor(Math.random() * categories.length)];
+};
+
+// Derive health_level from a numeric score (mirrors backend categorization)
+const scoreToHealthLevel = (score) => {
+  if (score > 80) return 'healthy';
+  if (score > 61.4) return 'above_average';
+  if (score > 28.6) return 'average';
+  if (score > 12) return 'not healthy';
+  return 'dangerous';
 };
 
 const generateMockUserId = () =>
@@ -607,11 +622,13 @@ export async function getWeeklyChart() {
     date.setDate(today.getDate() - i);
     const hasData = Math.random() > 0.2; // 80% chance of having data
 
+    const mentalHealthIndex = hasData ? randomScore() : 0;
     data.push({
       label: dayLabels[date.getDay()],
       date: date.toISOString().split('T')[0],
       has_data: hasData,
-      mental_health_index: hasData ? randomScore() : 0,
+      mental_health_index: mentalHealthIndex,
+      health_level: hasData ? scoreToHealthLevel(mentalHealthIndex) : null,
       work_screen: hasData ? Math.random() * 12 : 0,
       leisure_screen: hasData ? Math.random() * 8 : 0,
       sleep_duration: hasData ? 6 + Math.random() * 3 : 0,

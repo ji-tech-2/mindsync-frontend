@@ -124,11 +124,12 @@ describe('Security Events', () => {
 });
 
 describe('buildWeeklyChartFromHistory', () => {
-  // Helper: get today's date key in YYYY-MM-DD matching the function's logic
+  // Helper: get today's date key in YYYY-MM-DD (local time) matching the function's logic
   function getTodayKey() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return today.toISOString().split('T')[0];
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
   }
 
   it('should build 7-day chart with correct structure', () => {

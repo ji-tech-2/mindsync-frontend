@@ -67,13 +67,17 @@
   font-weight: var(--font-weight-semibold);
   color: white;
   white-space: nowrap;
-  min-width: 7.2rem;
+  min-width: 8.2rem;
   text-align: center;
 }
 
 /* Status Badge Colors - Using Semantic Colors */
 .healthy {
   background-color: var(--color-green);
+}
+
+.aboveAverage {
+  background-color: var(--color-lime);
 }
 
 .average {
