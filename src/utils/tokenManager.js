@@ -20,7 +20,11 @@ export const TokenManager = {
       email: user.email,
       name: user.name,
       userId: user.userId,
-      // Add other non-sensitive fields as needed
+      // Profile fields needed across the app (e.g. Screening pre-fill)
+      gender: user.gender,
+      occupation: user.occupation,
+      workRmt: user.workRmt,
+      dob: user.dob,
     };
   },
 
