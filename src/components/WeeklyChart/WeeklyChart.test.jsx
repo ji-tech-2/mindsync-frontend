@@ -225,17 +225,6 @@ describe('WeeklyChart', () => {
       const referenceLines = screen.getAllByTestId('reference-line');
       expect(referenceLines.length).toBe(3);
     });
-
-    it('should render reference lines with correct threshold values', () => {
-      renderChart({ data: mockData });
-      const referenceLines = screen.getAllByTestId('reference-line');
-      const yValues = referenceLines.map((line) =>
-        parseFloat(line.getAttribute('data-y'))
-      );
-      expect(yValues).toContain(12);
-      expect(yValues).toContain(28.6);
-      expect(yValues).toContain(61.4);
-    });
   });
 
   describe('Edge Cases', () => {

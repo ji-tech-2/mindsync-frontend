@@ -243,25 +243,6 @@ export default function WeeklyChart({
                   content={<CustomTooltip selectedMetric={selectedMetric} />}
                   cursor={{ fill: 'rgba(0, 0, 0, 0.05)', radius: 8 }}
                 />
-                {selectedMetric === 'mental_health_index' && (
-                  <>
-                    <ReferenceLine
-                      y={12}
-                      stroke={COLORS.DANGEROUS}
-                      strokeDasharray="4 4"
-                    />
-                    <ReferenceLine
-                      y={28.6}
-                      stroke={COLORS.NOT_HEALTHY}
-                      strokeDasharray="4 4"
-                    />
-                    <ReferenceLine
-                      y={61.4}
-                      stroke={COLORS.AVERAGE}
-                      strokeDasharray="4 4"
-                    />
-                  </>
-                )}
                 <Bar
                   dataKey={selectedMetric}
                   radius={[8, 8, 0, 0]}

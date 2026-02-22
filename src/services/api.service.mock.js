@@ -40,7 +40,7 @@ const randomScore = () => Math.floor(Math.random() * 100);
 const randomCategory = () => {
   const categories = [
     'healthy',
-    'above_average',
+    'above average',
     'average',
     'not healthy',
     'dangerous',
@@ -51,7 +51,7 @@ const randomCategory = () => {
 // Derive health_level from a numeric score (mirrors backend categorization)
 const scoreToHealthLevel = (score) => {
   if (score > 80) return 'healthy';
-  if (score > 61.4) return 'above_average';
+  if (score > 61.4) return 'above average';
   if (score > 28.6) return 'average';
   if (score > 12) return 'not healthy';
   return 'dangerous';
