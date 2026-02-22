@@ -8,7 +8,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-  ReferenceLine,
 } from 'recharts';
 import styles from './WeeklyChart.module.css';
 import Card from '../Card';
@@ -16,16 +15,15 @@ import Button from '../Button';
 import Dropdown from '../Dropdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
-
-// Category thresholds from Flask model (model.py categorize_mental_health_score)
-const THRESHOLDS = { DANGEROUS: 12, NOT_HEALTHY: 28.6, AVERAGE: 61.4 };
+import { getCategoryHexColor, getCategoryLabel } from '@/utils';
 
 // Gray color for days without data
 const NO_DATA_COLOR = '#D0D0D0';
 
-// Color constants using CSS variables
+// Color constants (hex — CSS variables are not supported inside Recharts SVG)
 const COLORS = {
   HEALTHY: '#10b981', // var(--color-green)
+  ABOVE_AVERAGE: '#bddd2c', // var(--color-lime)
   AVERAGE: '#f59e0b', // var(--color-yellow)
   NOT_HEALTHY: '#f97316', // var(--color-orange)
   DANGEROUS: '#ef4444', // var(--color-red)
@@ -44,21 +42,11 @@ const METRIC_LABELS = {
   social_activity: 'Social Activity (hrs/week)',
 };
 
-// Get bar color based on model category
-const getBarColor = (value) => {
-  if (value > THRESHOLDS.AVERAGE) return COLORS.HEALTHY; // Healthy - Green
-  if (value > THRESHOLDS.NOT_HEALTHY) return COLORS.AVERAGE; // Average - Yellow
-  if (value > THRESHOLDS.DANGEROUS) return COLORS.NOT_HEALTHY; // Not Healthy - Orange
-  return COLORS.DANGEROUS; // Dangerous - Red
-};
+// Get bar color from health_level field
+const getBarColor = (healthLevel) => getCategoryHexColor(healthLevel);
 
-// Get health status label
-const getHealthStatus = (value) => {
-  if (value > THRESHOLDS.AVERAGE) return 'Healthy';
-  if (value > THRESHOLDS.NOT_HEALTHY) return 'Average';
-  if (value > THRESHOLDS.DANGEROUS) return 'Not Healthy';
-  return 'Dangerous';
-};
+// Get health status label from health_level field
+const getHealthStatus = (healthLevel) => getCategoryLabel(healthLevel);
 
 // Custom X-axis tick that styles days with no data differently
 const CustomXAxisTick = ({ x, y, payload, data }) => {
@@ -107,9 +95,9 @@ const CustomTooltip = ({ active, payload, selectedMetric }) => {
             {selectedMetric === 'mental_health_index' && (
               <p
                 className={styles['tooltip-status']}
-                style={{ color: getBarColor(value) }}
+                style={{ color: getBarColor(entry.health_level) }}
               >
-                {getHealthStatus(value)}
+                {getHealthStatus(entry.health_level)}
               </p>
             )}
           </>
@@ -254,28 +242,6 @@ export default function WeeklyChart({
                   content={<CustomTooltip selectedMetric={selectedMetric} />}
                   cursor={{ fill: 'rgba(0, 0, 0, 0.05)', radius: 8 }}
                 />
-                {selectedMetric === 'mental_health_index' && (
-                  <>
-                    <ReferenceLine
-                      y={THRESHOLDS.DANGEROUS}
-                      stroke={COLORS.DANGEROUS}
-                      strokeDasharray="4 4"
-                      strokeOpacity={0.6}
-                    />
-                    <ReferenceLine
-                      y={THRESHOLDS.NOT_HEALTHY}
-                      stroke={COLORS.NOT_HEALTHY}
-                      strokeDasharray="4 4"
-                      strokeOpacity={0.6}
-                    />
-                    <ReferenceLine
-                      y={THRESHOLDS.AVERAGE}
-                      stroke={COLORS.HEALTHY}
-                      strokeDasharray="4 4"
-                      strokeOpacity={0.6}
-                    />
-                  </>
-                )}
                 <Bar
                   dataKey={selectedMetric}
                   radius={[8, 8, 0, 0]}
@@ -291,7 +257,7 @@ export default function WeeklyChart({
                           entry.has_data === false
                             ? NO_DATA_COLOR
                             : selectedMetric === 'mental_health_index'
-                              ? getBarColor(entry[selectedMetric])
+                              ? getBarColor(entry.health_level)
                               : COLORS.HEALTHY
                         }
                         fillOpacity={entry.has_data === false ? 0.5 : 1}

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import styles from './HistoryItem.module.css';
+import { getCategoryLabel } from '@/utils';
 
 /**
  * Format date to display format
@@ -23,6 +24,8 @@ const getCategoryClass = (cat, styles) => {
   switch (cat.toLowerCase()) {
     case 'healthy':
       return styles.healthy;
+    case 'above_average':
+      return styles.aboveAverage;
     case 'average':
       return styles.average;
     case 'not healthy':
@@ -31,25 +34,6 @@ const getCategoryClass = (cat, styles) => {
       return styles.dangerous;
     default:
       return styles.unknown;
-  }
-};
-
-/**
- * Get display label for category
- */
-const getCategoryLabel = (cat) => {
-  if (!cat) return 'Unknown';
-  switch (cat.toLowerCase()) {
-    case 'healthy':
-      return 'Healthy';
-    case 'average':
-      return 'Average';
-    case 'not healthy':
-      return 'Not Healthy';
-    case 'dangerous':
-      return 'Dangerous';
-    default:
-      return cat;
   }
 };
 

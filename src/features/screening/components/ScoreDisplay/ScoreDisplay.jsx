@@ -1,23 +1,8 @@
 import styles from './ScoreDisplay.module.css';
+import { getCategoryColor } from '@/utils';
 
-// Health thresholds matching the model (same as WeeklyChart)
-const THRESHOLDS = {
-  DANGEROUS: 12,
-  NOT_HEALTHY: 28.6,
-  AVERAGE: 61.4,
-};
-
-/**
- * Get color based on score thresholds
- * @param {string} category - Health category from API
- * @returns {string} CSS variable color
- */
-const getScoreColor = (category) => {
-  if (category === 'dangerous') return 'var(--color-red)';
-  if (category === 'not healthy') return 'var(--color-orange)';
-  if (category === 'average') return 'var(--color-yellow)';
-  return 'var(--color-green)'; // healthy
-};
+// Alias for local readability
+const getScoreColor = (category) => getCategoryColor(category);
 
 /**
  * ScoreDisplay Component

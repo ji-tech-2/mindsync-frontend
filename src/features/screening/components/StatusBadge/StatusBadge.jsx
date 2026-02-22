@@ -1,28 +1,13 @@
 import styles from './StatusBadge.module.css';
+import {
+  getCategoryColor,
+  getCategoryLabel as getCategoryLabelBase,
+} from '@/utils';
 
-/**
- * Get color based on health category
- * @param {string} category - Health category from API
- * @returns {string} CSS variable color
- */
-const getStatusColor = (category) => {
-  if (category === 'dangerous') return 'var(--color-red)';
-  if (category === 'not healthy') return 'var(--color-orange)';
-  if (category === 'average') return 'var(--color-yellow)';
-  return 'var(--color-green)'; // healthy
-};
-
-/**
- * Get formatted label for health category
- * @param {string} category - Health category from API
- * @returns {string} Formatted label
- */
-const getCategoryLabel = (category) => {
-  if (category === 'dangerous') return 'DANGEROUS';
-  if (category === 'not healthy') return 'NOT HEALTHY';
-  if (category === 'average') return 'AVERAGE';
-  return 'HEALTHY';
-};
+// Alias so the badge always shows uppercase text
+const getStatusColor = (category) => getCategoryColor(category);
+const getCategoryLabel = (category) =>
+  getCategoryLabelBase(category).toUpperCase();
 
 /**
  * StatusBadge Component
