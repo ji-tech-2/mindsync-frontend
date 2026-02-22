@@ -23,7 +23,7 @@ const getCategoryClass = (cat, styles) => {
   switch (cat.toLowerCase()) {
     case 'healthy':
       return styles.healthy;
-    case 'above_average':
+    case 'above average':
       return styles.aboveAverage;
     case 'average':
       return styles.average;

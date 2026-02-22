@@ -5,7 +5,7 @@
  * every feature always displays the same colors and labels.
  *
  * Categories (API values):
- *   healthy | above_average | average | not healthy | dangerous
+ *   healthy | above average | average | not healthy | dangerous
  */
 
 // ---------------------------------------------------------------------------
@@ -13,7 +13,7 @@
 // ---------------------------------------------------------------------------
 export const CATEGORY_HEX_COLORS = {
   healthy: '#10b981', // --color-green
-  above_average: '#bddd2c', // --color-lime
+  'above average': '#bddd2c', // --color-lime
   average: '#f59e0b', // --color-yellow
   'not healthy': '#f97316', // --color-orange
   dangerous: '#ef4444', // --color-red
@@ -24,7 +24,7 @@ export const CATEGORY_HEX_COLORS = {
 // ---------------------------------------------------------------------------
 export const CATEGORY_CSS_COLORS = {
   healthy: 'var(--color-green)',
-  above_average: 'var(--color-lime)',
+  'above average': 'var(--color-lime)',
   average: 'var(--color-yellow)',
   'not healthy': 'var(--color-orange)',
   dangerous: 'var(--color-red)',
@@ -35,7 +35,7 @@ export const CATEGORY_CSS_COLORS = {
 // ---------------------------------------------------------------------------
 export const CATEGORY_LABELS = {
   healthy: 'Healthy',
-  above_average: 'Above Average',
+  'above average': 'Above Average',
   average: 'Average',
   'not healthy': 'Not Healthy',
   dangerous: 'Dangerous',
