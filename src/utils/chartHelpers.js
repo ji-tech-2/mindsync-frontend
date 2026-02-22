@@ -12,15 +12,21 @@
  * @param {Array} historyItems - Array of screening history items
  * @returns {Array} Weekly chart data with 7 days
  */
+// Returns YYYY-MM-DD in the browser's local timezone
+const toLocalDateKey = (d) => {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
 export function buildWeeklyChartFromHistory(historyItems) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Group clamped scores by date
+  // Group clamped scores by local date
   const scoresByDate = {};
   historyItems.forEach((item) => {
     const d = new Date(item.created_at || item.date);
-    const key = d.toISOString().split('T')[0];
+    const key = toLocalDateKey(d);
     const raw = item.prediction_score ?? item.score ?? 0;
     const clamped = Math.max(0, Math.min(100, raw));
     if (!scoresByDate[key]) scoresByDate[key] = [];
@@ -32,7 +38,7 @@ export function buildWeeklyChartFromHistory(historyItems) {
   for (let i = 6; i >= 0; i--) {
     const d = new Date(today);
     d.setDate(today.getDate() - i);
-    const key = d.toISOString().split('T')[0];
+    const key = toLocalDateKey(d);
     const scores = scoresByDate[key];
     const hasData = !!scores;
     const avg = scores

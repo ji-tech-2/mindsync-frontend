@@ -12,7 +12,7 @@ describe('HistoryItem', () => {
 
   it('renders the formatted date', () => {
     render(<HistoryItem {...defaultProps} />);
-    // Date formatted in en-US with Asia/Jakarta timezone
+    // Date formatted in en-US using the browser's local timezone
     expect(screen.getByText(/January/)).toBeTruthy();
     expect(screen.getByText(/2024/)).toBeTruthy();
   });

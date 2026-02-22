@@ -12,7 +12,6 @@ const formatDate = (dateString) => {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
-    timeZone: 'Asia/Jakarta',
   });
 };
 
