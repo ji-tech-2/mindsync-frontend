@@ -14,6 +14,7 @@ import {
   StageContainer,
   FormSection,
   Message,
+  SimpleHeader,
 } from '@/components';
 import MultipleChoice from '../components/MultipleChoice';
 import Slider from '../components/Slider';
@@ -24,7 +25,6 @@ import {
   faChevronLeft,
   faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
-import logoPrimaryAlt from '@/assets/logo-primary-alt.svg';
 import styles from './Screening.module.css';
 import VANTA from 'vanta/dist/vanta.fog.min';
 import * as THREE from 'three';
@@ -544,18 +544,7 @@ export default function Screening() {
 
   return (
     <>
-      <div className={styles.header}>
-        <Button
-          variant="outlined"
-          theme="light"
-          href={user ? '/dashboard' : '/'}
-          icon={<FontAwesomeIcon icon={faChevronLeft} />}
-          className={styles.exitButton}
-        >
-          Back to Home
-        </Button>
-        <img src={logoPrimaryAlt} alt="MindSync" className={styles.logo} />
-      </div>
+      <SimpleHeader href={user ? '/dashboard' : '/'} />
 
       <div ref={vantaRef} className={styles.wrapper}>
         <Card
