@@ -16,7 +16,9 @@
 import axios from 'axios';
 import { TokenManager } from '@/utils/tokenManager';
 
-const BASE_URL = import.meta.env.DEV ? '/api' : 'https://api.mindsync.my';
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.DEV ? '/api' : 'https://api.mindsync.my');
 
 /**
  * Axios instance for API calls
