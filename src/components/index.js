@@ -23,3 +23,5 @@ export { default as ProfileDropdown } from './ProfileDropdown';
 export { default as FormContainer } from './FormContainer';
 export { default as StageContainer } from './StageContainer';
 export { default as FormSection } from './FormSection';
+
+export { default as SimpleHeader } from './SimpleHeader';

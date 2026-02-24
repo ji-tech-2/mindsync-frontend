@@ -9,7 +9,7 @@
   position: relative;
   overflow-x: hidden;
   background:
-    linear-gradient(to bottom, rgb(92 86 67 / 40%), rgb(66 62 54 / 60%)),
+    linear-gradient(to bottom, rgb(92 86 67 / 60%), rgb(66 62 54 / 60%)),
     url('@/assets/background.jpg');
   background-size: cover;
   background-position: bottom;

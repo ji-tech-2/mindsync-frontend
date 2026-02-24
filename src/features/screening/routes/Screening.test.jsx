@@ -60,6 +60,11 @@ vi.mock('@/components', () => ({
       {children}
     </div>
   ),
+  SimpleHeader: ({ href, label, className }) => (
+    <div data-testid="simple-header" data-href={href} className={className}>
+      {label || 'Back to Home'}
+    </div>
+  ),
 }));
 
 // Mock screening-local components
