@@ -6,11 +6,10 @@
   min-width: 100%;
   min-height: 100vh;
   padding: var(--space-xl) var(--gutter);
-  padding-top: calc(64px + var(--space-xl));
   position: relative;
   overflow-x: hidden;
   background:
-    linear-gradient(to bottom, rgb(92 86 67 / 40%), rgb(66 62 54 / 60%)),
+    linear-gradient(to bottom, rgb(92 86 67 / 60%), rgb(66 62 54 / 60%)),
     url('@/assets/background.jpg');
   background-size: cover;
   background-position: bottom;
@@ -26,7 +25,6 @@
 @media (width >= 768px) {
   .wrapper {
     padding: var(--space-2xl) var(--gutter);
-    padding-top: calc(64px + var(--space-2xl));
   }
 
   .card {
@@ -38,7 +36,6 @@
 @media (width >= 1024px) {
   .wrapper {
     padding: var(--space-3xl) var(--gutter);
-    padding-top: calc(64px + var(--space-3xl));
   }
 
   .card {
