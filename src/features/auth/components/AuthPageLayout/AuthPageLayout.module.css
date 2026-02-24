@@ -6,6 +6,7 @@
   min-width: 100%;
   min-height: 100vh;
   padding: var(--space-xl) var(--gutter);
+  padding-top: calc(64px + var(--space-xl));
   position: relative;
   overflow-x: hidden;
   background:
@@ -25,6 +26,7 @@
 @media (width >= 768px) {
   .wrapper {
     padding: var(--space-2xl) var(--gutter);
+    padding-top: calc(64px + var(--space-2xl));
   }
 
   .card {
@@ -36,6 +38,7 @@
 @media (width >= 1024px) {
   .wrapper {
     padding: var(--space-3xl) var(--gutter);
+    padding-top: calc(64px + var(--space-3xl));
   }
 
   .card {

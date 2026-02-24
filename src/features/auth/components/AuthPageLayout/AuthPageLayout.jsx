@@ -1,4 +1,4 @@
-import { Card } from '@/components';
+import { Card, SimpleHeader } from '@/components';
 import styles from './AuthPageLayout.module.css';
 
 /**
@@ -13,6 +13,8 @@ import styles from './AuthPageLayout.module.css';
 function AuthPageLayout({ children }) {
   return (
     <div className={styles.wrapper}>
+      <SimpleHeader />
+
       <Card
         padded
         clipOverflow={false}

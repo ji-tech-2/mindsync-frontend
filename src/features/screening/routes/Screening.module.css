@@ -10,24 +10,6 @@
   background-color: var(--color-primary);
 }
 
-.header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--gutter);
-  margin: 0 auto;
-  z-index: 100;
-}
-
-.logo {
-  height: 32px;
-  width: auto;
-}
-
 .card {
   max-width: 100%;
   width: 100%;
@@ -83,10 +65,6 @@
     padding-top: calc(52px + var(--gutter));
   }
 
-  .logo {
-    height: 36px;
-  }
-
   .card {
     max-width: 600px;
     min-height: 400px;
@@ -95,10 +73,6 @@
 
 /* Desktop: 1024px - 12 columns */
 @media (width >= 1024px) {
-  .logo {
-    height: 40px;
-  }
-
   .card {
     max-width: 600px;
   }
