@@ -34,7 +34,7 @@ import sleepImage from '@/assets/feature-images/tania-mousinho-sleep.jpg?w=800&f
 import stressImage from '@/assets/feature-images/vitaly-gariev-stress.jpg?w=800&format=webp&quality=85';
 import exerciseImage from '@/assets/feature-images/vitaly-gariev-exercise.jpg?w=800&format=webp&quality=85';
 import workImage from '@/assets/feature-images/christin-hume-work.jpg?w=800&format=webp&quality=85';
-import wakeImage from '@/assets/feature-images/vitaly-gariev-wake.jpg?w=800&format=webp&quality=85';
+import wakeImage from '@/assets/feature-images/bruce-mars-wake.jpg?w=800&format=webp&quality=85';
 
 // ============================================
 // SINGLE SOURCE OF TRUTH - Feature Display Names
