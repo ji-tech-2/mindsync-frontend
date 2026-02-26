@@ -25,6 +25,8 @@ RUN if [ -f coverage/coverage-summary.json ]; then \
 fi
 
 FROM base AS build
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN npm run build
 
 # Serve using NGINX
