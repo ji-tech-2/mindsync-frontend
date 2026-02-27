@@ -25,15 +25,15 @@ RUN if [ -f coverage/coverage-summary.json ]; then \
 fi
 
 FROM base AS build
-ARG VITE_API_BASE_URL
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN npm run build
 
 # Serve using NGINX
 FROM nginx:alpine
-ARG ENV=prod
 
-COPY nginx.${ENV}.conf /etc/nginx/conf.d/default.conf
+# Copy the nginx conf as a template - the official nginx image processes
+# /etc/nginx/templates/*.template with envsubst at container startup,
+# substituting env vars and writing the result to /etc/nginx/conf.d/
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Create SSL directory

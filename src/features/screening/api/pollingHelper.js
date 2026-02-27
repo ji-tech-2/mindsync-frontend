@@ -107,7 +107,7 @@ function buildPartialResponse(data) {
  */
 export async function pollPredictionResult(predictionId, options = {}) {
   const {
-    baseURL = 'https://api.mindsync.my',
+    baseURL = '/api',
     resultPath = '/v1/predictions',
     maxAttempts = 60,
     interval = 2000,

@@ -96,7 +96,7 @@ mindsync-frontend/
 
 - **Node.js**: 18.x or higher
 - **npm**: 9.x or higher
-- **Backend**: Spring Boot backend running on `https://api.mindsync.my` (or configure in `api.js`)
+- **Backend**: Spring Boot backend (default: `http://localhost:8000` for dev, configured via `API_BASE_URL` for Docker)
 
 ### Installation
 
@@ -115,13 +115,10 @@ mindsync-frontend/
 
 3. **Configure API endpoint** (optional)
 
-   Edit `src/config/api.js` if your backend is on a different URL:
+   By default, `npm run dev` proxies `/api` to `http://localhost:8000`. To point at a different backend, create `.env.local`:
 
-   ```javascript
-   export const API_CONFIG = {
-     BASE_URL: import.meta.env.DEV ? '/api' : 'http://your-backend-url:8000',
-     // ...
-   };
+   ```env
+   VITE_API_TARGET=http://localhost:9090
    ```
 
 4. **Start development server**
@@ -148,17 +145,15 @@ npm run test:coverage # Generate test coverage report
 
 ### Environment Variables
 
-Create a `.env` file in the root directory (optional):
+For `npm run dev`, override the backend proxy target by creating `.env.local`:
 
 ```env
-VITE_API_URL=https://api.mindsync.my
+VITE_API_TARGET=http://localhost:9090
 ```
 
-Access in code:
+For Docker deployments, pass `API_BASE_URL` at container startup (see Docker section below).
 
-```javascript
-const apiUrl = import.meta.env.VITE_API_URL;
-```
+No environment variables are baked into the image at build time.
 
 ## Testing
 
@@ -377,28 +372,12 @@ git commit -m "test: add tests for login"
 
 ## Docker
 
-Build and run with Docker:
-
-**Development** (accepts localhost, 127.0.0.1, or any hostname):
+All requests to `/api/*` are proxied to `API_BASE_URL` by nginx. The URL is injected at container startup via nginx's built-in template mechanism — it is **not** baked into the image, so the same image works for any environment.
 
 ```bash
-# Build image with development configuration
-docker build --build-arg ENV=dev -t mindsync-frontend .
-
-# Run container
-docker run -p 80:80 -p 443:443 mindsync-frontend
-```
-
-Access at `https://localhost` (accept the self-signed certificate warning)
-
-**Production** (mindsync.my only):
-
-```bash
-# Build image with production configuration
-docker build --build-arg ENV=prod -t mindsync-frontend .
-
-# Run container with Let's Encrypt certificates
+docker build -t mindsync-frontend .
 docker run -p 80:80 -p 443:443 \
+  -e API_BASE_URL=https://api.yourdomain.com \
   -v /etc/letsencrypt/live/mindsync.my/fullchain.pem:/etc/nginx/ssl/cert.pem:ro \
   -v /etc/letsencrypt/live/mindsync.my/privkey.pem:/etc/nginx/ssl/key.pem:ro \
   mindsync-frontend
@@ -419,32 +398,14 @@ docker run -p 80:80 -p 443:443 \
 
 ### API Endpoint Configuration
 
-The backend API URL is configured in `src/config/api.js`:
+All API calls from the SPA use the relative path `/api`. This is proxied to the real backend in two ways:
 
-- **Development**: Uses Vite proxy at `/api` to bypass CORS
-- **Production**: Uses direct HTTPS URL to backend (`https://api.mindsync.my`)
+| Context          | How `/api` is resolved                                                          |
+| ---------------- | ------------------------------------------------------------------------------- |
+| `npm run dev`    | Vite dev server proxies to `VITE_API_TARGET` (default: `http://localhost:8000`) |
+| Docker container | nginx proxies to `API_BASE_URL` (passed via `-e` at `docker run`)               |
 
-To change the API endpoint, modify `src/config/api.js`:
-
-```javascript
-export const API_CONFIG = {
-  BASE_URL: import.meta.env.DEV ? '/api' : 'https://your-api-domain.com',
-  // ... rest of config
-};
-```
-
-And update the Vite proxy target in `vite.config.js`:
-
-```javascript
-server: {
-  proxy: {
-    '/api': {
-      target: 'https://your-api-domain.com',
-      // ... rest of proxy config
-    },
-  },
-},
-```
+`nginx.conf` contains `${API_BASE_URL}` as a placeholder. The official nginx Docker image processes it as a template at container startup using `envsubst`, so no rebuild is needed to change the backend URL.
 
 ## Contributing
 
