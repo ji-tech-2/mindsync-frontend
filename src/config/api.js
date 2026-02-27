@@ -9,16 +9,15 @@
  * - Credentials automatically included with requests (withCredentials: true)
  *
  * Base URL Configuration:
- * - Development: Uses Vite proxy (/api) to bypass CORS
- * - Production: Uses direct HTTPS URL (https://api.mindsync.my)
+ * - All requests use relative path /api, which nginx proxies to the backend.
+ * - In production: nginx template substitutes ${API_BASE_URL} at container startup.
+ * - In development (npm run dev): Vite dev server proxies /api → localhost:8000.
  */
 
 import axios from 'axios';
 import { TokenManager } from '@/utils/tokenManager';
 
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  (import.meta.env.DEV ? '/api' : 'https://api.mindsync.my');
+const BASE_URL = '/api';
 
 /**
  * Axios instance for API calls
