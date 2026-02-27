@@ -17,7 +17,7 @@
 import axios from 'axios';
 import { TokenManager } from '@/utils/tokenManager';
 
-const BASE_URL = '/api';
+const BASE_URL = import.meta.env.API_BASE_URL + '/api';
 
 /**
  * Axios instance for API calls
